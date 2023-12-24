@@ -1,0 +1,11 @@
+/node_modules/
+/lib/
+/test/
+custom-elements.json
+# top level source
+hexchess-board.js
+hexchess-board.js.map
+hexchess-board.d.ts
+hexchess-board.d.ts.map
+# only generated for size check
+hexchess-board.bundled.js
