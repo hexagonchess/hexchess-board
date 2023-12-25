@@ -4,8 +4,10 @@
 custom-elements.json
 # top level source
 hexchess-board.js
-hexchess-board.js.map
-hexchess-board.d.ts
-hexchess-board.d.ts.map
+piece.js
+utils.js
+*.js.map
+*.d.ts
+*.d.ts.map
 # only generated for size check
 hexchess-board.bundled.js
