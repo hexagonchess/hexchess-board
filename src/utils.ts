@@ -198,28 +198,6 @@ export const ANNOTATED_BLACK_SQUARES: Square[] = [
   'L2',
   'L1',
 ];
-const WHITE_PAWN_TWO_SQUARES: Square[] = [
-  'B1',
-  'C2',
-  'D3',
-  'E4',
-  'F5',
-  'G4',
-  'H3',
-  'I2',
-  'K1',
-]
-const BLACK_PAWN_TWO_SQUARES: Square[] = [
-  'B7',
-  'C7',
-  'D7',
-  'E7',
-  'F7',
-  'G7',
-  'H7',
-  'I7',
-  'K7',
-]
 
 export const PIECE_SIZE = 45;
 
@@ -597,65 +575,3 @@ const numberOfRows = (column: Column): number => {
       return 11;
   }
 };
-
-const getTopSquare = (square: Square): Square | null => {
-  switch (square) {
-    case 'A6':
-    case 'B7':
-    case 'C8':
-    case 'D9':
-    case 'E10':
-    case 'F11':
-    case 'G10':
-    case 'H9':
-    case 'I8':
-    case 'K7':
-    case 'L6':
-      return null;
-    default: {
-      const column = square[0];
-      const row = Number.parseInt(square.slice(1));
-      return `${column}${row + 1}` as Square;
-    }
-  }
-}
-
-const getBottomSquare = (square: Square): Square | null => {
-  const column = square[0];
-  const row = Number.parseInt(square.slice(1));
-  if (row === 1) {
-    return null;
-  }
-  return `${column}${row - 1}` as Square;
-}
-
-const allMovesForPawn = (currentSquare: Square, board: FullBoard): Square[] => {
-  const pawn = board[currentSquare];
-  const isWhitePawn = pawn === 'P';
-  const squares: Square[] = []
-  if (isWhitePawn) {
-    const oneUp = getTopSquare(currentSquare);
-    if (oneUp !== null && board[oneUp] === null) {
-      squares.push(oneUp);
-      if (WHITE_PAWN_TWO_SQUARES.includes(currentSquare)) {
-        const twoUp = getTopSquare(oneUp);
-        if (twoUp !== null && board[twoUp] === null) {
-          squares.push(twoUp);
-        }
-      }
-    }
-  } else {
-    const oneDown = getBottomSquare(currentSquare);
-    if (oneDown !== null && board[oneDown] === null) {
-      squares.push(oneDown);
-      if (BLACK_PAWN_TWO_SQUARES.includes(currentSquare)) {
-        const twoDown = getBottomSquare(oneDown);
-        if (twoDown !== null && board[twoDown] === null) {
-          squares.push(twoDown);
-        }
-      }
-    }
-  }
-
-  return squares;
-}

@@ -57,6 +57,14 @@ export class HexchessBoard extends LitElement {
     .label {
       fill: var(--hexchess-label-bg, #ffffff);
       font-size: var(--hexchess-label-size, 12px);
+      /* Disable user selection */
+      /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
     }
 
     .white {
