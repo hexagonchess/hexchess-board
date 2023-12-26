@@ -28,15 +28,16 @@ import {renderPiece} from './piece';
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
  *
- * @cssprop [--hexchess-white-bg=#0fafdb]          - The background color of the white tiles.
- * @cssprop [--hexchess-selected-white-bg=#a68a2d] - The background color of a white tile that's selected to be moved.
- * @cssprop [--hexchess-black-bg=#2a5966]          - The background color of the black tiles.
- * @cssprop [--hexchess-selected-black-bg=#a68a2d] - The background color of a black tile that's selected to be moved.
- * @cssprop [--hexchess-grey-bg=#24829c]           - The background color of the grey tiles.
- * @cssprop [--hexchess-selected-grey-bg=#a68a2d]  - The background color of a grey tile that's selected to be moved.
- * @cssprop [--hexchess-label-bg=#ffffff]          - The background color of the column and row labels.
- * @cssprop [--hexchess-label-size=12px]           - The font size of the column and row labels.
- * @cssprop [--hexchess-possible-move-bg=#a68a2d]  - The fill color of the small circle shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-white-bg=#0fafdb]            - The background color of the white tiles.
+ * @cssprop [--hexchess-selected-white-bg=#a68a2d]   - The background color of a white tile that's selected to be moved.
+ * @cssprop [--hexchess-black-bg=#2a5966]            - The background color of the black tiles.
+ * @cssprop [--hexchess-selected-black-bg=#a68a2d]   - The background color of a black tile that's selected to be moved.
+ * @cssprop [--hexchess-grey-bg=#24829c]             - The background color of the grey tiles.
+ * @cssprop [--hexchess-selected-grey-bg=#a68a2d]    - The background color of a grey tile that's selected to be moved.
+ * @cssprop [--hexchess-label-bg=#ffffff]            - The background color of the column and row labels.
+ * @cssprop [--hexchess-label-size=12px]             - The font size of the column and row labels.
+ * @cssprop [--hexchess-possible-move-bg=#a68a2d]    - The fill color of the small dot shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-attempted-move-bg=#a68a2d88] - The fill color of a hexgon when the user drags over a square, trying to move there.
  */
 @customElement('hexchess-board')
 export class HexchessBoard extends LitElement {
@@ -49,9 +50,13 @@ export class HexchessBoard extends LitElement {
       cursor: grabbing;
     }
 
-    polygon .possible-move {
-      stroke: var(--hexchess-possible-move-stroke, #a68a2d);
-      stroke-width: 10;
+    .piece {
+      fill: var(--hexchess-piece-bg, #000000);
+      pointer-events: none;
+    }
+
+    .possible-move > polygon {
+      fill: var(--hexchess-possible-move-bg, #a68a2d88);
     }
 
     .label {
@@ -109,6 +114,22 @@ export class HexchessBoard extends LitElement {
   private _draggedDiv?: HTMLDivElement;
   private _draggedSquare: Square | null = null;
   private _initialDragPosition: {x: number; y: number} | null = null;
+  private _hexagonPoints: Record<Square, number[][]> = {} as Record<
+    Square,
+    number[][]
+  >;
+  private _lastKnownWidth: number | null = null;
+  private _hexagonPointsAsString: Record<Square, string> = {} as Record<
+    Square,
+    string
+  >;
+  private _polygonWidth = 0;
+  private _polygonHeight = 0;
+  private _columnConfig: ColumnConfig = {} as ColumnConfig;
+  private _offsets: Record<Square, [number, number]> = {} as Record<
+    Square,
+    [number, number]
+  >;
 
   // -----------------
   // Public properties
@@ -183,11 +204,21 @@ export class HexchessBoard extends LitElement {
   @property({type: Number})
   width?: number;
 
+  constructor() {
+    super();
+    if (!this.width) {
+      this._lastKnownWidth = this.height;
+    }
+    this._recalculateBoardCoordinates(this.width ?? this.height, this.height);
+  }
+
   // ---------------
   // Event listeners
   // ---------------
 
-  private _handleMouseDown(event: MouseEvent, square: Square) {
+  private _handleMouseDown(event: MouseEvent | PointerEvent) {
+    event.preventDefault();
+
     // Only primary button interactions
     if (event.button !== 0) {
       return;
@@ -198,6 +229,25 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
+    if (!this._hexagonPoints) {
+      return;
+    }
+
+    const square = this._getSquareFromClick(event);
+    if (square === null) {
+      // Clicking outside the board should erase any previous clicks
+      if (
+        this._from !== null ||
+        this._draggedPiece !== null ||
+        this._draggedSquare !== null
+      ) {
+        this._from = null;
+        this._draggedPiece = null;
+        this._draggedSquare = null;
+        this.requestUpdate('board');
+      }
+      return;
+    }
     if (this._from === null) {
       if (Object.keys(this._currentPosition).length === 0) {
         return;
@@ -216,6 +266,9 @@ export class HexchessBoard extends LitElement {
       this._draggedPiece = piece;
       this._initialDragPosition = {x: event.clientX, y: event.clientY};
       if (this._draggedDiv) {
+        // const deltaX = event.clientX - this._initialDragPosition!.x;
+        // const deltaY = event.clientY - this._initialDragPosition!.y;
+        // this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
         this._draggedDiv.style.left = `${event.clientX}px`;
         this._draggedDiv.style.top = `${event.clientY}px`;
       }
@@ -223,18 +276,89 @@ export class HexchessBoard extends LitElement {
       this.requestUpdate('board');
       return;
     }
-  }
 
-  private _handleMouseUp(event: MouseEvent, square: Square) {
-    // only primary button interactions
-    if (event.button !== 0) {
-      this._draggedSquare = null;
-      this._draggedPiece = null;
-      this._from = null;
+    // Since this._from is not null, we know the user has clicked or dragged another piece
+
+    // Now trying to click or drag on a different piece, erase the click entirely, or click to move
+    if (square !== this._from) {
+      if (Object.keys(this._currentPosition).length === 0) {
+        this._from = null;
+        this._draggedPiece = null;
+        this._draggedSquare = null;
+        this.requestUpdate('board');
+        return;
+      }
+
+      // No piece is on this square - either the user is trying to move the piece here or erase the click
+      const fullBoard = this._currentPosition as FullBoard;
+      if (fullBoard[square] === null) {
+        // Legal move, so we let the user make it
+        if (
+          this._legalMoves &&
+          this._from in this._legalMoves &&
+          this._legalMoves[this._from].has(square)
+        ) {
+          this.move(this._from, square);
+          return;
+        }
+
+        // Erase the click
+        this._from = null;
+        this._draggedPiece = null;
+        this._draggedSquare = null;
+        this.requestUpdate('board');
+        return;
+      }
+
+      // Clicking on an empty square - either making a move or erasing
+      const piece = fullBoard[square];
+      if (piece === null) {
+        // Legal move, so we let the user make it
+        if (
+          this._legalMoves &&
+          this._from in this._legalMoves &&
+          this._legalMoves[this._from].has(square)
+        ) {
+          this.move(this._from, square);
+          return;
+        }
+
+        // Illegal move, so we erase the click
+        this._from = null;
+        this._draggedPiece = null;
+        this._draggedSquare = null;
+        this.requestUpdate('board');
+        return;
+      }
+
+      this._draggedPiece = piece;
+      this._initialDragPosition = {x: event.clientX, y: event.clientY};
+      if (this._draggedDiv) {
+        // const deltaX = event.clientX - this._initialDragPosition!.x;
+        // const deltaY = event.clientY - this._initialDragPosition!.y;
+        // this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        this._draggedDiv.style.left = `${event.clientX}px`;
+        this._draggedDiv.style.top = `${event.clientY}px`;
+      }
+      this._from = square;
       this.requestUpdate('board');
       return;
     }
 
+    // User is clicking on the exact same piece they previously clicked on
+    // They're either toggling it to be unselected or trying to drag/move it again
+  }
+
+  private _handleMouseEnter(square: Square) {
+    if (!this._from || !this._draggedPiece || !this._draggedDiv) {
+      return;
+    }
+
+    this._draggedSquare = square;
+    this.requestUpdate('board');
+  }
+
+  private _handleMouseUp(event: MouseEvent | PointerEvent) {
     if (this._from === null) {
       this._draggedSquare = null;
       this._draggedPiece = null;
@@ -245,34 +369,41 @@ export class HexchessBoard extends LitElement {
 
     if (this._legalMoves && !(this._from in this._legalMoves)) {
       this._draggedSquare = null;
-      this._from = null;
       this._draggedPiece = null;
       this.requestUpdate('board');
       return;
     }
+
+    const square = this._getSquareFromClick(event);
+    if (square === null) {
+      this._draggedSquare = null;
+      this._draggedPiece = null;
+      this.requestUpdate('board');
+      return;
+    }
+
     if (
       this._legalMoves &&
       this._from in this._legalMoves &&
       !this._legalMoves[this._from].has(square)
     ) {
-      this._draggedSquare = null;
       this._draggedPiece = null;
-      this._from = null;
+      this._draggedSquare = null;
       this.requestUpdate('board');
       return;
     }
 
-    this.move(this._from, square);
-  }
-
-  private _handleMouseEnter(square: Square) {
-    this._draggedSquare = square;
-  }
-
-  private _handleMouseMove(event: MouseEvent) {
-    if (!this._draggedPiece || !this._from || !this._draggedDiv) {
-      this._from = null;
+    if (!this.move(this._from, square)) {
       this._draggedPiece = null;
+      this._draggedSquare = null;
+      this.requestUpdate('board');
+    }
+  }
+
+  private _handleMouseMove(event: MouseEvent | PointerEvent) {
+    if (!this._draggedPiece || !this._from || !this._draggedDiv) {
+      this._draggedPiece = null;
+      this._draggedSquare = null;
       return;
     }
 
@@ -295,7 +426,34 @@ export class HexchessBoard extends LitElement {
     this.requestUpdate('board');
   }
 
-  private _columnConfig(boardWidth: number, boardHeight: number): ColumnConfig {
+  private _calculateHexagonPoints(width: number, height: number): number[][] {
+    const quarterWidth = width / 4;
+    const threeQuarterWidth = quarterWidth * 3;
+    const halfHeight = height / 2;
+    return [
+      [quarterWidth, 0],
+      [threeQuarterWidth, 0],
+      [width, halfHeight],
+      [threeQuarterWidth, height],
+      [quarterWidth, height],
+      [0, halfHeight],
+    ];
+  }
+
+  private _calculateHexagonPointsAsString(
+    width: number,
+    height: number
+  ): string {
+    const quarterWidth = width / 4;
+    const threeQuarterWidth = quarterWidth * 3;
+    const halfHeight = height / 2;
+    return `${quarterWidth},0 ${threeQuarterWidth},0 ${width},${halfHeight} ${threeQuarterWidth},${height} ${quarterWidth},${height} 0,${halfHeight}`;
+  }
+
+  private _calculateColumnConfig(
+    boardWidth: number,
+    boardHeight: number
+  ): ColumnConfig {
     const polygonWidth = boardWidth / 12;
     const polygonHeight = boardHeight / 12;
     const polygonHalfHeight = polygonHeight / 2;
@@ -384,6 +542,43 @@ export class HexchessBoard extends LitElement {
     return newLegalMoves as Record<Square, Set<Square>>;
   }
 
+  private _getSquareFromClick(event: MouseEvent | PointerEvent): Square | null {
+    if (!event.target) {
+      return null;
+    }
+
+    if (!(event.target instanceof SVGElement)) {
+      return null;
+    }
+
+    const parent = event.target.parentElement;
+    if (!parent) {
+      return null;
+    }
+
+    const dataset = parent.dataset;
+    if (!dataset || !('square' in dataset)) {
+      return null;
+    }
+
+    return dataset.square as Square;
+  }
+
+  private _getOffsets(square: Square, config: ColumnConfig): [number, number] {
+    const column = square[0] as Column;
+    const row = parseInt(square.slice(1));
+
+    const xOffset = config[column].x;
+    const baseOffset = config[column].y;
+    const numHexagons = this._numberOfHexagons(column);
+
+    const yOffset =
+      this.orientation === 'white'
+        ? baseOffset + this._polygonHeight * (numHexagons - (row - 1))
+        : baseOffset + this._polygonHeight * (row - 1);
+    return [xOffset, yOffset];
+  }
+
   private _numberOfHexagons(column: Column): number {
     switch (column) {
       case 'A':
@@ -406,6 +601,29 @@ export class HexchessBoard extends LitElement {
     }
   }
 
+  private _recalculateBoardCoordinates(width: number, height: number) {
+    this._polygonWidth = width / 12;
+    this._polygonHeight = height / 12;
+    this._columnConfig = this._calculateColumnConfig(width, height);
+    for (const column of COLUMN_ARRAY) {
+      const numHexagons = this._numberOfHexagons(column);
+      for (let row = 1; row <= numHexagons; row++) {
+        const square = `${column}${row}` as Square;
+        const [xOffset, yOffset] = this._getOffsets(square, this._columnConfig);
+        this._offsets[square] = [xOffset, yOffset];
+        this._hexagonPoints[square] = this._calculateHexagonPoints(
+          this._polygonWidth,
+          this._polygonHeight
+        ).map((point) => [point[0] + xOffset, point[1] + yOffset]);
+        this._hexagonPointsAsString[square] =
+          this._calculateHexagonPointsAsString(
+            this._polygonWidth,
+            this._polygonHeight
+          );
+      }
+    }
+  }
+
   private _recalculateLegalMoves(_fullBoard: FullBoard) {
     return undefined;
   }
@@ -423,7 +641,10 @@ export class HexchessBoard extends LitElement {
 
   private _renderPiece(column: Column, row: number, size: number) {
     const square = `${column}${row}` as keyof Board;
-    if (!this._currentPosition[square] || this._from === square) {
+    if (
+      !this._currentPosition[square] ||
+      (this._from === square && this._draggedSquare !== null)
+    ) {
       return nothing;
     }
     return renderPiece(this._currentPosition[square], size);
@@ -493,23 +714,10 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  private _renderColumn(
-    column: Column,
-    width: number,
-    height: number,
-    config: ColumnConfig
-  ) {
-    const xOffset = config[column].x;
-    const yOffset = config[column].y;
-    const colors = config[column].colors;
+  private _renderColumn(column: Column) {
+    const colors = this._columnConfig[column].colors;
 
     const numHexagons = this._numberOfHexagons(column);
-    const getYOffset = (row: number) => {
-      if (this.orientation === 'white') {
-        return yOffset + height * (numHexagons - row);
-      }
-      return yOffset + height * row;
-    };
 
     return svg`
       <g id="column-${column}">
@@ -521,26 +729,36 @@ export class HexchessBoard extends LitElement {
           const possibleMove =
             this._draggedSquare === `${column}${i + 1}` ? 'possible-move' : '';
           const classes = `${selectedClass} ${possibleMove}`;
+          const square = `${column}${i + 1}` as Square;
+          const offset = this._getOffsets(square, this._columnConfig);
           return svg`
             <g
+              @pointerenter=${() => this._handleMouseEnter(square)}
               class=${classes}
-              transform="translate(${xOffset},${getYOffset(i)})"
-              @mousedown=${(event: MouseEvent) =>
-                this._handleMouseDown(event, `${column}${i + 1}` as Square)}
-              @pointermove=${(event: MouseEvent) =>
-                requestAnimationFrame(() => this._handleMouseMove(event))}
-              @mouseenter=${() =>
-                this._handleMouseEnter(`${column}${i + 1}` as Square)}
-              @mouseup=${(event: MouseEvent) =>
-                this._handleMouseUp(event, `${column}${i + 1}` as Square)}
+              data-square=${square}
+              transform="translate(${offset[0]},${offset[1]})"
             >
-              ${this._renderHexagon(width, height, color)}
-              ${this._renderDot(width, height, column, i + 1)}
-              ${this._renderColumnLabel(column, i + 1, width, height)}
-              ${this._renderCoordinate(column, i + 1, width)}
-              <g transform="translate(${width / 2 - 45 / 2},${
-            height / 2 - 45 / 2
-          })">
+              ${this._renderHexagon(
+                this._polygonWidth,
+                this._polygonHeight,
+                color
+              )}
+              ${this._renderDot(
+                this._polygonWidth,
+                this._polygonHeight,
+                column,
+                i + 1
+              )}
+              ${this._renderColumnLabel(
+                column,
+                i + 1,
+                this._polygonWidth,
+                this._polygonHeight
+              )}
+              ${this._renderCoordinate(column, i + 1, this._polygonWidth)}
+              <g class="piece" transform="translate(${
+                this._polygonWidth / 2 - 45 / 2
+              },${this._polygonHeight / 2 - 45 / 2})">
                 ${this._renderPiece(column, i + 1, PIECE_SIZE)}
               </g>
             </g>
@@ -578,7 +796,7 @@ export class HexchessBoard extends LitElement {
       return nothing;
     }
 
-    const radius = Math.min(width / 10, 5);
+    const radius = Math.min(this._polygonHeight, this._polygonWidth) / 6;
     return svg`<circle
       cx=${width / 2}
       cy=${height / 2}
@@ -587,35 +805,27 @@ export class HexchessBoard extends LitElement {
   }
 
   private _renderHexagon(width: number, height: number, color: TileColor) {
-    const quarterWidth = width / 4;
-    const threeQuarterWidth = quarterWidth * 3;
-    const halfHeight = height / 2;
-    const points = `${quarterWidth},0 ${threeQuarterWidth},0 ${width},${halfHeight} ${threeQuarterWidth},${height} ${quarterWidth},${height} 0,${halfHeight}`;
     return svg`<polygon
-      points=${points}
+      points=${this._calculateHexagonPointsAsString(width, height)}
       class="${color}" />`;
   }
 
-  private _renderBoard(width: number, height: number) {
-    const polygonWidth = width / 12;
-    const polygonHeight = height / 12;
-    const columnConfig = this._columnConfig(width, height);
+  private _renderBoard() {
     const cursorClass = this._draggedPiece ? 'cursor-grabbing' : 'cursor-grab';
 
     return html`
-      <div class=${cursorClass}>
-        <svg width="${width}" height="${height}">
+      <div
+        class=${cursorClass}
+        @pointerdown=${(event: MouseEvent | PointerEvent) =>
+          this._handleMouseDown(event)}
+        @pointerup=${(event: MouseEvent | PointerEvent) =>
+          this._handleMouseUp(event)}
+        @pointermove=${(event: MouseEvent) =>
+          requestAnimationFrame(() => this._handleMouseMove(event))}
+      >
+        <svg width="${this.width}" height="${this.height}">
           ${COLUMN_ARRAY.map((column) => {
-            return svg`
-              <g id="column-${column}">
-                ${this._renderColumn(
-                  column,
-                  polygonWidth,
-                  polygonHeight,
-                  columnConfig
-                )}
-              </g>
-            `;
+            return svg`${this._renderColumn(column)}`;
           })}
         </svg>
         ${this._renderDraggedPiece()}
@@ -624,7 +834,10 @@ export class HexchessBoard extends LitElement {
   }
 
   override render() {
-    return html` ${this._renderBoard(this.width ?? this.height, this.height)} `;
+    if (this.width && this._lastKnownWidth !== this.width) {
+      this._recalculateBoardCoordinates(this.width, this.height);
+    }
+    return html` ${this._renderBoard()} `;
   }
 
   // --------------
