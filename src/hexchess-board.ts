@@ -1,22 +1,21 @@
+import {BoardState, getNewState} from './board-state';
 import {
   ANNOTATED_BLACK_SQUARES,
   ANNOTATED_WHITE_SQUARES,
   BLACK_COLUMN_LABEL_SQUARES,
   COLUMN_ARRAY,
   Orientation,
-  Piece,
   WHITE_COLUMN_LABEL_SQUARES,
   emptyBoard,
   stringToMoves,
 } from './utils';
-import {LitElement, html, css, svg, nothing} from 'lit';
+import {LitElement, html, svg, nothing} from 'lit';
 import {customElement, property, query} from 'lit/decorators.js';
 import {
   Board,
   Color,
   Column,
   ColumnConfig,
-  FullBoard,
   PIECE_SIZE,
   Square,
   TileColor,
@@ -24,7 +23,7 @@ import {
   fenToBoard,
 } from './utils';
 import {renderPiece} from './piece';
-import { styles } from './hexchess-styles';
+import {styles} from './hexchess-styles';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -44,16 +43,15 @@ import { styles } from './hexchess-styles';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
-  private _currentMove = -1;
-  private _currentPosition: Board = {};
-  private _from: Square | null = null;
-  private _legalMoves?: Record<Square, Set<Square>> = undefined;
-  private _moves: Square[][] = [];
-  private _turn = 0;
-  private _draggedPiece: Piece | null = null;
+  private _state: BoardState = {
+    board: emptyBoard,
+    legalMoves: {},
+    moves: [],
+    name: 'WAITING',
+    turn: 0,
+  };
   @query('.drag-piece')
   private _draggedDiv?: HTMLDivElement;
-  private _draggedSquare: Square | null = null;
   private _initialDragPosition: {x: number; y: number} | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
     Square,
@@ -82,14 +80,15 @@ export class HexchessBoard extends LitElement {
    */
   @property({
     converter: (value: string | null | undefined) => fenToBoard(value ?? ''),
+    type: Object,
   })
   get board(): Board {
-    return this._currentPosition;
+    return this._state.board;
   }
 
   set board(board: Board) {
-    const oldValue = this._currentPosition;
-    this._currentPosition = board;
+    const oldValue = this._state.board;
+    this._state.board = board;
     this.requestUpdate('board', oldValue);
   }
 
@@ -102,12 +101,12 @@ export class HexchessBoard extends LitElement {
     type: Array,
   })
   get moves(): Square[][] {
-    return this._moves;
+    return this._state.moves;
   }
 
   set moves(moves: Square[][]) {
-    const oldValue = this._moves;
-    this._moves = moves;
+    const oldValue = this._state.moves;
+    this._state.moves = moves;
     this.requestUpdate('moves', oldValue);
   }
 
@@ -165,207 +164,98 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
-    // Ignore attempts at moving if not viewing the latest board state
-    if (this._currentMove !== this._moves.length - 1) {
-      return;
-    }
-
     if (!this._hexagonPoints) {
       return;
     }
 
     const square = this._getSquareFromClick(event);
+    let newState;
     if (square === null) {
-      // Clicking outside the board should erase any previous clicks
-      if (
-        this._from !== null ||
-        this._draggedPiece !== null ||
-        this._draggedSquare !== null
-      ) {
-        this._from = null;
-        this._draggedPiece = null;
-        this._draggedSquare = null;
-        this.requestUpdate('board');
-      }
-      return;
+      newState = getNewState(this._state, {name: 'MOUSE_DOWN_OUTSIDE_BOARD'});
+    } else {
+      newState = getNewState(this._state, {
+        name: 'MOUSE_DOWN',
+        square,
+      });
     }
-    if (this._from === null) {
-      if (Object.keys(this._currentPosition).length === 0) {
-        return;
-      }
 
-      const fullBoard = this._currentPosition as FullBoard;
-      if (fullBoard[square] === null) {
-        return;
-      }
-
-      const piece = fullBoard[square];
-      if (piece === null) {
-        return;
-      }
-
-      this._draggedPiece = piece;
+    if (newState.didChange) {
       this._initialDragPosition = {x: event.clientX, y: event.clientY};
-      if (this._draggedDiv) {
-        // const deltaX = event.clientX - this._initialDragPosition!.x;
-        // const deltaY = event.clientY - this._initialDragPosition!.y;
-        // this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-        this._draggedDiv.style.left = `${event.clientX}px`;
-        this._draggedDiv.style.top = `${event.clientY}px`;
-      }
-      this._from = square;
+      this._state = newState.state;
       this.requestUpdate('board');
-      return;
     }
-
-    // Since this._from is not null, we know the user has clicked or dragged another piece
-
-    // Now trying to click or drag on a different piece, erase the click entirely, or click to move
-    if (square !== this._from) {
-      if (Object.keys(this._currentPosition).length === 0) {
-        this._from = null;
-        this._draggedPiece = null;
-        this._draggedSquare = null;
-        this.requestUpdate('board');
-        return;
-      }
-
-      // No piece is on this square - either the user is trying to move the piece here or erase the click
-      const fullBoard = this._currentPosition as FullBoard;
-      if (fullBoard[square] === null) {
-        // Legal move, so we let the user make it
-        if (
-          this._legalMoves &&
-          this._from in this._legalMoves &&
-          this._legalMoves[this._from].has(square)
-        ) {
-          this.move(this._from, square);
-          return;
-        }
-
-        // Erase the click
-        this._from = null;
-        this._draggedPiece = null;
-        this._draggedSquare = null;
-        this.requestUpdate('board');
-        return;
-      }
-
-      // Clicking on an empty square - either making a move or erasing
-      const piece = fullBoard[square];
-      if (piece === null) {
-        // Legal move, so we let the user make it
-        if (
-          this._legalMoves &&
-          this._from in this._legalMoves &&
-          this._legalMoves[this._from].has(square)
-        ) {
-          this.move(this._from, square);
-          return;
-        }
-
-        // Illegal move, so we erase the click
-        this._from = null;
-        this._draggedPiece = null;
-        this._draggedSquare = null;
-        this.requestUpdate('board');
-        return;
-      }
-
-      this._draggedPiece = piece;
-      this._initialDragPosition = {x: event.clientX, y: event.clientY};
-      if (this._draggedDiv) {
-        // const deltaX = event.clientX - this._initialDragPosition!.x;
-        // const deltaY = event.clientY - this._initialDragPosition!.y;
-        // this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-        this._draggedDiv.style.left = `${event.clientX}px`;
-        this._draggedDiv.style.top = `${event.clientY}px`;
-      }
-      this._from = square;
-      this.requestUpdate('board');
-      return;
-    }
-
-    // User is clicking on the exact same piece they previously clicked on
-    // They're either toggling it to be unselected or trying to drag/move it again
   }
 
   private _handleMouseEnter(square: Square) {
-    if (!this._from || !this._draggedPiece || !this._draggedDiv) {
+    if (this._state.name !== 'DRAG_PIECE') {
       return;
     }
 
-    this._draggedSquare = square;
-    this.requestUpdate('board');
+    const newState = getNewState(this._state, {
+      name: 'MOUSE_MOVE_SQUARE',
+      square,
+    });
+    if (newState.didChange) {
+      this._state = newState.state;
+      this.requestUpdate('board');
+    }
   }
 
   private _handleMouseUp(event: MouseEvent | PointerEvent) {
-    if (this._from === null) {
-      this._draggedSquare = null;
-      this._draggedPiece = null;
-      this._from = null;
-      this.requestUpdate('board');
-      return;
-    }
-
-    if (this._legalMoves && !(this._from in this._legalMoves)) {
-      this._draggedSquare = null;
-      this._draggedPiece = null;
-      this.requestUpdate('board');
-      return;
-    }
-
     const square = this._getSquareFromClick(event);
-    if (square === null) {
-      this._draggedSquare = null;
-      this._draggedPiece = null;
-      this.requestUpdate('board');
-      return;
+    let newState;
+    if (!square) {
+      newState = getNewState(this._state, {
+        name: 'MOUSE_UP_OUTSIDE_BOARD',
+      });
+    } else {
+      newState = getNewState(this._state, {
+        name: 'MOUSE_UP',
+        square,
+      });
     }
-
-    if (
-      this._legalMoves &&
-      this._from in this._legalMoves &&
-      !this._legalMoves[this._from].has(square)
-    ) {
-      this._draggedPiece = null;
-      this._draggedSquare = null;
-      this.requestUpdate('board');
-      return;
-    }
-
-    if (!this.move(this._from, square)) {
-      this._draggedPiece = null;
-      this._draggedSquare = null;
+    if (newState?.didChange) {
+      this._state = newState.state;
       this.requestUpdate('board');
     }
   }
 
   private _handleMouseMove(event: MouseEvent | PointerEvent) {
-    if (!this._draggedPiece || !this._from || !this._draggedDiv) {
-      this._draggedPiece = null;
-      this._draggedSquare = null;
+    if (
+      this._state.name !== 'DRAG_PIECE' &&
+      this._state.name !== 'MOUSE_DOWN_PIECE_SELECTED'
+    ) {
       return;
     }
 
     const deltaX = event.clientX - this._initialDragPosition!.x;
     const deltaY = event.clientY - this._initialDragPosition!.y;
-    this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    if (this._draggedDiv) {
+      this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    }
+
+    const square = this._getSquareFromClick(event);
+    let newState;
+    if (square) {
+      newState = getNewState(this._state, {
+        name: 'MOUSE_MOVE_SQUARE',
+        square,
+      });
+    } else {
+      newState = getNewState(this._state, {
+        name: 'MOUSE_MOVE_OUTSIDE_BOARD',
+      });
+    }
+
+    if (newState.didChange) {
+      this._state = newState.state;
+      this.requestUpdate('board');
+    }
   }
 
   // ----------------------
   // Private helper methods
   // ----------------------
-
-  private _applyMove(from: Square, to: Square) {
-    const fullBoard = this._currentPosition as FullBoard;
-    const piece = fullBoard[from];
-    fullBoard[from] = null;
-    fullBoard[to] = piece;
-    this._legalMoves = this._recalculateLegalMoves(fullBoard);
-
-    this.requestUpdate('board');
-  }
 
   private _calculateHexagonPoints(width: number, height: number): number[][] {
     const quarterWidth = width / 4;
@@ -565,30 +455,28 @@ export class HexchessBoard extends LitElement {
     }
   }
 
-  private _recalculateLegalMoves(_fullBoard: FullBoard) {
-    return undefined;
-  }
-
   // -----------------
   // Rendering methods
   // -----------------
 
   private _renderDraggedPiece() {
-    const piece = !this._draggedPiece
-      ? nothing
-      : renderPiece(this._draggedPiece, PIECE_SIZE);
+    const stateName = this._state.name;
+    if (stateName !== 'DRAG_PIECE') {
+      return nothing;
+    }
+    const piece = renderPiece(this._state.selectedPiece, PIECE_SIZE);
     return html`<div class="drag-piece">${piece}</div>`;
   }
 
   private _renderPiece(column: Column, row: number, size: number) {
     const square = `${column}${row}` as keyof Board;
-    if (
-      !this._currentPosition[square] ||
-      (this._from === square && this._draggedSquare !== null)
-    ) {
+    if (!(square in this._state.board) || this._state.board[square] === null) {
       return nothing;
     }
-    return renderPiece(this._currentPosition[square], size);
+    if (this._state.name === 'DRAG_PIECE' && this._state.square === square) {
+      return nothing;
+    }
+    return renderPiece(this._state.board[square]!, size);
   }
 
   private _renderColumnLabel(
@@ -663,14 +551,31 @@ export class HexchessBoard extends LitElement {
     return svg`
       <g id="column-${column}">
         ${[...Array(numHexagons).keys()].map((i) => {
+          // Helper methods
+          const square = `${column}${i + 1}` as Square;
+
+          // Base background color, except for classes defined below
           const color =
             i % 3 === 0 ? colors[0] : i % 3 === 1 ? colors[1] : colors[2];
-          const selectedClass =
-            this._from === `${column}${i + 1}` ? 'selected' : '';
-          const possibleMove =
-            this._draggedSquare === `${column}${i + 1}` ? 'possible-move' : '';
+
+          // Rendering classes
+          const isSelected =
+            this._state.name !== 'WAITING' &&
+            this._state.name !== 'REWOUND' &&
+            this._state.square === square;
+          const selectedClass = isSelected ? 'selected' : '';
+          let isPossibleMove;
+          if (this._state.name === 'DRAG_PIECE') {
+            isPossibleMove =
+              this._state.dragSquare === square &&
+              this._state.square !== square;
+          } else {
+            isPossibleMove = false;
+          }
+          const possibleMove = isPossibleMove ? 'possible-move' : '';
           const classes = `${selectedClass} ${possibleMove}`;
-          const square = `${column}${i + 1}` as Square;
+
+          // Offsets
           const offset = this._getOffsets(square, this._columnConfig);
           return svg`
             <g
@@ -715,25 +620,15 @@ export class HexchessBoard extends LitElement {
     column: Column,
     row: number
   ) {
-    if (this._from === null) {
-      return nothing;
-    }
-    if (!this._legalMoves) {
-      return nothing;
-    }
-    if (this._currentMove !== this._moves.length - 1) {
+    if (this._state.name === 'WAITING' || this._state.name === 'REWOUND') {
       return nothing;
     }
 
     const square = `${column}${row}` as Square;
-    if (this._from === square) {
+    if (this._state.square === square) {
       return nothing;
     }
-
-    if (!(this._from in this._legalMoves)) {
-      return nothing;
-    }
-    if (!this._legalMoves[this._from].has(square)) {
+    if (!this._state.legalMoves[this._state.square]?.has(square)) {
       return nothing;
     }
 
@@ -752,7 +647,11 @@ export class HexchessBoard extends LitElement {
   }
 
   private _renderBoard() {
-    const cursorClass = this._draggedPiece ? 'cursor-grabbing' : 'cursor-grab';
+    const cursorClass =
+      this._state.name === 'DRAG_PIECE' ||
+      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED'
+        ? 'cursor-grabbing'
+        : 'cursor-grab';
 
     return html`
       <div
@@ -789,7 +688,7 @@ export class HexchessBoard extends LitElement {
    * Converts to a hex-FEN notation describing the state of the board.
    */
   fen(): string {
-    return boardToFen(this._currentPosition);
+    return boardToFen(this._state.board);
   }
 
   /**
@@ -808,14 +707,11 @@ export class HexchessBoard extends LitElement {
    * If there are no previous moves, this does nothing.
    */
   rewind() {
-    if (this._currentMove === -1) {
-      return;
+    const newState = getNewState(this._state, {name: 'REWIND'});
+    if (newState.didChange) {
+      this._state = newState.state;
+      this.requestUpdate('board');
     }
-
-    const from = this._moves[this._currentMove][1];
-    const to = this._moves[this._currentMove][0];
-    this._applyMove(from, to);
-    this._currentMove -= 1;
   }
 
   /**
@@ -823,14 +719,11 @@ export class HexchessBoard extends LitElement {
    * If there are no next moves, this does nothing.
    */
   fastForward() {
-    if (this._currentMove === this._moves.length - 1) {
-      return;
+    const newState = getNewState(this._state, {name: 'FAST_FORWARD'});
+    if (newState.didChange) {
+      this._state = newState.state;
+      this.requestUpdate('board');
     }
-
-    this._currentMove += 1;
-    const from = this._moves[this._currentMove][0];
-    const to = this._moves[this._currentMove][1];
-    this._applyMove(from, to);
   }
 
   /**
@@ -849,7 +742,7 @@ export class HexchessBoard extends LitElement {
    * Without this, the component will do its best effort to compute legal moves on its own.
    */
   setLegalMoves(moves: Square[][]) {
-    this._legalMoves = this._convertToLegalMoveMap(moves);
+    this._state.legalMoves = this._convertToLegalMoveMap(moves);
     this.requestUpdate('board');
   }
 
@@ -858,87 +751,34 @@ export class HexchessBoard extends LitElement {
    *
    * @returns Whether or not the move can be made.
    */
-  move(
-    from: Square,
-    to: Square,
-    newLegalMoves: Square[][] | undefined = undefined
-  ): boolean {
+  move(from: Square, to: Square): boolean {
     // No moves if board is frozen
     if (this.frozen) {
       return false;
     }
 
-    // Cannot move if looking at an empty board
-    if (Object.keys(this._currentPosition).length === 0) {
-      return false;
+    const newState = getNewState(this._state, {
+      name: 'PROGRAMMATIC_MOVE',
+      move: [from, to],
+    });
+    if (newState.didChange) {
+      this._state = newState.state;
+      this.requestUpdate('board');
     }
-
-    // Cannot move if you're looking at a previous move
-    if (this._currentMove !== this._moves.length - 1) {
-      return false;
-    }
-
-    // Cannot move a piece that isn't there
-    const fullBoard = this._currentPosition as FullBoard;
-    if (!fullBoard[from]) {
-      return false;
-    }
-
-    const isMovingWhitePiece =
-      fullBoard[from] === fullBoard[from]?.toUpperCase();
-    // Cannot move black pieces if it's white's turn
-    if (this._turn % 2 === 0 && !isMovingWhitePiece) {
-      return false;
-    }
-    // Cannot move white pieces if it's black's turn
-    if (this._turn % 2 === 1 && isMovingWhitePiece) {
-      return false;
-    }
-
-    // Cannot take a piece of the same color
-    const isTargetingWhitePiece =
-      fullBoard[to] === fullBoard[to]?.toUpperCase();
-    if (fullBoard[to] !== null) {
-      if (
-        (isMovingWhitePiece && isTargetingWhitePiece) ||
-        (!isMovingWhitePiece && !isTargetingWhitePiece)
-      ) {
-        return false;
-      }
-    }
-
-    // Cannot capture a king
-    if (fullBoard[to]?.toUpperCase() === 'K') {
-      return false;
-    }
-
-    // Disallow illegal move
-    if (this._legalMoves) {
-      if (!(from in this._legalMoves)) {
-        return false;
-      }
-      if (!this._legalMoves[from].has(to)) {
-        return false;
-      }
-    }
-
-    if (newLegalMoves) {
-      this._legalMoves = this._convertToLegalMoveMap(newLegalMoves);
-    }
-    this._from = null;
-    this._draggedPiece = null;
-    this._moves.push([from, to]);
-    this._currentMove += 1;
-    this._turn += 1;
-    this._applyMove(from, to);
-    return true;
+    return newState.didChange;
   }
 
   /**
    * Resets and unfreezes the board to the default start state.
    */
   reset() {
-    this._currentPosition = JSON.parse(JSON.stringify(emptyBoard));
+    this._state = {
+      name: 'WAITING',
+      board: JSON.parse(JSON.stringify(emptyBoard)),
+      moves: [],
+      legalMoves: {},
+      turn: 0,
+    };
     this.frozen = false;
   }
 }
