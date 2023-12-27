@@ -40,7 +40,7 @@ export type Piece =
   | 'R'
   | 'P';
 
-const ALL_SQUARES = [
+export const ALL_SQUARES = [
   'A1',
   'A2',
   'A3',
@@ -198,7 +198,20 @@ export const ANNOTATED_BLACK_SQUARES: Square[] = [
   'L1',
 ];
 
-export const PIECE_SIZE = 45;
+export const PIECE_SIZES: Record<Piece, [number, number]> = {
+  k: [33.29, 33.63],
+  q: [38.5, 35.19],
+  b: [33, 33.32],
+  n: [32.03, 32.5],
+  r: [27, 30],
+  p: [23, 30.5],
+  K: [33.29, 33.63],
+  Q: [38.5, 35.19],
+  B: [33, 33.32],
+  N: [32.03, 32.5],
+  R: [27, 30],
+  P: [23, 30.5],
+};
 
 export type TileColor = 'white' | 'black' | 'grey';
 

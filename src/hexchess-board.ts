@@ -1,5 +1,12 @@
-import {BoardState, getNewState} from './board-state';
 import {
+  BoardState,
+  CancelSelectionSoonState,
+  DragPieceState,
+  MouseDownPieceSelected,
+  getNewState,
+} from './board-state';
+import {
+  ALL_SQUARES,
   ANNOTATED_BLACK_SQUARES,
   ANNOTATED_WHITE_SQUARES,
   BLACK_COLUMN_LABEL_SQUARES,
@@ -10,20 +17,20 @@ import {
   stringToMoves,
 } from './utils';
 import {LitElement, html, svg, nothing} from 'lit';
-import {customElement, property, query} from 'lit/decorators.js';
+import {customElement, property} from 'lit/decorators.js';
 import {
   Board,
   Color,
   Column,
   ColumnConfig,
-  PIECE_SIZE,
+  PIECE_SIZES,
   Square,
   TileColor,
   boardToFen,
   fenToBoard,
 } from './utils';
-import {renderPiece} from './piece';
 import {styles} from './hexchess-styles';
+import {pieceDefinitions, renderPiece} from './piece';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -43,6 +50,21 @@ import {styles} from './hexchess-styles';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
+  private _columnConfig: ColumnConfig = {} as ColumnConfig;
+  private _draggedPiece: SVGElement | null = null;
+  private _hexagonPoints: Record<Square, number[][]> = {} as Record<
+    Square,
+    number[][]
+  >;
+  private _hexagonPointsAsString: Record<Square, string> = {} as Record<
+    Square,
+    string
+  >;
+  private _lastKnownWidth: number | null = null;
+  private _polygonWidth = 0;
+  private _polygonHeight = 0;
+  private _originalDragPosition: {x: number; y: number} | null = null;
+  private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
     board: emptyBoard,
     legalMoves: {},
@@ -50,25 +72,6 @@ export class HexchessBoard extends LitElement {
     name: 'WAITING',
     turn: 0,
   };
-  @query('.drag-piece')
-  private _draggedDiv?: HTMLDivElement;
-  private _initialDragPosition: {x: number; y: number} | null = null;
-  private _hexagonPoints: Record<Square, number[][]> = {} as Record<
-    Square,
-    number[][]
-  >;
-  private _lastKnownWidth: number | null = null;
-  private _hexagonPointsAsString: Record<Square, string> = {} as Record<
-    Square,
-    string
-  >;
-  private _polygonWidth = 0;
-  private _polygonHeight = 0;
-  private _columnConfig: ColumnConfig = {} as ColumnConfig;
-  private _offsets: Record<Square, [number, number]> = {} as Record<
-    Square,
-    [number, number]
-  >;
 
   // -----------------
   // Public properties
@@ -142,14 +145,11 @@ export class HexchessBoard extends LitElement {
    * If not provided, the board will use the default width.
    */
   @property({type: Number})
-  width?: number;
+  width = 1150;
 
   constructor() {
     super();
-    if (!this.width) {
-      this._lastKnownWidth = this.height;
-    }
-    this._recalculateBoardCoordinates(this.width ?? this.height, this.height);
+    this._recalculateBoardCoordinates(this.width, this.height);
   }
 
   // ---------------
@@ -179,8 +179,30 @@ export class HexchessBoard extends LitElement {
       });
     }
 
+    if (
+      newState.state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+      newState.state.name === 'CANCEL_SELECTION_SOON'
+    ) {
+      this._draggedPiece = this.renderRoot.querySelector(`.piece-${square}`);
+      if (this._draggedPiece) {
+        const boundingRect = this._draggedPiece.getBoundingClientRect();
+        this._originalDragPosition = {
+          x: boundingRect.left,
+          y: boundingRect.top,
+        };
+        const isLeftOf = event.clientX < boundingRect.left;
+        const deltaX = isLeftOf
+          ? event.clientX - boundingRect.left - boundingRect.width / 2
+          : event.clientX - boundingRect.right + boundingRect.width / 2;
+        const isAboveOf = event.clientY < boundingRect.top;
+        const deltaY = isAboveOf
+          ? event.clientY - boundingRect.top - boundingRect.height / 2
+          : event.clientY - boundingRect.bottom + boundingRect.height / 2;
+        this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      }
+    }
+
     if (newState.didChange) {
-      this._initialDragPosition = {x: event.clientX, y: event.clientY};
       this._state = newState.state;
       this.requestUpdate('board');
     }
@@ -214,6 +236,37 @@ export class HexchessBoard extends LitElement {
         square,
       });
     }
+
+    // Set new position of piece
+    const state = this._state as
+      | MouseDownPieceSelected
+      | DragPieceState
+      | CancelSelectionSoonState;
+    const originalPiece = this._state.board[state.square];
+    const newPiece = newState.state.board[state.square];
+    if (this._draggedPiece) {
+      if (originalPiece === newPiece) {
+        // 1. The piece didn't move and needs to go back to the square center
+        this._draggedPiece.style.transform = 'none';
+      } else {
+        // 2. The piece moved and needs to go to the center of the new square
+        this._draggedPiece.classList.remove(`piece-${state.square}`);
+        this._draggedPiece.classList.add(
+          `piece-${
+            (
+              newState.state as
+                | MouseDownPieceSelected
+                | DragPieceState
+                | CancelSelectionSoonState
+            ).square
+          }`
+        );
+      }
+    }
+
+    this._draggedPiece = null;
+    this._originalDragPosition = null;
+
     if (newState?.didChange) {
       this._state = newState.state;
       this.requestUpdate('board');
@@ -223,15 +276,19 @@ export class HexchessBoard extends LitElement {
   private _handleMouseMove(event: MouseEvent | PointerEvent) {
     if (
       this._state.name !== 'DRAG_PIECE' &&
-      this._state.name !== 'MOUSE_DOWN_PIECE_SELECTED'
+      this._state.name !== 'MOUSE_DOWN_PIECE_SELECTED' &&
+      this._state.name !== 'CANCEL_SELECTION_SOON'
     ) {
       return;
     }
 
-    const deltaX = event.clientX - this._initialDragPosition!.x;
-    const deltaY = event.clientY - this._initialDragPosition!.y;
-    if (this._draggedDiv) {
-      this._draggedDiv.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    if (this._draggedPiece) {
+      const size = PIECE_SIZES[(this._state as DragPieceState).selectedPiece];
+      const deltaX =
+        event.clientX - this._originalDragPosition!.x - size[0] / 2;
+      const deltaY =
+        event.clientY - this._originalDragPosition!.y - size[1] / 2;
+      this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
     const square = this._getSquareFromClick(event);
@@ -358,6 +415,22 @@ export class HexchessBoard extends LitElement {
     };
   }
 
+  private _calculateSquareCenters(
+    columnConfig: ColumnConfig
+  ): Record<Square, [number, number]> {
+    const centers = {} as Record<Square, [number, number]>;
+
+    for (const square of ALL_SQUARES) {
+      const offSets = this._getOffsets(square, columnConfig);
+      centers[square] = [
+        offSets[0] + this._polygonWidth / 2,
+        offSets[1] + this._polygonHeight / 2,
+      ];
+    }
+
+    return centers;
+  }
+
   private _convertToLegalMoveMap(
     moves: Square[][]
   ): Record<Square, Set<Square>> {
@@ -405,7 +478,7 @@ export class HexchessBoard extends LitElement {
 
     const yOffset =
       this.orientation === 'white'
-        ? baseOffset + this._polygonHeight * (numHexagons - (row - 1))
+        ? baseOffset + this._polygonHeight * (numHexagons - row)
         : baseOffset + this._polygonHeight * (row - 1);
     return [xOffset, yOffset];
   }
@@ -436,12 +509,12 @@ export class HexchessBoard extends LitElement {
     this._polygonWidth = width / 12;
     this._polygonHeight = height / 12;
     this._columnConfig = this._calculateColumnConfig(width, height);
+    this._squareCenters = this._calculateSquareCenters(this._columnConfig);
     for (const column of COLUMN_ARRAY) {
       const numHexagons = this._numberOfHexagons(column);
       for (let row = 1; row <= numHexagons; row++) {
         const square = `${column}${row}` as Square;
         const [xOffset, yOffset] = this._getOffsets(square, this._columnConfig);
-        this._offsets[square] = [xOffset, yOffset];
         this._hexagonPoints[square] = this._calculateHexagonPoints(
           this._polygonWidth,
           this._polygonHeight
@@ -459,24 +532,29 @@ export class HexchessBoard extends LitElement {
   // Rendering methods
   // -----------------
 
-  private _renderDraggedPiece() {
-    const stateName = this._state.name;
-    if (stateName !== 'DRAG_PIECE') {
-      return nothing;
-    }
-    const piece = renderPiece(this._state.selectedPiece, PIECE_SIZE);
-    return html`<div class="drag-piece">${piece}</div>`;
-  }
-
-  private _renderPiece(column: Column, row: number, size: number) {
-    const square = `${column}${row}` as keyof Board;
+  private _renderPiece(square: Square) {
     if (!(square in this._state.board) || this._state.board[square] === null) {
       return nothing;
     }
-    if (this._state.name === 'DRAG_PIECE' && this._state.square === square) {
-      return nothing;
-    }
-    return renderPiece(this._state.board[square]!, size);
+    const [pX, pY] = PIECE_SIZES[this._state.board[square]!];
+    const [x, y] = this._squareCenters![square];
+    const finalX = x - pX / 2;
+    const finalY = y - pY / 2;
+    return svg`
+      <g
+        class="piece piece-${square}"
+      >
+        ${renderPiece(this._state.board[square]!, finalX, finalY)}
+      </g>
+    `;
+  }
+
+  private _renderPieces() {
+    return html`
+      ${Object.keys(this._state.board).map((square) =>
+        this._renderPiece(square as Square)
+      )}
+    `;
   }
 
   private _renderColumnLabel(
@@ -602,11 +680,6 @@ export class HexchessBoard extends LitElement {
                 this._polygonHeight
               )}
               ${this._renderCoordinate(column, i + 1, this._polygonWidth)}
-              <g class="piece" transform="translate(${
-                this._polygonWidth / 2 - 45 / 2
-              },${this._polygonHeight / 2 - 45 / 2})">
-                ${this._renderPiece(column, i + 1, PIECE_SIZE)}
-              </g>
             </g>
           `;
         })}
@@ -649,12 +722,16 @@ export class HexchessBoard extends LitElement {
   private _renderBoard() {
     const cursorClass =
       this._state.name === 'DRAG_PIECE' ||
-      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED'
+      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+      this._state.name === 'CANCEL_SELECTION_SOON'
         ? 'cursor-grabbing'
         : 'cursor-grab';
 
     return html`
-      <div
+      <svg
+        width="${this.width}"
+        height="${this.height}"
+        viewbox="0 0 ${this.width} ${this.height}"
         class=${cursorClass}
         @pointerdown=${(event: MouseEvent | PointerEvent) =>
           this._handleMouseDown(event)}
@@ -663,13 +740,14 @@ export class HexchessBoard extends LitElement {
         @pointermove=${(event: MouseEvent) =>
           requestAnimationFrame(() => this._handleMouseMove(event))}
       >
-        <svg width="${this.width}" height="${this.height}">
+        ${pieceDefinitions}
+        <g>
           ${COLUMN_ARRAY.map((column) => {
             return svg`${this._renderColumn(column)}`;
           })}
-        </svg>
-        ${this._renderDraggedPiece()}
-      </div>
+        </g>
+        <g>${this._renderPieces()}</g>
+      </svg>
     `;
   }
 

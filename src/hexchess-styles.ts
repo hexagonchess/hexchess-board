@@ -12,6 +12,7 @@ export const styles = css`
   .piece {
     fill: var(--hexchess-piece-bg, #000000);
     pointer-events: none;
+    z-index: 1;
   }
 
   .possible-move > polygon {
@@ -58,6 +59,6 @@ export const styles = css`
 
   .drag-piece {
     position: absolute;
-    z-index: 10;
+    z-index: 2;
   }
 `;

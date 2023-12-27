@@ -10,6 +10,11 @@ export type BoardChange = {state: BoardState; didChange: boolean};
 
 // TODO - handle reset at any state
 
+// TODO - add 2 new states in place of PIECE_SELECTED;
+// PIECE_SELECTED_MOUSE_DOWN and PIECE_SELECTED_MOUSE_UP
+// We need to distinguish the grabbing vs grab cursor
+// Additionally, we need to decide on that for mouse move as well
+
 export type WaitingState = {
   board: Board;
   legalMoves: LegalMoves;
@@ -17,7 +22,7 @@ export type WaitingState = {
   moves: Square[][];
   turn: number;
 };
-type MouseDownPieceSelected = {
+export type MouseDownPieceSelected = {
   board: Board;
   legalMoves: LegalMoves;
   moves: Square[][];
@@ -26,7 +31,7 @@ type MouseDownPieceSelected = {
   square: Square;
   turn: number;
 };
-type MouseUpPieceSelected = {
+export type MouseUpPieceSelected = {
   board: Board;
   legalMoves: LegalMoves;
   moves: Square[][];
@@ -35,7 +40,7 @@ type MouseUpPieceSelected = {
   square: Square;
   turn: number;
 };
-type DragPieceState = {
+export type DragPieceState = {
   board: Board;
   dragSquare: Square;
   legalMoves: LegalMoves;
@@ -45,7 +50,7 @@ type DragPieceState = {
   square: Square;
   turn: number;
 };
-type CancelSelectionSoonState = {
+export type CancelSelectionSoonState = {
   board: Board;
   legalMoves: LegalMoves;
   moves: Square[][];
@@ -54,7 +59,7 @@ type CancelSelectionSoonState = {
   square: Square;
   turn: number;
 };
-type RewoundState = {
+export type RewoundState = {
   board: Board;
   currentTurn: number;
   legalMoves: LegalMoves;
