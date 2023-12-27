@@ -3,7 +3,9 @@
 /test/
 custom-elements.json
 # top level source
+board-state.js
 hexchess-board.js
+hexchess-styles.js
 piece.js
 utils.js
 *.js.map
