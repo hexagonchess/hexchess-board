@@ -1,7 +1,6 @@
 export type Orientation = 'white' | 'black';
 
-export type Board = EmptyBoard | FullBoard;
-export type FullBoard = Record<Square, Piece | null>;
+export type Board = Record<Square, Piece | null>;
 export type EmptyBoard = {};
 
 export type Color = 'white' | 'black' | 'grey';
@@ -434,13 +433,12 @@ export const boardToFen = (board: Board): string => {
     return '6/7/8/9/10/11/10/9/8/7/6';
   }
 
-  const fullBoard = board as FullBoard;
   const fenParts: string[] = [];
   for (const column of COLUMN_ARRAY) {
     const rows = numberOfRows(column);
     for (const row of [...Array(rows).keys()].map((i) => i + 1)) {
       const square = `${column}${row + 1}` as Square;
-      const piece = fullBoard[square];
+      const piece = board[square];
       if (piece === null) {
         fenParts.push('1');
       } else {
@@ -470,7 +468,7 @@ export const validatePosition = (position: unknown): Board | null => {
     return null;
   }
 
-  const partialBoard: Partial<FullBoard> = {};
+  const partialBoard: Partial<Board> = {};
   for (let i = 0; i < 11; i++) {
     const column = columns[i];
     // Convert all other numbers to ones
