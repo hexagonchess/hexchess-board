@@ -360,43 +360,34 @@ export class HexchessBoard extends LitElement {
     boardWidth: number,
     boardHeight: number
   ): ColumnConfig {
-    const polygonWidth = boardWidth / 12;
-    const polygonHeight = boardHeight / 12;
+    const polygonWidth = boardWidth / 8.5;
+    const polygonHeight = boardHeight / 11;
     const polygonHalfHeight = polygonHeight / 2;
     const polygonQuarterWidth = polygonWidth / 4;
 
-    const offsetFX = boardWidth / 2 - polygonWidth * 2;
     const offsetFY = 0;
-
-    const offsetEX = offsetFX - polygonQuarterWidth * 3;
     const offsetEY = polygonHalfHeight;
-
-    const offsetDX = offsetEX - polygonQuarterWidth * 3;
     const offsetDY = polygonHeight;
-
-    const offsetCX = offsetDX - polygonQuarterWidth * 3;
     const offsetCY = polygonHeight + polygonHalfHeight;
-
-    const offsetBX = offsetCX - polygonQuarterWidth * 3;
     const offsetBY = polygonHeight * 2;
-
-    const offsetAX = offsetBX - polygonQuarterWidth * 3;
     const offsetAY = polygonHeight * 2 + polygonHalfHeight;
-
-    const offsetGX = offsetFX + polygonQuarterWidth * 3;
     const offsetGY = offsetEY;
-
-    const offsetHX = offsetGX + polygonQuarterWidth * 3;
     const offsetHY = offsetDY;
-
-    const offsetIX = offsetHX + polygonQuarterWidth * 3;
     const offsetIY = offsetCY;
-
-    const offsetKX = offsetIX + polygonQuarterWidth * 3;
     const offsetKY = offsetBY;
-
-    const offsetLX = offsetKX + polygonQuarterWidth * 3;
     const offsetLY = offsetAY;
+
+    const offsetAX = 0;
+    const offsetBX = offsetAX + polygonQuarterWidth * 3;
+    const offsetCX = offsetBX + polygonQuarterWidth * 3;
+    const offsetDX = offsetCX + polygonQuarterWidth * 3;
+    const offsetEX = offsetDX + polygonQuarterWidth * 3;
+    const offsetFX = offsetEX + polygonQuarterWidth * 3;
+    const offsetGX = offsetFX + polygonQuarterWidth * 3;
+    const offsetHX = offsetGX + polygonQuarterWidth * 3;
+    const offsetIX = offsetHX + polygonQuarterWidth * 3;
+    const offsetKX = offsetIX + polygonQuarterWidth * 3;
+    const offsetLX = offsetKX + polygonQuarterWidth * 3;
 
     const whiteStart: Color[] = ['white', 'black', 'grey'];
     const greyStart: Color[] = ['grey', 'white', 'black'];
@@ -524,8 +515,8 @@ export class HexchessBoard extends LitElement {
   }
 
   private _recalculateBoardCoordinates(width: number, height: number) {
-    this._polygonWidth = width / 12;
-    this._polygonHeight = height / 12;
+    this._polygonWidth = width / 8.5;
+    this._polygonHeight = height / 11;
     this._columnConfig = this._calculateColumnConfig(width, height);
     this._squareCenters = this._calculateSquareCenters(this._columnConfig);
     for (const column of COLUMN_ARRAY) {

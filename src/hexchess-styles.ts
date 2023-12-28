@@ -1,6 +1,11 @@
 import {css} from 'lit';
 
 export const styles = css`
+  :host {
+    font-family: var(--hexchess-font, -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif);
+    font-weight: 600;
+  }
+
   .board {
     background-color: var(--hexchess-board-bg, #fcfaf2);
   }
@@ -8,7 +13,6 @@ export const styles = css`
   .username {
     color: var(--hexchess-playername-color, black);
     font-size: var(--hexchess-playername-size, 1.4rem);
-    font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
