@@ -12,6 +12,7 @@ import {
   BLACK_COLUMN_LABEL_SQUARES,
   COLUMN_ARRAY,
   Orientation,
+  Piece,
   WHITE_COLUMN_LABEL_SQUARES,
   emptyBoard,
   stringToMoves,
@@ -56,6 +57,8 @@ import {pieceDefinitions, renderPiece} from './piece';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
+  private _capturedPieceScaleFactor = 0.6;
+  private _capturedPieceGroupPadding = 10;
   private _columnConfig: ColumnConfig = {} as ColumnConfig;
   private _draggedPiece: SVGElement | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
@@ -73,9 +76,12 @@ export class HexchessBoard extends LitElement {
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
     board: emptyBoard,
+    capturedPieces: {},
     legalMoves: {},
     moves: [],
     name: 'WAITING',
+    scoreBlack: 42,
+    scoreWhite: 42,
     turn: 0,
   };
 
@@ -122,13 +128,13 @@ export class HexchessBoard extends LitElement {
   /**
    * Black's player name
    */
-  @property({ type: String })
+  @property({type: String})
   blackPlayerName = 'Black';
 
   /**
    * White's player name
    */
-  @property({ type: String })
+  @property({type: String})
   whitePlayerName = 'White';
 
   /**
@@ -541,6 +547,177 @@ export class HexchessBoard extends LitElement {
   // Rendering methods
   // -----------------
 
+  private _renderScore(x: number, y: number, score: number | undefined) {
+    if (!score) {
+      return nothing;
+    }
+
+    if (score === 0 || score < 0) {
+      return nothing;
+    }
+
+    return svg`<text class="score" dominant-baseline="hanging" x="${x}" y="${y}">(+${score})</text>`;
+  }
+
+  private _renderCapturedPieceGroup(
+    piece: Piece,
+    numPieces: number,
+    x: number,
+    y: number
+  ) {
+    const size = PIECE_SIZES[piece];
+    return svg`
+      ${[...Array(numPieces).keys()].map((numPiece) => {
+        return renderPiece(
+          piece,
+          x + size[0] * this._capturedPieceScaleFactor * numPiece,
+          y
+        );
+      })}
+    `;
+  }
+
+  private _renderOneSideCapturedPieces(
+    pieces: Partial<Record<Piece, number>>,
+    x: number,
+    y: number,
+    score: number
+  ) {
+    const pawn = 'p' in pieces ? 'p' : 'P' in pieces ? 'P' : undefined;
+    const bishop = 'b' in pieces ? 'b' : 'B' in pieces ? 'B' : undefined;
+    const knight = 'n' in pieces ? 'n' : 'N' in pieces ? 'N' : undefined;
+    const rook = 'r' in pieces ? 'r' : 'R' in pieces ? 'R' : undefined;
+    const queen = 'q' in pieces ? 'q' : 'Q' in pieces ? 'Q' : undefined;
+
+    const bishopX = pawn
+      ? x +
+        PIECE_SIZES['p'][0] *
+          this._capturedPieceScaleFactor *
+          (pieces[pawn] ?? 0) +
+        this._capturedPieceGroupPadding
+      : x;
+    const knightX = bishop
+      ? bishopX +
+        PIECE_SIZES['b'][0] *
+          this._capturedPieceScaleFactor *
+          (pieces[bishop] ?? 0) +
+        this._capturedPieceGroupPadding
+      : bishopX;
+    const rookX = knight
+      ? knightX +
+        PIECE_SIZES['n'][0] *
+          this._capturedPieceScaleFactor *
+          (pieces[knight] ?? 0) +
+        this._capturedPieceGroupPadding
+      : knightX;
+    const queenX = rook
+      ? rookX +
+        PIECE_SIZES['r'][0] *
+          this._capturedPieceScaleFactor *
+          (pieces[rook] ?? 0) +
+        this._capturedPieceGroupPadding
+      : rookX;
+    const scoreX = queen
+      ? queenX + PIECE_SIZES['q'][0] + 2 * this._capturedPieceGroupPadding
+      : queenX;
+
+    const capturedPawns = pawn
+      ? this._renderCapturedPieceGroup(pawn, pieces[pawn]!, x, y)
+      : nothing;
+    const capturedBishops = bishop
+      ? this._renderCapturedPieceGroup(bishop, pieces[bishop]!, bishopX, y)
+      : nothing;
+    const capturedKnights = knight
+      ? this._renderCapturedPieceGroup(knight, pieces[knight]!, knightX, y)
+      : nothing;
+    const capturedRooks = rook
+      ? this._renderCapturedPieceGroup(rook, pieces[rook]!, rookX, y)
+      : nothing;
+    const capturedQueens = queen
+      ? this._renderCapturedPieceGroup(queen, pieces[queen]!, queenX, y)
+      : nothing;
+
+    return svg`
+      <g class="captured-pieces" transform="scale(${
+        this._capturedPieceScaleFactor
+      })">
+        ${capturedPawns}
+        ${capturedBishops}
+        ${capturedKnights}
+        ${capturedRooks}
+        ${capturedQueens}
+        ${this._renderScore(
+          scoreX,
+          y + PIECE_SIZES['p'][1] * this._capturedPieceScaleFactor,
+          score
+        )}
+      </g>
+    `;
+  }
+
+  private _renderCapturedPieces() {
+    const isOrientationWhite = this.orientation === 'white';
+    const x = isOrientationWhite
+      ? this._columnConfig.A.x
+      : this._columnConfig.L.x;
+    const topY = this._getOffsets(
+      isOrientationWhite ? 'E10' : 'E1',
+      this._columnConfig
+    )[1];
+    const bottomY =
+      (this._getOffsets(
+        isOrientationWhite ? 'E1' : 'E10',
+        this._columnConfig
+      )[1] +
+        this._polygonHeight) /
+      this._capturedPieceScaleFactor;
+
+    const whitePieceKeys = Object.keys(this._state.capturedPieces).filter(
+      (letter) => letter.toUpperCase() === letter
+    );
+    const blackPieceKeys = Object.keys(this._state.capturedPieces).filter(
+      (letter) => letter.toLowerCase() === letter
+    );
+
+    if (whitePieceKeys.length === 0 && blackPieceKeys.length === 0) {
+      return nothing;
+    }
+
+    const whitePieces = whitePieceKeys.reduce((acc, piece) => {
+      const p = piece as Piece;
+      acc[p] = this._state.capturedPieces[p];
+      return acc;
+    }, {} as Partial<Record<Piece, number>>);
+
+    const blackPieces = blackPieceKeys.reduce((acc, piece) => {
+      const p = piece as Piece;
+      acc[p] = this._state.capturedPieces[p];
+      return acc;
+    }, {} as Partial<Record<Piece, number>>);
+
+    const whiteScore = this._state.scoreWhite - this._state.scoreBlack;
+    const blackScore = this._state.scoreBlack - this._state.scoreWhite;
+
+    return svg`
+      <g id="captured-pieces-top">
+      ${this._renderOneSideCapturedPieces(
+        isOrientationWhite ? whitePieces : blackPieces,
+        x,
+        topY,
+        isOrientationWhite ? blackScore : whiteScore
+      )}
+      </g>
+      <g id="captured-pieces-bottom">
+      ${this._renderOneSideCapturedPieces(
+        isOrientationWhite ? blackPieces : whitePieces,
+        x,
+        bottomY,
+        isOrientationWhite ? whiteScore : blackScore
+      )}
+      </g>
+    `;
+  }
+
   private _renderPiece(square: Square) {
     if (!(square in this._state.board) || this._state.board[square] === null) {
       return nothing;
@@ -757,26 +934,45 @@ export class HexchessBoard extends LitElement {
         </g>
         <g>${this._renderPieces()}</g>
         <g>${this._renderPlayers()}</g>
+        <g>${this._renderCapturedPieces()}</g>
       </svg>
     `;
   }
 
-  private _renderPlayer(name: string, x: number, y: number) {
+  private _renderPlayer(
+    name: string,
+    x: number,
+    y: number,
+    alignment: 'auto' | 'hanging'
+  ) {
     return svg`
-      <text x="${x}" y="${y}" class="username">${name}</text>
+      <text dominant-baseline="${alignment}" x="${x}" y="${y}" class="username">${name}</text>
     `;
   }
 
   private _renderPlayers() {
     const isOrientationWhite = this.orientation === 'white';
-    const x = isOrientationWhite ? this._columnConfig.A.x : this._columnConfig.L.x;
-    const topY = this._getOffsets(isOrientationWhite ? 'E10' : 'E1', this._columnConfig)[1];
-    const bottomY = this._getOffsets(isOrientationWhite ? 'E1' : 'E10', this._columnConfig)[1] + this._polygonHeight;
-    const topName = isOrientationWhite ? this.blackPlayerName : this.whitePlayerName;
-    const bottomName = isOrientationWhite ? this.whitePlayerName : this.blackPlayerName;
+    const x = isOrientationWhite
+      ? this._columnConfig.A.x
+      : this._columnConfig.L.x;
+    const topY = this._getOffsets(
+      isOrientationWhite ? 'F11' : 'F1',
+      this._columnConfig
+    )[1];
+    const bottomY =
+      this._getOffsets(
+        isOrientationWhite ? 'F1' : 'F11',
+        this._columnConfig
+      )[1] + this._polygonHeight;
+    const topName = isOrientationWhite
+      ? this.blackPlayerName
+      : this.whitePlayerName;
+    const bottomName = isOrientationWhite
+      ? this.whitePlayerName
+      : this.blackPlayerName;
     return svg`
-      ${this._renderPlayer(topName, x, topY)}
-      ${this._renderPlayer(bottomName, x, bottomY)}
+      ${this._renderPlayer(topName, x, topY, 'hanging')}
+      ${this._renderPlayer(bottomName, x, bottomY, 'auto')}
     `;
   }
 
@@ -880,10 +1076,13 @@ export class HexchessBoard extends LitElement {
    */
   reset() {
     this._state = {
-      name: 'WAITING',
       board: JSON.parse(JSON.stringify(emptyBoard)),
-      moves: [],
+      capturedPieces: {},
       legalMoves: {},
+      moves: [],
+      name: 'WAITING',
+      scoreBlack: 42,
+      scoreWhite: 42,
       turn: 0,
     };
     this.frozen = false;

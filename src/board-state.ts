@@ -1,4 +1,4 @@
-import {Piece, Square, Board} from './utils';
+import {Piece, Square, Board, PIECE_VALUES} from './utils';
 
 type LegalMoves = Partial<Record<Square, Set<Square>>>;
 export type BoardChange = {state: BoardState; didChange: boolean};
@@ -10,61 +10,74 @@ export type BoardChange = {state: BoardState; didChange: boolean};
 
 // TODO - handle reset at any state
 
-// TODO - add 2 new states in place of PIECE_SELECTED;
-// PIECE_SELECTED_MOUSE_DOWN and PIECE_SELECTED_MOUSE_UP
-// We need to distinguish the grabbing vs grab cursor
-// Additionally, we need to decide on that for mouse move as well
-
 export type WaitingState = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   name: 'WAITING';
   moves: Square[][];
+  scoreBlack: number;
+  scoreWhite: number;
   turn: number;
 };
 export type MouseDownPieceSelected = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Square[][];
   name: 'MOUSE_DOWN_PIECE_SELECTED';
+  scoreBlack: number;
+  scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
   turn: number;
 };
 export type MouseUpPieceSelected = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Square[][];
   name: 'MOUSE_UP_PIECE_SELECTED';
+  scoreBlack: number;
+  scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
   turn: number;
 };
 export type DragPieceState = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   dragSquare: Square;
   legalMoves: LegalMoves;
   moves: Square[][];
   name: 'DRAG_PIECE';
+  scoreBlack: number;
+  scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
   turn: number;
 };
 export type CancelSelectionSoonState = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Square[][];
   name: 'CANCEL_SELECTION_SOON';
+  scoreBlack: number;
+  scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
   turn: number;
 };
 export type RewoundState = {
   board: Board;
+  capturedPieces: Partial<Record<Piece, number>>;
   currentTurn: number;
   legalMoves: LegalMoves;
   moves: Square[][];
   name: 'REWOUND';
+  scoreBlack: number;
+  scoreWhite: number;
   turn: number;
 };
 
@@ -132,6 +145,56 @@ export const getNewState = (
   }
 };
 
+const _capturePieceOrMakeMove = (
+  state: WaitingState | MouseUpPieceSelected | DragPieceState,
+  capturingPiece: Piece,
+  from: Square,
+  to: Square
+): BoardChange => {
+  const capturedPiece = state.board[to];
+  const newBoard = JSON.parse(JSON.stringify(state.board));
+  newBoard[from] = null;
+  newBoard[to] = capturingPiece;
+  if (capturedPiece) {
+    const isWhitePiece = capturedPiece.toUpperCase() === capturedPiece;
+    const newWhiteScore = isWhitePiece
+      ? state.scoreWhite - PIECE_VALUES[capturedPiece]
+      : state.scoreWhite;
+    const newBlackScore = isWhitePiece
+      ? state.scoreBlack
+      : state.scoreBlack - PIECE_VALUES[capturedPiece];
+    const newCapturedPieces = JSON.parse(JSON.stringify(state.capturedPieces));
+    if (capturedPiece in newCapturedPieces) {
+      newCapturedPieces[capturedPiece] = newCapturedPieces[capturedPiece] + 1;
+    } else {
+      newCapturedPieces[capturedPiece] = 1;
+    }
+    return {
+      state: {
+        ...state,
+        board: newBoard,
+        capturedPieces: newCapturedPieces,
+        moves: state.moves.concat([from, to]),
+        name: 'WAITING',
+        scoreBlack: newBlackScore,
+        scoreWhite: newWhiteScore,
+        turn: state.turn + 1,
+      },
+      didChange: true,
+    };
+  }
+  return {
+    state: {
+      ...state,
+      board: newBoard,
+      moves: state.moves.concat([from, to]),
+      name: 'WAITING',
+      turn: state.turn + 1,
+    },
+    didChange: true,
+  };
+};
+
 const _rewoundStateTransition = (
   state: RewoundState,
   transition: Transition
@@ -171,13 +234,10 @@ const _waitingStateTransition = (
       }
       return {
         state: {
-          board: state.board,
-          legalMoves: state.legalMoves,
-          moves: state.moves,
+          ...state,
           name: 'MOUSE_DOWN_PIECE_SELECTED',
           selectedPiece: piece,
           square: transition.square,
-          turn: state.turn,
         },
         didChange: true,
       };
@@ -197,19 +257,7 @@ const _waitingStateTransition = (
         return {state, didChange: false};
       }
 
-      const newBoard = JSON.parse(JSON.stringify(state.board));
-      newBoard[from] = null;
-      newBoard[to] = piece;
-      return {
-        state: {
-          board: newBoard,
-          legalMoves: state.legalMoves,
-          moves: state.moves.concat([from, to]),
-          name: 'WAITING',
-          turn: state.turn + 1,
-        },
-        didChange: true,
-      };
+      return _capturePieceOrMakeMove(state, piece, from, to);
     }
     default:
       return {state, didChange: false};
@@ -277,19 +325,12 @@ const _mouseUpPieceSelectedStateTransition = (
 
       // 2. If it's a legal move, make the move
       if (state.legalMoves[state.square]?.has(transition.square)) {
-        const newBoard = JSON.parse(JSON.stringify(state.board));
-        newBoard[state.square] = null;
-        newBoard[transition.square] = state.selectedPiece;
-        return {
-          state: {
-            ...state,
-            board: newBoard,
-            moves: state.moves.concat([state.square, transition.square]),
-            name: 'WAITING',
-            turn: state.turn + 1,
-          },
-          didChange: true,
-        };
+        return _capturePieceOrMakeMove(
+          state,
+          state.selectedPiece,
+          state.square,
+          transition.square
+        );
       }
 
       // 3. If it's an occupied piece, select the piece
@@ -364,19 +405,12 @@ const _dragPieceStateTransition = (
           didChange: true,
         };
       }
-      const newBoard = JSON.parse(JSON.stringify(state.board));
-      newBoard[state.square] = null;
-      newBoard[transition.square] = state.selectedPiece;
-      return {
-        state: {
-          ...state,
-          board: newBoard,
-          moves: state.moves.concat([state.square, transition.square]),
-          name: 'WAITING',
-          turn: state.turn + 1,
-        },
-        didChange: true,
-      };
+      return _capturePieceOrMakeMove(
+        state,
+        state.selectedPiece,
+        state.square,
+        transition.square
+      );
     }
     default:
       return {state, didChange: false};
@@ -391,39 +425,26 @@ const _cancelSelectionSoonStateTransition = (
     case 'MOUSE_MOVE_OUTSIDE_BOARD':
       return {
         state: {
-          board: state.board,
-          legalMoves: state.legalMoves,
-          moves: state.moves,
+          ...state,
           name: 'DRAG_PIECE',
-          selectedPiece: state.selectedPiece,
-          square: state.square,
           dragSquare: state.square,
-          turn: state.turn,
         },
         didChange: true,
       };
     case 'MOUSE_MOVE_SQUARE':
       return {
         state: {
-          board: state.board,
-          legalMoves: state.legalMoves,
-          moves: state.moves,
+          ...state,
           name: 'DRAG_PIECE',
-          selectedPiece: state.selectedPiece,
-          square: state.square,
           dragSquare: transition.square,
-          turn: state.turn,
         },
         didChange: true,
       };
     case 'MOUSE_UP':
       return {
         state: {
-          board: state.board,
-          legalMoves: state.legalMoves,
-          moves: state.moves,
+          ...state,
           name: 'WAITING',
-          turn: state.turn,
         },
         didChange: true,
       };

@@ -2,12 +2,26 @@ import {css} from 'lit';
 
 export const styles = css`
   :host {
-    font-family: var(--hexchess-font, -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif);
+    font-family: var(
+      --hexchess-font,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      system-ui,
+      Helvetica,
+      Arial,
+      sans-serif
+    );
     font-weight: 600;
   }
 
   .board {
     background-color: var(--hexchess-board-bg, #fcfaf2);
+  }
+
+  .score {
+    color: var(--hexchess-score-color, black);
+    font-size: var(--hexchess-score-size, 1.4rem);
   }
 
   .username {
@@ -76,6 +90,6 @@ export const styles = css`
 
   .drag-piece {
     position: absolute;
-    z-index: 2;
+    z-index: 10;
   }
 `;

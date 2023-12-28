@@ -40,6 +40,21 @@ export type Piece =
   | 'R'
   | 'P';
 
+export const PIECE_VALUES: Record<Piece, number> = {
+  k: 1_000,
+  q: 9,
+  b: 3,
+  n: 3,
+  r: 5,
+  p: 1,
+  K: 1_000,
+  Q: 9,
+  B: 3,
+  N: 3,
+  R: 5,
+  P: 1,
+};
+
 export const ALL_SQUARES = [
   'A1',
   'A2',
