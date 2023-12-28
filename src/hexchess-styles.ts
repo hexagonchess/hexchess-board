@@ -1,6 +1,19 @@
 import {css} from 'lit';
 
 export const styles = css`
+  .board {
+    background-color: var(--hexchess-board-bg, #fcfaf2);
+  }
+
+  .username {
+    color: var(--hexchess-playername-color, black);
+    font-size: var(--hexchess-playername-size, 1.4rem);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .cursor-grab {
     cursor: grab;
   }

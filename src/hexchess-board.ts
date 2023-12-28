@@ -35,6 +35,12 @@ import {pieceDefinitions, renderPiece} from './piece';
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
  *
+ * Player variables
+ * @cssprop [--hexchess-playername-size=1.4rem]      - The font size of the player names.
+ * @cssprop [--hexchess-playername-color=black]      - The color of the player names.
+ *
+ * Board variables
+ * @cssprop [--hexchess-board-bg=#fcfaf2]            - The background color of the whitespace of the board (not tiles).
  * @cssprop [--hexchess-white-bg=#0fafdb]            - The background color of the white tiles.
  * @cssprop [--hexchess-selected-white-bg=#a68a2d]   - The background color of a white tile that's selected to be moved.
  * @cssprop [--hexchess-black-bg=#2a5966]            - The background color of the black tiles.
@@ -112,6 +118,18 @@ export class HexchessBoard extends LitElement {
     this._state.moves = moves;
     this.requestUpdate('moves', oldValue);
   }
+
+  /**
+   * Black's player name
+   */
+  @property({ type: String })
+  blackPlayerName = 'Black';
+
+  /**
+   * White's player name
+   */
+  @property({ type: String })
+  whitePlayerName = 'White';
 
   /**
    * The orientation of the board.
@@ -732,7 +750,7 @@ export class HexchessBoard extends LitElement {
         width="${this.width}"
         height="${this.height}"
         viewbox="0 0 ${this.width} ${this.height}"
-        class=${cursorClass}
+        class="board ${cursorClass}"
         @pointerdown=${(event: MouseEvent | PointerEvent) =>
           this._handleMouseDown(event)}
         @pointerup=${(event: MouseEvent | PointerEvent) =>
@@ -747,7 +765,27 @@ export class HexchessBoard extends LitElement {
           })}
         </g>
         <g>${this._renderPieces()}</g>
+        <g>${this._renderPlayers()}</g>
       </svg>
+    `;
+  }
+
+  private _renderPlayer(name: string, x: number, y: number) {
+    return svg`
+      <text x="${x}" y="${y}" class="username">${name}</text>
+    `;
+  }
+
+  private _renderPlayers() {
+    const isOrientationWhite = this.orientation === 'white';
+    const x = isOrientationWhite ? this._columnConfig.A.x : this._columnConfig.L.x;
+    const topY = this._getOffsets(isOrientationWhite ? 'E10' : 'E1', this._columnConfig)[1];
+    const bottomY = this._getOffsets(isOrientationWhite ? 'E1' : 'E10', this._columnConfig)[1] + this._polygonHeight;
+    const topName = isOrientationWhite ? this.blackPlayerName : this.whitePlayerName;
+    const bottomName = isOrientationWhite ? this.whitePlayerName : this.blackPlayerName;
+    return svg`
+      ${this._renderPlayer(topName, x, topY)}
+      ${this._renderPlayer(bottomName, x, bottomY)}
     `;
   }
 
