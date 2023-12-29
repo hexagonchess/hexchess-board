@@ -1,5 +1,35 @@
 import {svg, nothing} from 'lit';
-import {Piece} from './utils';
+import {Piece} from './types';
+
+export const PIECE_VALUES: Record<Piece, number> = {
+  k: 1_000,
+  q: 9,
+  b: 3,
+  n: 3,
+  r: 5,
+  p: 1,
+  K: 1_000,
+  Q: 9,
+  B: 3,
+  N: 3,
+  R: 5,
+  P: 1,
+};
+
+export const PIECE_SIZES: Record<Piece, [number, number]> = {
+  k: [33.29, 33.63],
+  q: [38.5, 35.19],
+  b: [33, 33.32],
+  n: [32.03, 32.5],
+  r: [27, 30],
+  p: [23, 30.5],
+  K: [33.29, 33.63],
+  Q: [38.5, 35.19],
+  B: [33, 33.32],
+  N: [32.03, 32.5],
+  R: [27, 30],
+  P: [23, 30.5],
+};
 
 export const renderPiece = (piece: Piece, x: number, y: number) => {
   if (piece === null) return nothing;

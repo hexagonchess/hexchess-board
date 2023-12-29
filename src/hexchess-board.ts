@@ -11,27 +11,16 @@ import {
   ANNOTATED_WHITE_SQUARES,
   BLACK_COLUMN_LABEL_SQUARES,
   COLUMN_ARRAY,
-  Orientation,
-  Piece,
   WHITE_COLUMN_LABEL_SQUARES,
   emptyBoard,
   stringToMoves,
 } from './utils';
 import {LitElement, html, svg, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {
-  Board,
-  Color,
-  Column,
-  ColumnConfig,
-  PIECE_SIZES,
-  Square,
-  TileColor,
-  boardToFen,
-  fenToBoard,
-} from './utils';
+import {Column, ColumnConfig, Square, boardToFen, fenToBoard} from './utils';
 import {styles} from './hexchess-styles';
-import {pieceDefinitions, renderPiece} from './piece';
+import {PIECE_SIZES, pieceDefinitions, renderPiece} from './piece';
+import {Board, Color, Move, Orientation, Piece, TileColor} from './types';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -115,11 +104,11 @@ export class HexchessBoard extends LitElement {
     converter: (value: string | null | undefined) => stringToMoves(value ?? ''),
     type: Array,
   })
-  get moves(): Square[][] {
+  get moves(): Move[] {
     return this._state.moves;
   }
 
-  set moves(moves: Square[][]) {
+  set moves(moves: Move[]) {
     const oldValue = this._state.moves;
     this._state.moves = moves;
     this.requestUpdate('moves', oldValue);

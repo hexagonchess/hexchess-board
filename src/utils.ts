@@ -1,9 +1,4 @@
-export type Orientation = 'white' | 'black';
-
-export type Board = Record<Square, Piece | null>;
-export type EmptyBoard = {};
-
-export type Color = 'white' | 'black' | 'grey';
+import {Board, Color, Piece} from './types';
 
 export const COLUMN_ARRAY = [
   'A',
@@ -25,35 +20,6 @@ export type ColumnConfig = Record<
   Column,
   {x: number; y: number; colors: Color[]}
 >;
-
-export type Piece =
-  | 'k'
-  | 'q'
-  | 'b'
-  | 'n'
-  | 'r'
-  | 'p'
-  | 'K'
-  | 'Q'
-  | 'B'
-  | 'N'
-  | 'R'
-  | 'P';
-
-export const PIECE_VALUES: Record<Piece, number> = {
-  k: 1_000,
-  q: 9,
-  b: 3,
-  n: 3,
-  r: 5,
-  p: 1,
-  K: 1_000,
-  Q: 9,
-  B: 3,
-  N: 3,
-  R: 5,
-  P: 1,
-};
 
 export const ALL_SQUARES = [
   'A1',
@@ -212,23 +178,6 @@ export const ANNOTATED_BLACK_SQUARES: Square[] = [
   'L2',
   'L1',
 ];
-
-export const PIECE_SIZES: Record<Piece, [number, number]> = {
-  k: [33.29, 33.63],
-  q: [38.5, 35.19],
-  b: [33, 33.32],
-  n: [32.03, 32.5],
-  r: [27, 30],
-  p: [23, 30.5],
-  K: [33.29, 33.63],
-  Q: [38.5, 35.19],
-  B: [33, 33.32],
-  N: [32.03, 32.5],
-  R: [27, 30],
-  P: [23, 30.5],
-};
-
-export type TileColor = 'white' | 'black' | 'grey';
 
 export const emptyBoard: Board = {
   A1: null,

@@ -7,6 +7,7 @@ board-state.js
 hexchess-board.js
 hexchess-styles.js
 piece.js
+types.js
 utils.js
 *.js.map
 *.d.ts

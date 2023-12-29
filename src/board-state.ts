@@ -1,21 +1,18 @@
-import {Piece, Square, Board, PIECE_VALUES} from './utils';
+import {PIECE_VALUES} from './piece';
+import {Board, Move, Piece} from './types';
+import {Square} from './utils';
 
 type LegalMoves = Partial<Record<Square, Set<Square>>>;
 export type BoardChange = {state: BoardState; didChange: boolean};
 
-// TODO - make an actual move type
-// This doesn't handle captures, only moves to empty squares
-
 // TODO - recalculate new legal moves whenever making a move
-
-// TODO - handle reset at any state
 
 export type WaitingState = {
   board: Board;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   name: 'WAITING';
-  moves: Square[][];
+  moves: Move[];
   scoreBlack: number;
   scoreWhite: number;
   turn: number;
@@ -24,7 +21,7 @@ export type MouseDownPieceSelected = {
   board: Board;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
-  moves: Square[][];
+  moves: Move[];
   name: 'MOUSE_DOWN_PIECE_SELECTED';
   scoreBlack: number;
   scoreWhite: number;
@@ -36,7 +33,7 @@ export type MouseUpPieceSelected = {
   board: Board;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
-  moves: Square[][];
+  moves: Move[];
   name: 'MOUSE_UP_PIECE_SELECTED';
   scoreBlack: number;
   scoreWhite: number;
@@ -49,7 +46,7 @@ export type DragPieceState = {
   capturedPieces: Partial<Record<Piece, number>>;
   dragSquare: Square;
   legalMoves: LegalMoves;
-  moves: Square[][];
+  moves: Move[];
   name: 'DRAG_PIECE';
   scoreBlack: number;
   scoreWhite: number;
@@ -61,7 +58,7 @@ export type CancelSelectionSoonState = {
   board: Board;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
-  moves: Square[][];
+  moves: Move[];
   name: 'CANCEL_SELECTION_SOON';
   scoreBlack: number;
   scoreWhite: number;
@@ -74,7 +71,7 @@ export type RewoundState = {
   capturedPieces: Partial<Record<Piece, number>>;
   currentTurn: number;
   legalMoves: LegalMoves;
-  moves: Square[][];
+  moves: Move[];
   name: 'REWOUND';
   scoreBlack: number;
   scoreWhite: number;
@@ -174,7 +171,7 @@ const _capturePieceOrMakeMove = (
         ...state,
         board: newBoard,
         capturedPieces: newCapturedPieces,
-        moves: state.moves.concat([from, to]),
+        moves: state.moves.concat({from, to, capturedPiece}),
         name: 'WAITING',
         scoreBlack: newBlackScore,
         scoreWhite: newWhiteScore,
@@ -187,7 +184,7 @@ const _capturePieceOrMakeMove = (
     state: {
       ...state,
       board: newBoard,
-      moves: state.moves.concat([from, to]),
+      moves: state.moves.concat({from, to}),
       name: 'WAITING',
       turn: state.turn + 1,
     },
@@ -204,15 +201,39 @@ const _rewoundStateTransition = (
       if (state.currentTurn === state.turn) {
         return {state, didChange: false};
       }
-      // TODO - actually implement
-      return {state, didChange: false};
+      const move = state.moves[state.currentTurn];
+      const newBoard = JSON.parse(JSON.stringify(state.board));
+      newBoard[move.from] = null;
+      newBoard[move.to] = state.board[move.from];
+      const newName =
+        state.currentTurn === state.turn - 1 ? 'WAITING' : 'REWOUND';
+      return {
+        state: {
+          ...state,
+          board: newBoard,
+          currentTurn: state.currentTurn + 1,
+          name: newName,
+        },
+        didChange: true,
+      };
     }
     case 'REWIND': {
       if (state.currentTurn === 0) {
         return {state, didChange: false};
       }
-      // TODO - actually implement
-      return {state, didChange: false};
+      const newBoard = JSON.parse(JSON.stringify(state.board));
+      const move = state.moves[state.currentTurn];
+      newBoard[move.to] = move.capturedPiece ? move.capturedPiece : null;
+      newBoard[move.from] = state.board[move.to];
+      return {
+        state: {
+          ...state,
+          board: newBoard,
+          currentTurn: state.currentTurn - 1,
+          name: 'REWOUND',
+        },
+        didChange: false,
+      };
     }
     default:
       return {state, didChange: false};
@@ -224,6 +245,24 @@ const _waitingStateTransition = (
   transition: Transition
 ): BoardChange => {
   switch (transition.name) {
+    case 'REWIND': {
+      if (state.turn === 0) {
+        return {state, didChange: false};
+      }
+      const move = state.moves[state.turn - 1];
+      const newBoard = JSON.parse(JSON.stringify(state.board));
+      newBoard[move.to] = move.capturedPiece ? move.capturedPiece : null;
+      newBoard[move.from] = state.board[move.to];
+      return {
+        state: {
+          ...state,
+          board: newBoard,
+          currentTurn: state.turn - 1,
+          name: 'REWOUND',
+        },
+        didChange: true,
+      };
+    }
     case 'MOUSE_DOWN': {
       if (!(transition.square in state.board)) {
         return {state, didChange: false};
