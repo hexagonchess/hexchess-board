@@ -1,24 +1,22 @@
+import {Game} from './game';
 import {PIECE_VALUES} from './piece';
-import {Board, Move, Piece} from './types';
+import {Position} from './position';
+import {LegalMoves, Move, Piece} from './types';
 import {Square} from './utils';
 
-type LegalMoves = Partial<Record<Square, Set<Square>>>;
 export type BoardChange = {state: BoardState; didChange: boolean};
 
-// TODO - recalculate new legal moves whenever making a move
-
 export type WaitingState = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   name: 'WAITING';
   moves: Move[];
   scoreBlack: number;
   scoreWhite: number;
-  turn: number;
 };
 export type MouseDownPieceSelected = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Move[];
@@ -27,10 +25,9 @@ export type MouseDownPieceSelected = {
   scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
-  turn: number;
 };
 export type MouseUpPieceSelected = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Move[];
@@ -39,10 +36,9 @@ export type MouseUpPieceSelected = {
   scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
-  turn: number;
 };
 export type DragPieceState = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   dragSquare: Square;
   legalMoves: LegalMoves;
@@ -52,10 +48,9 @@ export type DragPieceState = {
   scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
-  turn: number;
 };
 export type CancelSelectionSoonState = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
   moves: Move[];
@@ -64,10 +59,9 @@ export type CancelSelectionSoonState = {
   scoreWhite: number;
   selectedPiece: Piece;
   square: Square;
-  turn: number;
 };
 export type RewoundState = {
-  board: Board;
+  game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   currentTurn: number;
   legalMoves: LegalMoves;
@@ -75,7 +69,19 @@ export type RewoundState = {
   name: 'REWOUND';
   scoreBlack: number;
   scoreWhite: number;
-  turn: number;
+};
+
+// TODO - handle all state transitions for this
+// Flagging, resigning, accepting draw, and making moves to cause this
+export type GameOverState = {
+  game: Game;
+  capturedPieces: Partial<Record<Piece, number>>;
+  currentTurn: number;
+  moves: Move[];
+  name: 'GAMEOVER';
+  outcome: 'WHITE_WINS' | 'BLACK_WINS' | 'DRAW';
+  scoreBlack: number;
+  scoreWhite: number;
 };
 
 export type BoardState =
@@ -144,49 +150,46 @@ export const getNewState = (
 
 const _capturePieceOrMakeMove = (
   state: WaitingState | MouseUpPieceSelected | DragPieceState,
-  capturingPiece: Piece,
   from: Square,
   to: Square
 ): BoardChange => {
-  const capturedPiece = state.board[to];
-  const newBoard = JSON.parse(JSON.stringify(state.board));
-  newBoard[from] = null;
-  newBoard[to] = capturingPiece;
-  if (capturedPiece) {
-    const isWhitePiece = capturedPiece.toUpperCase() === capturedPiece;
-    const newWhiteScore = isWhitePiece
-      ? state.scoreWhite - PIECE_VALUES[capturedPiece]
+  const capturedPiece = state.game.board.getPiece(to);
+  const newMove = {
+    from,
+    to,
+    capturedPiece: capturedPiece ? capturedPiece.toString() : undefined,
+  };
+  const newWhiteScore =
+    capturedPiece?.color === 'white'
+      ? state.scoreWhite - PIECE_VALUES[capturedPiece?.toString()]
       : state.scoreWhite;
-    const newBlackScore = isWhitePiece
-      ? state.scoreBlack
-      : state.scoreBlack - PIECE_VALUES[capturedPiece];
-    const newCapturedPieces = JSON.parse(JSON.stringify(state.capturedPieces));
-    if (capturedPiece in newCapturedPieces) {
-      newCapturedPieces[capturedPiece] = newCapturedPieces[capturedPiece] + 1;
+  const newBlackScore =
+    capturedPiece?.color === 'black'
+      ? state.scoreBlack - PIECE_VALUES[capturedPiece?.toString()]
+      : state.scoreBlack;
+  state.game.movePiece(Position.fromString(from), Position.fromString(to));
+  let newCapturedPieces: Partial<Record<Piece, number>>;
+  if (!capturedPiece) {
+    newCapturedPieces = state.capturedPieces;
+  } else {
+    const capturedPieceAsString = capturedPiece.toString();
+    newCapturedPieces = JSON.parse(JSON.stringify(state.capturedPieces));
+    if (capturedPiece.toString() in newCapturedPieces) {
+      newCapturedPieces[capturedPieceAsString] =
+        newCapturedPieces[capturedPieceAsString]! + 1;
     } else {
-      newCapturedPieces[capturedPiece] = 1;
+      newCapturedPieces[capturedPieceAsString] = 1;
     }
-    return {
-      state: {
-        ...state,
-        board: newBoard,
-        capturedPieces: newCapturedPieces,
-        moves: state.moves.concat({from, to, capturedPiece}),
-        name: 'WAITING',
-        scoreBlack: newBlackScore,
-        scoreWhite: newWhiteScore,
-        turn: state.turn + 1,
-      },
-      didChange: true,
-    };
   }
   return {
     state: {
       ...state,
-      board: newBoard,
-      moves: state.moves.concat({from, to}),
+      capturedPieces: newCapturedPieces,
+      legalMoves: state.game.allLegalMoves(),
+      moves: state.moves.concat(newMove),
       name: 'WAITING',
-      turn: state.turn + 1,
+      scoreBlack: newBlackScore,
+      scoreWhite: newWhiteScore,
     },
     didChange: true,
   };
@@ -198,19 +201,16 @@ const _rewoundStateTransition = (
 ): BoardChange => {
   switch (transition.name) {
     case 'FAST_FORWARD': {
-      if (state.currentTurn === state.turn) {
+      if (state.currentTurn === state.game.turn) {
         return {state, didChange: false};
       }
       const move = state.moves[state.currentTurn];
-      const newBoard = JSON.parse(JSON.stringify(state.board));
-      newBoard[move.from] = null;
-      newBoard[move.to] = state.board[move.from];
+      state.game.fastForward(move);
       const newName =
-        state.currentTurn === state.turn - 1 ? 'WAITING' : 'REWOUND';
+        state.currentTurn === state.game.turn - 1 ? 'WAITING' : 'REWOUND';
       return {
         state: {
           ...state,
-          board: newBoard,
           currentTurn: state.currentTurn + 1,
           name: newName,
         },
@@ -221,18 +221,15 @@ const _rewoundStateTransition = (
       if (state.currentTurn === 0) {
         return {state, didChange: false};
       }
-      const newBoard = JSON.parse(JSON.stringify(state.board));
-      const move = state.moves[state.currentTurn];
-      newBoard[move.to] = move.capturedPiece ? move.capturedPiece : null;
-      newBoard[move.from] = state.board[move.to];
+      const move = state.moves[state.currentTurn - 1];
+      state.game.rewind(move);
       return {
         state: {
           ...state,
-          board: newBoard,
           currentTurn: state.currentTurn - 1,
           name: 'REWOUND',
         },
-        didChange: false,
+        didChange: true,
       };
     }
     default:
@@ -246,28 +243,25 @@ const _waitingStateTransition = (
 ): BoardChange => {
   switch (transition.name) {
     case 'REWIND': {
-      if (state.turn === 0) {
+      if (state.game.turn === 0) {
         return {state, didChange: false};
       }
-      const move = state.moves[state.turn - 1];
-      const newBoard = JSON.parse(JSON.stringify(state.board));
-      newBoard[move.to] = move.capturedPiece ? move.capturedPiece : null;
-      newBoard[move.from] = state.board[move.to];
+      const move = state.moves[state.game.turn - 1];
+      state.game.rewind(move);
       return {
         state: {
           ...state,
-          board: newBoard,
-          currentTurn: state.turn - 1,
+          currentTurn: state.game.turn - 1,
           name: 'REWOUND',
         },
         didChange: true,
       };
     }
     case 'MOUSE_DOWN': {
-      if (!(transition.square in state.board)) {
+      if (!(transition.square in state.game.board.pieces)) {
         return {state, didChange: false};
       }
-      const piece = state.board[transition.square];
+      const piece = state.game.board.getPiece(transition.square);
       if (!piece) {
         return {state, didChange: false};
       }
@@ -275,7 +269,7 @@ const _waitingStateTransition = (
         state: {
           ...state,
           name: 'MOUSE_DOWN_PIECE_SELECTED',
-          selectedPiece: piece,
+          selectedPiece: piece.toString(),
           square: transition.square,
         },
         didChange: true,
@@ -284,10 +278,10 @@ const _waitingStateTransition = (
     case 'PROGRAMMATIC_MOVE': {
       const from = transition.move[0];
       const to = transition.move[1];
-      if (!(from in state.board)) {
+      if (!(from in state.game.board.pieces)) {
         return {state, didChange: false};
       }
-      const piece = state.board[from];
+      const piece = state.game.board.getPiece(from);
       if (!piece) {
         return {state, didChange: false};
       }
@@ -296,7 +290,7 @@ const _waitingStateTransition = (
         return {state, didChange: false};
       }
 
-      return _capturePieceOrMakeMove(state, piece, from, to);
+      return _capturePieceOrMakeMove(state, from, to);
     }
     default:
       return {state, didChange: false};
@@ -345,7 +339,7 @@ const _mouseUpPieceSelectedStateTransition = (
 ): BoardChange => {
   switch (transition.name) {
     case 'MOUSE_DOWN': {
-      if (!(transition.square in state.board)) {
+      if (!(transition.square in state.game.board.pieces)) {
         throw new Error(
           'Square must be in board - did you mean MOUSE_DOWN_OUTSIDE_BOARD transition?'
         );
@@ -364,22 +358,17 @@ const _mouseUpPieceSelectedStateTransition = (
 
       // 2. If it's a legal move, make the move
       if (state.legalMoves[state.square]?.has(transition.square)) {
-        return _capturePieceOrMakeMove(
-          state,
-          state.selectedPiece,
-          state.square,
-          transition.square
-        );
+        return _capturePieceOrMakeMove(state, state.square, transition.square);
       }
 
       // 3. If it's an occupied piece, select the piece
-      const piece = state.board[transition.square]!;
+      const piece = state.game.board.getPiece(transition.square)!;
       if (piece) {
         return {
           state: {
             ...state,
             name: 'MOUSE_DOWN_PIECE_SELECTED',
-            selectedPiece: piece,
+            selectedPiece: piece.toString(),
             square: transition.square,
           },
           didChange: true,
@@ -444,12 +433,7 @@ const _dragPieceStateTransition = (
           didChange: true,
         };
       }
-      return _capturePieceOrMakeMove(
-        state,
-        state.selectedPiece,
-        state.square,
-        transition.square
-      );
+      return _capturePieceOrMakeMove(state, state.square, transition.square);
     }
     default:
       return {state, didChange: false};

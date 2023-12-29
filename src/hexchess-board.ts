@@ -12,7 +12,6 @@ import {
   BLACK_COLUMN_LABEL_SQUARES,
   COLUMN_ARRAY,
   WHITE_COLUMN_LABEL_SQUARES,
-  emptyBoard,
   stringToMoves,
 } from './utils';
 import {LitElement, html, svg, nothing} from 'lit';
@@ -20,7 +19,9 @@ import {customElement, property} from 'lit/decorators.js';
 import {Column, ColumnConfig, Square, boardToFen, fenToBoard} from './utils';
 import {styles} from './hexchess-styles';
 import {PIECE_SIZES, pieceDefinitions, renderPiece} from './piece';
-import {Board, Color, Move, Orientation, Piece, TileColor} from './types';
+import {Color, Move, Orientation, Piece, TileColor} from './types';
+import {Board} from './board';
+import {Game} from './game';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -64,14 +65,13 @@ export class HexchessBoard extends LitElement {
   private _originalDragPosition: {x: number; y: number} | null = null;
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
-    board: emptyBoard,
     capturedPieces: {},
-    legalMoves: {},
+    game: new Game(),
+    legalMoves: new Game().allLegalMoves(),
     moves: [],
     name: 'WAITING',
     scoreBlack: 42,
     scoreWhite: 42,
-    turn: 0,
   };
 
   // -----------------
@@ -87,13 +87,12 @@ export class HexchessBoard extends LitElement {
     type: Object,
   })
   get board(): Board {
-    return this._state.board;
+    return this._state.game.board;
   }
 
   set board(board: Board) {
-    const oldValue = this._state.board;
-    this._state.board = board;
-    this.requestUpdate('board', oldValue);
+    this._state.game = new Game(board);
+    this.requestUpdate('board');
   }
 
   /**
@@ -267,8 +266,8 @@ export class HexchessBoard extends LitElement {
       | MouseDownPieceSelected
       | DragPieceState
       | CancelSelectionSoonState;
-    const originalPiece = this._state.board[state.square];
-    const newPiece = newState.state.board[state.square];
+    const originalPiece = this._state.game.board.getPiece(state.square);
+    const newPiece = newState.state.game.board.getPiece(state.square);
     if (this._draggedPiece) {
       if (originalPiece === newPiece) {
         // 1. The piece didn't move and needs to go back to the square center
@@ -445,21 +444,6 @@ export class HexchessBoard extends LitElement {
     }
 
     return centers;
-  }
-
-  private _convertToLegalMoveMap(
-    moves: Square[][]
-  ): Record<Square, Set<Square>> {
-    const newLegalMoves: Partial<Record<Square, Set<Square>>> = {};
-    for (const move of moves) {
-      if (!(move[0] in newLegalMoves)) {
-        newLegalMoves[move[0]] = new Set([move[1]]);
-      } else {
-        newLegalMoves[move[0]]!.add(move[1]);
-      }
-    }
-
-    return newLegalMoves as Record<Square, Set<Square>>;
   }
 
   private _getSquareFromClick(event: MouseEvent | PointerEvent): Square | null {
@@ -720,10 +704,14 @@ export class HexchessBoard extends LitElement {
   }
 
   private _renderPiece(square: Square) {
-    if (!(square in this._state.board) || this._state.board[square] === null) {
+    if (
+      !(square in this._state.game.board.pieces) ||
+      this._state.game.board.getPiece(square) === null
+    ) {
       return nothing;
     }
-    const [pX, pY] = PIECE_SIZES[this._state.board[square]!];
+    const piece = this._state.game.board.getPiece(square)!;
+    const [pX, pY] = PIECE_SIZES[piece.toString()];
     const [x, y] = this._squareCenters![square];
     const finalX = x - pX / 2;
     const finalY = y - pY / 2;
@@ -731,17 +719,14 @@ export class HexchessBoard extends LitElement {
       <g
         class="piece piece-${square}"
       >
-        ${renderPiece(this._state.board[square]!, finalX, finalY)}
+        ${renderPiece(piece.toString(), finalX, finalY)}
       </g>
     `;
   }
 
   private _renderPieces() {
-    return html`
-      ${Object.keys(this._state.board).map((square) =>
-        this._renderPiece(square as Square)
-      )}
-    `;
+    const squares = Object.keys(this._state.game.board.pieces) as Square[];
+    return html` ${squares.map((square) => this._renderPiece(square))} `;
   }
 
   private _renderColumnLabel(
@@ -992,7 +977,7 @@ export class HexchessBoard extends LitElement {
    * Converts to a hex-FEN notation describing the state of the board.
    */
   fen(): string {
-    return boardToFen(this._state.board);
+    return boardToFen(this._state.game.board);
   }
 
   /**
@@ -1039,18 +1024,6 @@ export class HexchessBoard extends LitElement {
   }
 
   /**
-   * Sets all legal moves for the current latest board configuration.
-   * Useful if you want to offload legal move computation to a different chess engine,
-   * or alternatively if you have a set of limited possibilities you want to explore.
-   *
-   * Without this, the component will do its best effort to compute legal moves on its own.
-   */
-  setLegalMoves(moves: Square[][]) {
-    this._state.legalMoves = this._convertToLegalMoveMap(moves);
-    this.requestUpdate('board');
-  }
-
-  /**
    * Make a move on the board.
    *
    * @returns Whether or not the move can be made.
@@ -1076,15 +1049,15 @@ export class HexchessBoard extends LitElement {
    * Resets and unfreezes the board to the default start state.
    */
   reset() {
+    const newGame = new Game();
     this._state = {
-      board: JSON.parse(JSON.stringify(emptyBoard)),
       capturedPieces: {},
-      legalMoves: {},
+      game: newGame,
+      legalMoves: newGame.allLegalMoves(),
       moves: [],
       name: 'WAITING',
       scoreBlack: 42,
       scoreWhite: 42,
-      turn: 0,
     };
     this.frozen = false;
   }

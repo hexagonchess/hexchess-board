@@ -1,4 +1,5 @@
-import {Board, Color, Piece} from './types';
+import {Board} from './board';
+import {Color, Piece} from './types';
 
 export const COLUMN_ARRAY = [
   'A',
@@ -179,198 +180,10 @@ export const ANNOTATED_BLACK_SQUARES: Square[] = [
   'L1',
 ];
 
-export const emptyBoard: Board = {
-  A1: null,
-  A2: null,
-  A3: null,
-  A4: null,
-  A5: null,
-  A6: null,
-  B1: null,
-  B2: null,
-  B3: null,
-  B4: null,
-  B5: null,
-  B6: null,
-  B7: null,
-  C1: null,
-  C2: null,
-  C3: null,
-  C4: null,
-  C5: null,
-  C6: null,
-  C7: null,
-  C8: null,
-  D1: null,
-  D2: null,
-  D3: null,
-  D4: null,
-  D5: null,
-  D6: null,
-  D7: null,
-  D8: null,
-  D9: null,
-  E1: null,
-  E2: null,
-  E3: null,
-  E4: null,
-  E5: null,
-  E6: null,
-  E7: null,
-  E8: null,
-  E9: null,
-  E10: null,
-  F1: null,
-  F2: null,
-  F3: null,
-  F4: null,
-  F5: null,
-  F6: null,
-  F7: null,
-  F8: null,
-  F9: null,
-  F10: null,
-  F11: null,
-  G1: null,
-  G2: null,
-  G3: null,
-  G4: null,
-  G5: null,
-  G6: null,
-  G7: null,
-  G8: null,
-  G9: null,
-  G10: null,
-  H1: null,
-  H2: null,
-  H3: null,
-  H4: null,
-  H5: null,
-  H6: null,
-  H7: null,
-  H8: null,
-  H9: null,
-  I1: null,
-  I2: null,
-  I3: null,
-  I4: null,
-  I5: null,
-  I6: null,
-  I7: null,
-  I8: null,
-  K1: null,
-  K2: null,
-  K3: null,
-  K4: null,
-  K5: null,
-  K6: null,
-  K7: null,
-  L1: null,
-  L2: null,
-  L3: null,
-  L4: null,
-  L5: null,
-  L6: null,
-};
-
-export const startBoard: Board = {
-  A1: null,
-  A2: null,
-  A3: null,
-  A4: null,
-  A5: null,
-  A6: null,
-  B1: 'P',
-  B2: null,
-  B3: null,
-  B4: null,
-  B5: null,
-  B6: null,
-  B7: 'p',
-  C1: 'R',
-  C2: 'P',
-  C3: null,
-  C4: null,
-  C5: null,
-  C6: null,
-  C7: 'p',
-  C8: 'r',
-  D1: 'N',
-  D2: null,
-  D3: 'P',
-  D4: null,
-  D5: null,
-  D6: null,
-  D7: 'p',
-  D8: null,
-  D9: 'n',
-  E1: 'Q',
-  E2: null,
-  E3: null,
-  E4: 'P',
-  E5: null,
-  E6: null,
-  E7: 'p',
-  E8: null,
-  E9: null,
-  E10: 'q',
-  F1: 'B',
-  F2: 'B',
-  F3: 'B',
-  F4: null,
-  F5: 'P',
-  F6: null,
-  F7: 'p',
-  F8: null,
-  F9: 'b',
-  F10: 'b',
-  F11: 'b',
-  G1: 'K',
-  G2: null,
-  G3: null,
-  G4: 'P',
-  G5: null,
-  G6: null,
-  G7: 'p',
-  G8: null,
-  G9: null,
-  G10: 'k',
-  H1: 'N',
-  H2: null,
-  H3: 'P',
-  H4: null,
-  H5: null,
-  H6: null,
-  H7: 'p',
-  H8: null,
-  H9: 'n',
-  I1: 'R',
-  I2: 'P',
-  I3: null,
-  I4: null,
-  I5: null,
-  I6: null,
-  I7: 'p',
-  I8: 'r',
-  K1: 'P',
-  K2: null,
-  K3: null,
-  K4: null,
-  K5: null,
-  K6: null,
-  K7: 'p',
-  L1: null,
-  L2: null,
-  L3: null,
-  L4: null,
-  L5: null,
-  L6: null,
-};
-
 export const fenToBoard = (position: string | null): Board => {
   const converted = validatePosition(position);
   if (converted === null) {
-    return deepCopy(emptyBoard);
+    return Board.empty();
   }
   return converted;
 };
@@ -415,11 +228,11 @@ export const boardToFen = (board: Board): string => {
     const rows = numberOfRows(column);
     for (const row of [...Array(rows).keys()].map((i) => i + 1)) {
       const square = `${column}${row + 1}` as Square;
-      const piece = board[square];
+      const piece = board.getPiece(square);
       if (piece === null) {
         fenParts.push('1');
       } else {
-        fenParts.push(piece);
+        fenParts.push(piece.toString());
       }
     }
     fenParts.push('/');
@@ -433,10 +246,10 @@ export const validatePosition = (position: unknown): Board | null => {
     return null;
   }
   if (position === '') {
-    return deepCopy(emptyBoard);
+    return Board.empty();
   }
   if (position === 'start') {
-    return deepCopy(startBoard);
+    return Board.new();
   }
 
   // Hexches has 11 columns
@@ -445,7 +258,7 @@ export const validatePosition = (position: unknown): Board | null => {
     return null;
   }
 
-  const partialBoard: Partial<Board> = {};
+  const partialBoard = Board.empty();
   for (let i = 0; i < 11; i++) {
     const column = columns[i];
     // Convert all other numbers to ones
@@ -476,16 +289,14 @@ export const validatePosition = (position: unknown): Board | null => {
     }
     for (let j = 0; j < convertedColumn.length; j++) {
       const square = `${name}${j + 1}` as Square;
-      partialBoard[square] =
-        convertedColumn[j] === '1' ? null : (convertedColumn[j] as Piece);
+      partialBoard.addPieceFromString(
+        square,
+        convertedColumn[j] === '1' ? null : (convertedColumn[j] as Piece)
+      );
     }
   }
 
   return partialBoard as Board;
-};
-
-const deepCopy = <T>(thing: T): T => {
-  return JSON.parse(JSON.stringify(thing));
 };
 
 const columnNameFromIndex = (index: number): string => {

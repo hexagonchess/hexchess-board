@@ -3,10 +3,19 @@
 /test/
 custom-elements.json
 # top level source
+bishop.js
+board.js
 board-state.js
+game.js
 hexchess-board.js
 hexchess-styles.js
+king.js
+knight.js
+pawn.js
 piece.js
+position.js
+queen.js
+rook.js
 types.js
 utils.js
 *.js.map

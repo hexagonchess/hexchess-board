@@ -1,7 +1,9 @@
+import {Board} from './board';
+import {Position} from './position';
 import {Square} from './utils';
 
-export type Board = Record<Square, Piece | null>;
 export type Color = 'white' | 'black' | 'grey';
+export type LegalMoves = Partial<Record<Square, Set<Square>>>;
 export type Move = {
   from: Square;
   to: Square;
@@ -22,3 +24,12 @@ export type Piece =
   | 'N'
   | 'R'
   | 'P';
+
+export interface HexchessPiece {
+  readonly color: Color;
+  readonly position: Position;
+
+  allSquareMoves(board: Board): Position[];
+  defendedSquares(board: Board): Position[];
+  toString(): Piece;
+}
