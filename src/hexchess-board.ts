@@ -169,6 +169,18 @@ export class HexchessBoard extends LitElement {
   // Event listeners
   // ---------------
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    window.addEventListener('pointerup', this._handleMouseUp.bind(this));
+    window.addEventListener('pointermove', this._handleMouseMove.bind(this));
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    window.removeEventListener('pointerup', this._handleMouseUp);
+    window.removeEventListener('pointermove', this._handleMouseMove);
+  }
+
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
     event.preventDefault();
 
