@@ -12,15 +12,17 @@ export class Position {
     board: Board,
     getNextPos: () => Position | null
   ): boolean {
-    const nextPos = getNextPos();
+    const potential = getNextPos();
     // Next square doesn't exist or is occupied by another piece
-    if (
-      !nextPos ||
-      !(nextPos.toSquare() in board) ||
-      board.getPiece(nextPos.toSquare()) !== null
-    ) {
+    if (!potential || !(potential.toSquare() in board.pieces)) {
       return false;
     }
+
+    const potentialPiece = board.getPiece(potential.toSquare());
+    if (potentialPiece && potentialPiece.color === color) {
+      return false;
+    }
+
     const piece = board.getPiece(startingPosition.toSquare());
     if (piece) {
       // The square is occupied by the opponent's piece (can't go past a capture)

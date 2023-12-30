@@ -12,7 +12,7 @@ export class King implements HexchessPiece {
   }
 
   private _validatePosition(newPos: Position, board: Board): boolean {
-    if (!(newPos.toSquare() in board)) {
+    if (!(newPos.toSquare() in board.pieces)) {
       return false;
     }
 
