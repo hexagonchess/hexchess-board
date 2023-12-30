@@ -604,7 +604,7 @@ export class HexchessBoard extends LitElement {
       : rookX;
     const scoreX = queen
       ? queenX + PIECE_SIZES['q'][0] + 2 * this._capturedPieceGroupPadding
-      : queenX;
+      : queenX + 2 * this._capturedPieceGroupPadding;
 
     const capturedPawns = pawn
       ? this._renderCapturedPieceGroup(pawn, pieces[pawn]!, x, y)
