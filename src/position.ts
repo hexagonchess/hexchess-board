@@ -69,7 +69,7 @@ export class Position {
   }
 
   static areTwoSquaresApartVertically(pos1: Position, pos2: Position): boolean {
-    return pos1.col && pos2.col && Math.abs(pos1.row - pos2.row) === 2;
+    return pos1.col === pos2.col && Math.abs(pos1.row - pos2.row) === 2;
   }
 
   static validatePosition(column: string, row: number): boolean {
@@ -496,7 +496,9 @@ export class Position {
   // This is useful for calculating moves for most pieces
   // -------------------------------------------------------------------
 
-  getAllTopPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllTopPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -511,7 +513,9 @@ export class Position {
     return positions;
   }
 
-  getAllTopRightPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllTopRightPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -527,7 +531,7 @@ export class Position {
   }
 
   getAllSkipTopRightPositions(
-    keepGoing: (pos: Position) => boolean
+    keepGoing: (pos: Position) => boolean = () => true
   ): Position[] {
     const positions: Position[] = [];
 
@@ -543,7 +547,9 @@ export class Position {
     return positions;
   }
 
-  getAllRightPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllRightPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -559,7 +565,7 @@ export class Position {
   }
 
   getAllBottomRightPositions(
-    keepGoing: (pos: Position) => boolean
+    keepGoing: (pos: Position) => boolean = () => true
   ): Position[] {
     const positions: Position[] = [];
 
@@ -576,7 +582,7 @@ export class Position {
   }
 
   getAllSkipBottomRightPositions(
-    keepGoing: (pos: Position) => boolean
+    keepGoing: (pos: Position) => boolean = () => true
   ): Position[] {
     const positions: Position[] = [];
 
@@ -592,7 +598,9 @@ export class Position {
     return positions;
   }
 
-  getAllBottomPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllBottomPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -607,7 +615,9 @@ export class Position {
     return positions;
   }
 
-  getAllBottomLeftPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllBottomLeftPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -623,7 +633,7 @@ export class Position {
   }
 
   getAllSkipBottomLeftPositions(
-    keepGoing: (pos: Position) => boolean
+    keepGoing: (pos: Position) => boolean = () => true
   ): Position[] {
     const positions: Position[] = [];
 
@@ -639,7 +649,9 @@ export class Position {
     return positions;
   }
 
-  getAllLeftPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllLeftPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -654,7 +666,9 @@ export class Position {
     return positions;
   }
 
-  getAllTopLeftPositions(keepGoing: (pos: Position) => boolean): Position[] {
+  getAllTopLeftPositions(
+    keepGoing: (pos: Position) => boolean = () => true
+  ): Position[] {
     const positions: Position[] = [];
 
     let currentPosition = new Position(this.col, this.row);
@@ -671,7 +685,7 @@ export class Position {
   }
 
   getAllSkipTopLeftPositions(
-    keepGoing: (pos: Position) => boolean
+    keepGoing: (pos: Position) => boolean = () => true
   ): Position[] {
     const positions: Position[] = [];
 

@@ -78,6 +78,7 @@ export class Pawn implements HexchessPiece {
         ? firstPos.getTopPosition()
         : firstPos.getBottomPosition();
     if (secondPos === null) {
+      // Should not be possible
       return null;
     }
     const piece = board.getPiece(secondPos.toSquare());

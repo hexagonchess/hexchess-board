@@ -13,10 +13,10 @@ export class Board {
 
   static clone(board: Board): Board {
     const clone = Board.empty();
-    const pieces: HexchessPiece[] = Object.keys(board.pieces)
-      .filter((square) => board.getPiece(square as Square) !== null)
-      .map((square) => board.getPiece(square as Square) as HexchessPiece);
-    for (const piece of pieces) {
+    for (const [_square, piece] of Object.entries(board.pieces)) {
+      if (piece === null) {
+        continue;
+      }
       if (piece instanceof Pawn) {
         clone.addPiece(
           new Pawn(piece.color, piece.position, piece.didMoveTwoSquares)
@@ -87,7 +87,7 @@ export class Board {
     positions['H9'] = new Knight('black', new Position('H', 9));
 
     positions['I1'] = new Rook('white', new Position('I', 1));
-    positions['I2'] = new Pawn('white', new Position('I', 3));
+    positions['I2'] = new Pawn('white', new Position('I', 2));
     positions['I7'] = new Pawn('black', new Position('I', 7));
     positions['I8'] = new Rook('black', new Position('I', 8));
 

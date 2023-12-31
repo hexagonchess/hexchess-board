@@ -9,7 +9,7 @@ import {Rook} from './rook';
 import {Color, HexchessPiece, LegalMoves, Move, Piece} from './types';
 import {Square} from './utils';
 
-enum GameState {
+export enum GameState {
   CHECKMATE,
   STALEMATE,
   IN_PROGRESS,
@@ -99,19 +99,21 @@ export class Game {
       .some((pos) => pos.col === to.col && pos.row === to.row);
   }
 
-  private _getCheckedSquares(color: Omit<Color, 'grey'>): Set<Position> {
-    const checkPositions: Set<Position> = new Set(
+  private _getCheckedSquares(color: Omit<Color, 'grey'>): Set<Square> {
+    const checkPositions: Set<Square> = new Set(
       this.board
         .getPieces(color === 'white' ? 'black' : 'white')
+        .filter((piece) => !(piece instanceof Pawn))
         .map((piece) => piece.allSquareMoves(this.board))
         .flat()
+        .map((pos) => pos.toSquare())
     );
     const defendedPositions = this.board
-      .getPieces(color === 'white' ? 'white' : 'black')
+      .getPieces(color === 'white' ? 'black' : 'white')
       .map((piece) => piece.defendedSquares(this.board))
       .flat();
     for (const position of defendedPositions) {
-      checkPositions.add(position);
+      checkPositions.add(position.toSquare());
     }
     return checkPositions;
   }
@@ -125,7 +127,7 @@ export class Game {
 
     return king
       .allSquareMoves(this.board)
-      .filter((pos) => !checkedSquares.has(pos));
+      .filter((pos) => !checkedSquares.has(pos.toSquare()));
   }
 
   private _isInCheck(color: Omit<Color, 'grey'>): boolean {
@@ -135,7 +137,7 @@ export class Game {
     }
 
     const checkedSquares = this._getCheckedSquares(color);
-    return checkedSquares.has(king.position);
+    return checkedSquares.has(king.position.toSquare());
   }
 
   private _isCheckmate(color: Omit<Color, 'grey'>): boolean {
@@ -159,7 +161,7 @@ export class Game {
     return this._isCheckmate(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
-  isStateMate(): boolean {
+  isStalemate(): boolean {
     return this._isStalemate(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
@@ -190,7 +192,7 @@ export class Game {
       if (this.isCheckmate()) {
         this._checkmate = true;
       }
-      if (this.isStateMate()) {
+      if (this.isStalemate()) {
         this._stalemate = true;
       }
     }
@@ -227,7 +229,7 @@ export class Game {
     if (this.isCheckmate()) {
       this._checkmate = true;
     }
-    if (this.isStateMate()) {
+    if (this.isStalemate()) {
       this._stalemate = true;
     }
   }
