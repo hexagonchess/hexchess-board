@@ -308,10 +308,16 @@ export class HexchessBoard extends LitElement {
 
     if (this._draggedPiece) {
       const size = PIECE_SIZES[(this._state as DragPieceState).selectedPiece];
-      const deltaX =
-        event.clientX - this._originalDragPosition!.x - size[0] / 2;
-      const deltaY =
-        event.clientY - this._originalDragPosition!.y - size[1] / 2;
+      const newXPos = Math.min(
+        Math.max(size[0] / 2, event.clientX),
+        this.width - size[0] / 2
+      );
+      const newYPos = Math.min(
+        Math.max(size[1] / 2, event.clientY),
+        this.height - size[1] / 2
+      );
+      const deltaX = newXPos - this._originalDragPosition!.x - size[0] / 2;
+      const deltaY = newYPos - this._originalDragPosition!.y - size[1] / 2;
       this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
