@@ -1,7 +1,8 @@
 import {Game} from './game';
+import {Pawn} from './pawn';
 import {PIECE_VALUES} from './piece';
 import {Position} from './position';
-import {LegalMoves, Move, Piece} from './types';
+import {HexchessPiece, LegalMoves, Move, Piece} from './types';
 import {Square} from './utils';
 
 export type BoardChange = {state: BoardState; didChange: boolean};
@@ -153,11 +154,25 @@ const _capturePieceOrMakeMove = (
   from: Square,
   to: Square
 ): BoardChange => {
-  const capturedPiece = state.game.board.getPiece(to);
+  const fromPiece = state.game.board.getPiece(from);
+  const toPiece = state.game.board.getPiece(to);
+  let capturedPiece: HexchessPiece | null;
+  let enPassant = false;
+  if (fromPiece instanceof Pawn && from[0] !== to[0] && !toPiece) {
+    enPassant = true;
+    const row = Number.parseInt(to.slice(1));
+    const capturedLocation =
+      fromPiece.color === 'white' ? `${to[0]}${row - 1}` : `${to[0]}${row + 1}`;
+    capturedPiece = state.game.board.getPiece(capturedLocation as Square);
+  } else {
+    capturedPiece = state.game.board.getPiece(to);
+  }
+
   const newMove = {
     from,
     to,
     capturedPiece: capturedPiece ? capturedPiece.toString() : undefined,
+    enPassant,
   };
   const newWhiteScore =
     capturedPiece?.color === 'white'

@@ -340,10 +340,18 @@ export class HexchessBoard extends LitElement {
 
   private _reconcileNewState(newState: BoardChange) {
     if (newState.didChange) {
-      if (newState.state.game.state() === GameState.PROMOTING && this._state.game.state() !== GameState.PROMOTING) {
+      if (
+        newState.state.game.state() === GameState.PROMOTING &&
+        this._state.game.state() !== GameState.PROMOTING
+      ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
-        this.dispatchEvent(new CustomEvent('promoting', { detail: { location: move.to }}));
-      } else if (this._state.game.state() === GameState.PROMOTING && newState.state.game.state() !== GameState.PROMOTING) {
+        this.dispatchEvent(
+          new CustomEvent('promoting', {detail: {location: move.to}})
+        );
+      } else if (
+        this._state.game.state() === GameState.PROMOTING &&
+        newState.state.game.state() !== GameState.PROMOTING
+      ) {
         // TODO
         this.dispatchEvent(new CustomEvent('promoted'));
       } else if (newState.state.moves.length > this._state.moves.length) {

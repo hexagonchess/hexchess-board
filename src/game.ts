@@ -83,6 +83,11 @@ export class Game {
     try {
       if (clone.getPiece(to.toSquare()) !== null) {
         clone.capturePiece(from, to);
+      } else if (
+        clone.getPiece(to.toSquare()) instanceof Pawn &&
+        to.col !== from.col
+      ) {
+        clone.enPassant(from, to);
       } else {
         clone.movePiece(from, to);
       }
@@ -177,6 +182,11 @@ export class Game {
     const otherPiece = this.board.getPiece(to.toSquare());
     if (otherPiece !== null) {
       this.board.capturePiece(from, to);
+    } else if (
+      this.board.getPiece(from.toSquare()) instanceof Pawn &&
+      to.col !== from.col
+    ) {
+      this.board.enPassant(from, to);
     } else {
       this.board.movePiece(from, to);
     }
@@ -257,7 +267,12 @@ export class Game {
   }
 
   fastForward(move: Move) {
-    if (move.capturedPiece) {
+    if (move.enPassant) {
+      this.board.enPassant(
+        Position.fromString(move.from),
+        Position.fromString(move.to)
+      );
+    } else if (move.capturedPiece) {
       this.board.capturePiece(
         Position.fromString(move.from),
         Position.fromString(move.to)
@@ -278,9 +293,21 @@ export class Game {
     );
     if (move.capturedPiece) {
       if (move.capturedPiece === 'p') {
-        this.board.addPiece(new Pawn('black', Position.fromString(move.to)));
+        if (move.enPassant) {
+          this.board.addPiece(
+            new Pawn('black', Position.fromString(move.to).getBottomPosition()!)
+          );
+        } else {
+          this.board.addPiece(new Pawn('black', Position.fromString(move.to)));
+        }
       } else if (move.capturedPiece === 'P') {
-        this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
+        if (move.enPassant) {
+          this.board.addPiece(
+            new Pawn('white', Position.fromString(move.to).getTopPosition()!)
+          );
+        } else {
+          this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
+        }
       } else if (move.capturedPiece === 'k') {
         this.board.addPiece(new King('black', Position.fromString(move.to)));
       } else if (move.capturedPiece === 'K') {

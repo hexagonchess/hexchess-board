@@ -11,7 +11,7 @@ import {HexchessPiece} from '../types';
 import {Square} from '../utils';
 
 describe('Board', () => {
-  test('Propertly initialize the game state', () => {
+  test('Properly initialize the game state', () => {
     const board = Board.new();
     expect(board.getPieces('white').length).toBe(18);
     expect(board.getPieces('black').length).toBe(18);
@@ -348,5 +348,23 @@ describe('Board', () => {
         expect(p.toString()).toEqual(clone.pieces[s]?.toString());
       }
     }
+  });
+
+  test('Performs en passant correctly', () => {
+    const board = Board.empty();
+    const whitePawn = new Pawn('white', new Position('B', 1));
+    const blackPawn = new Pawn('black', new Position('C', 3));
+    board.addPiece(whitePawn);
+    board.addPiece(blackPawn);
+
+    board.movePiece(new Position('B', 1), new Position('B', 3));
+    board.enPassant(new Position('C', 3), new Position('B', 2));
+
+    expect(board.getPiece('B3')).toBeNull();
+    expect(board.getPiece('C3')).toBeNull();
+    expect(board.getPiece('B1')).toBeNull();
+    expect(board.getPiece('B2')).toEqual(
+      new Pawn('black', new Position('B', 2))
+    );
   });
 });

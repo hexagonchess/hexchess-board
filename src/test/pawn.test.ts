@@ -94,6 +94,42 @@ describe('Pawns', () => {
     expect(possibleSquares2.length).toBe(3);
   });
 
+  test('Calculates white en passant properly', () => {
+    const board = Board.empty();
+    const whitePawn = new Pawn('white', new Position('B', 5));
+    const blackPawn = new Pawn('black', new Position('C', 7));
+    board.addPiece(whitePawn);
+    board.addPiece(blackPawn);
+
+    let allSquares = whitePawn.allSquareMoves(board);
+    expect(allSquares.length).toBe(1);
+    expect(allSquares[0].toString()).toBe('B6');
+
+    board.movePiece(new Position('C', 7), new Position('C', 5));
+    allSquares = whitePawn.allSquareMoves(board);
+    expect(allSquares.length).toBe(2);
+    expect(allSquares[0].toString()).toBe('B6');
+    expect(allSquares[1].toString()).toBe('C6');
+  });
+
+  test('Calculates black en passant properly', () => {
+    const board = Board.empty();
+    const whitePawn = new Pawn('white', new Position('B', 1));
+    const blackPawn = new Pawn('black', new Position('C', 3));
+    board.addPiece(whitePawn);
+    board.addPiece(blackPawn);
+
+    let allSquares = blackPawn.allSquareMoves(board);
+    expect(allSquares.length).toBe(1);
+    expect(allSquares[0].toString()).toBe('C2');
+
+    board.movePiece(new Position('B', 1), new Position('B', 3));
+    allSquares = blackPawn.allSquareMoves(board);
+    expect(allSquares.length).toBe(2);
+    expect(allSquares[0].toString()).toBe('C2');
+    expect(allSquares[1].toString()).toBe('B2');
+  });
+
   test('Calculates defended squares properly', () => {
     const whitePawn = new Pawn('white', new Position('B', 1));
     const blackPawn = new Pawn('black', new Position('B', 7));

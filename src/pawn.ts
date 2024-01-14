@@ -85,6 +85,45 @@ export class Pawn implements HexchessPiece {
     return piece === null ? secondPos : null;
   }
 
+  private _getEnpassantSquare(
+    board: Board,
+    direction: 'left' | 'right'
+  ): Position | null {
+    const piecePos =
+      this.color === 'white'
+        ? direction === 'left'
+          ? this.position.getBottomLeftPosition()!
+          : this.position.getBottomRightPosition()!
+        : direction === 'left'
+        ? this.position.getTopLeftPosition()!
+        : this.position.getTopRightPosition()!;
+    if (piecePos === null) {
+      return null;
+    }
+
+    const piece = board.getPiece(piecePos.toSquare());
+    if (piece === null) {
+      return null;
+    }
+    if (!(piece instanceof Pawn)) {
+      return null;
+    }
+    if (piece.color === this.color) {
+      return null;
+    }
+    if (!piece.didMoveTwoSquares) {
+      return null;
+    }
+
+    return this.color === 'white'
+      ? direction === 'left'
+        ? this.position.getTopLeftPosition()
+        : this.position.getTopRightPosition()
+      : direction === 'left'
+      ? this.position.getBottomLeftPosition()
+      : this.position.getBottomRightPosition();
+  }
+
   private _getCaptureSquare(
     board: Board,
     direction: 'left' | 'right'
@@ -118,6 +157,8 @@ export class Pawn implements HexchessPiece {
       this._getTwoSquareForward(board),
       this._getCaptureSquare(board, 'left'),
       this._getCaptureSquare(board, 'right'),
+      this._getEnpassantSquare(board, 'left'),
+      this._getEnpassantSquare(board, 'right'),
     ].filter((pos) => pos !== null) as Position[];
   }
 

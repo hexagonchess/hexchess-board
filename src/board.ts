@@ -314,4 +314,19 @@ export class Board {
       throw new Error('Invalid piece type');
     }
   }
+
+  enPassant(from: Position, to: Position) {
+    const fromPiece = this.getPiece(from.toSquare());
+    if (fromPiece === null || !(fromPiece instanceof Pawn)) {
+      throw new Error(`No pawn found at ${from.toSquare()}`);
+    }
+
+    this.pieces[from.toSquare()] = null;
+    if (fromPiece.color === 'white') {
+      this.pieces[to.getBottomPosition()!.toSquare()] = null;
+    } else {
+      this.pieces[to.getTopPosition()!.toSquare()] = null;
+    }
+    this.pieces[to.toSquare()] = new Pawn(fromPiece.color, to, false);
+  }
 }
