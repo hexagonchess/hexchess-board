@@ -19,7 +19,7 @@ import {LitElement, html, svg, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {Column, ColumnConfig, Square, boardToFen, fenToBoard} from './utils';
 import {styles} from './hexchess-styles';
-import {PIECE_SIZES, pieceDefinitions, renderPiece} from './piece';
+import {DEFAULT_PIECE_SIZE, renderPiece} from './piece';
 import {Color, Move, Orientation, Piece, TileColor} from './types';
 import {Board} from './board';
 import {Game, GameState} from './game';
@@ -214,6 +214,7 @@ export class HexchessBoard extends LitElement {
       newState.state.name === 'CANCEL_SELECTION_SOON'
     ) {
       this._draggedPiece = this.renderRoot.querySelector(`.piece-${square}`);
+      this._draggedPiece?.classList.add('drag-piece');
       if (this._draggedPiece) {
         const boundingRect = this._draggedPiece.getBoundingClientRect();
         this._originalDragPosition = {
@@ -274,7 +275,10 @@ export class HexchessBoard extends LitElement {
         this._draggedPiece.style.transform = 'none';
       } else {
         // 2. The piece moved and needs to go to the center of the new square
-        this._draggedPiece.classList.remove(`piece-${state.square}`);
+        this._draggedPiece.classList.remove(
+          `piece-${state.square}`,
+          'drag-piece'
+        );
         this._draggedPiece.classList.add(
           `piece-${
             (
@@ -288,6 +292,7 @@ export class HexchessBoard extends LitElement {
       }
     }
 
+    this._draggedPiece?.classList.remove('drag-piece');
     this._draggedPiece = null;
     this._originalDragPosition = null;
 
@@ -304,17 +309,16 @@ export class HexchessBoard extends LitElement {
     }
 
     if (this._draggedPiece) {
-      const size = PIECE_SIZES[(this._state as DragPieceState).selectedPiece];
       const newXPos = Math.min(
-        Math.max(size[0] / 2, event.clientX),
-        this.width - size[0] / 2
+        Math.max(DEFAULT_PIECE_SIZE / 2, event.clientX),
+        this.width - DEFAULT_PIECE_SIZE / 2
       );
       const newYPos = Math.min(
-        Math.max(size[1] / 2, event.clientY),
-        this.height - size[1] / 2
+        Math.max(DEFAULT_PIECE_SIZE / 2, event.clientY),
+        this.height - DEFAULT_PIECE_SIZE / 2
       );
-      const deltaX = newXPos - this._originalDragPosition!.x - size[0] / 2;
-      const deltaY = newYPos - this._originalDragPosition!.y - size[1] / 2;
+      const deltaX = newXPos - this._originalDragPosition!.x;
+      const deltaY = newYPos - this._originalDragPosition!.y;
       this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
@@ -577,12 +581,11 @@ export class HexchessBoard extends LitElement {
     x: number,
     y: number
   ) {
-    const size = PIECE_SIZES[piece];
     return svg`
       ${[...Array(numPieces).keys()].map((numPiece) => {
         return renderPiece(
           piece,
-          x + size[0] * this._capturedPieceScaleFactor * numPiece,
+          x + DEFAULT_PIECE_SIZE * this._capturedPieceScaleFactor * numPiece,
           y
         );
       })}
@@ -603,34 +606,34 @@ export class HexchessBoard extends LitElement {
 
     const bishopX = pawn
       ? x +
-        PIECE_SIZES['p'][0] *
+        DEFAULT_PIECE_SIZE *
           this._capturedPieceScaleFactor *
           (pieces[pawn] ?? 0) +
         this._capturedPieceGroupPadding
       : x;
     const knightX = bishop
       ? bishopX +
-        PIECE_SIZES['b'][0] *
+        DEFAULT_PIECE_SIZE *
           this._capturedPieceScaleFactor *
           (pieces[bishop] ?? 0) +
         this._capturedPieceGroupPadding
       : bishopX;
     const rookX = knight
       ? knightX +
-        PIECE_SIZES['n'][0] *
+        DEFAULT_PIECE_SIZE *
           this._capturedPieceScaleFactor *
           (pieces[knight] ?? 0) +
         this._capturedPieceGroupPadding
       : knightX;
     const queenX = rook
       ? rookX +
-        PIECE_SIZES['r'][0] *
+        DEFAULT_PIECE_SIZE *
           this._capturedPieceScaleFactor *
           (pieces[rook] ?? 0) +
         this._capturedPieceGroupPadding
       : rookX;
     const scoreX = queen
-      ? queenX + PIECE_SIZES['q'][0] + 2 * this._capturedPieceGroupPadding
+      ? queenX + DEFAULT_PIECE_SIZE + 2 * this._capturedPieceGroupPadding
       : queenX + 2 * this._capturedPieceGroupPadding;
 
     const capturedPawns = pawn
@@ -660,7 +663,7 @@ export class HexchessBoard extends LitElement {
         ${capturedQueens}
         ${this._renderScore(
           scoreX,
-          y + PIECE_SIZES['p'][1] * this._capturedPieceScaleFactor,
+          y + DEFAULT_PIECE_SIZE * this._capturedPieceScaleFactor,
           score
         )}
       </g>
@@ -738,22 +741,17 @@ export class HexchessBoard extends LitElement {
       return nothing;
     }
     const piece = this._state.game.board.getPiece(square)!;
-    const [pX, pY] = PIECE_SIZES[piece.toString()];
     const [x, y] = this._squareCenters![square];
-    const finalX = x - pX / 2;
-    const finalY = y - pY / 2;
-    return svg`
-      <g
-        class="piece piece-${square}"
-      >
-        ${renderPiece(piece.toString(), finalX, finalY)}
-      </g>
+    return html`
+      <div style="left: ${x}px; top: ${y}px" class="piece piece-${square}">
+        ${renderPiece(piece.toString(), x, y)}
+      </div>
     `;
   }
 
   private _renderPieces() {
     const squares = Object.keys(this._state.game.board.pieces) as Square[];
-    return html` ${squares.map((square) => this._renderPiece(square))} `;
+    return html`${squares.map((square) => this._renderPiece(square))}`;
   }
 
   private _renderColumnLabel(
@@ -927,28 +925,28 @@ export class HexchessBoard extends LitElement {
         : 'cursor-grab';
 
     return html`
-      <svg
-        width="${this.width}"
-        height="${this.height}"
-        viewbox="0 0 ${this.width} ${this.height}"
-        class="board ${cursorClass}"
-        @pointerdown=${(event: MouseEvent | PointerEvent) =>
-          this._handleMouseDown(event)}
-        @pointerup=${(event: MouseEvent | PointerEvent) =>
-          this._handleMouseUp(event)}
-        @pointermove=${(event: MouseEvent) =>
-          requestAnimationFrame(() => this._handleMouseMove(event))}
-      >
-        ${pieceDefinitions}
-        <g>
-          ${COLUMN_ARRAY.map((column) => {
-            return svg`${this._renderColumn(column)}`;
-          })}
-        </g>
-        <g>${this._renderPieces()}</g>
-        <g>${this._renderPlayers()}</g>
-        <g>${this._renderCapturedPieces()}</g>
-      </svg>
+      <div>
+        <svg
+          width="${this.width}"
+          height="${this.height}"
+          viewbox="0 0 ${this.width} ${this.height}"
+          class="board ${cursorClass}"
+          @pointerdown=${(event: MouseEvent | PointerEvent) =>
+            this._handleMouseDown(event)}
+          @pointerup=${(event: MouseEvent | PointerEvent) =>
+            this._handleMouseUp(event)}
+          @pointermove=${(event: MouseEvent) =>
+            requestAnimationFrame(() => this._handleMouseMove(event))}
+        >
+          <g>
+            ${COLUMN_ARRAY.map((column) => {
+              return svg`${this._renderColumn(column)}`;
+            })}
+          </g>
+          <g>${this._renderPlayers()}</g>
+        </svg>
+        ${this._renderPieces()} ${this._renderCapturedPieces()}
+      </div>
     `;
   }
 

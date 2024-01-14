@@ -41,6 +41,7 @@ export const styles = css`
   }
 
   .piece {
+    position: absolute;
     fill: var(--hexchess-piece-bg, #000000);
     pointer-events: none;
     z-index: 1;
