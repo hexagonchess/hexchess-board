@@ -19,35 +19,12 @@ export const styles = css`
     background-color: var(--hexchess-board-bg, #fcfaf2);
   }
 
-  .score {
-    color: var(--hexchess-score-color, black);
-    font-size: var(--hexchess-score-size, 1.4rem);
-  }
-
-  .username {
-    color: var(--hexchess-playername-color, black);
-    font-size: var(--hexchess-playername-size, 1.4rem);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .cursor-grab {
     cursor: grab;
   }
 
   .cursor-grabbing {
     cursor: grabbing;
-  }
-
-  .piece {
-    fill: var(--hexchess-piece-bg, #000000);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .possible-move > polygon {
-    fill: var(--hexchess-possible-move-bg, #a68a2d88);
   }
 
   .label {
@@ -61,6 +38,29 @@ export const styles = css`
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  }
+
+  .piece {
+    fill: var(--hexchess-piece-bg, #000000);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .possible-move > polygon {
+    fill: var(--hexchess-possible-move-bg, #a68a2d88);
+  }
+
+  .score {
+    color: var(--hexchess-score-color, black);
+    font-size: var(--hexchess-score-size, 1.4rem);
+  }
+
+  .username {
+    color: var(--hexchess-playername-color, black);
+    font-size: var(--hexchess-playername-size, 1.4rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .white {

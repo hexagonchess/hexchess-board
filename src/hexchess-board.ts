@@ -1,4 +1,5 @@
 import {
+  BoardChange,
   BoardState,
   CancelSelectionSoonState,
   DragPieceState,
@@ -21,7 +22,7 @@ import {styles} from './hexchess-styles';
 import {PIECE_SIZES, pieceDefinitions, renderPiece} from './piece';
 import {Color, Move, Orientation, Piece, TileColor} from './types';
 import {Board} from './board';
-import {Game} from './game';
+import {Game, GameState} from './game';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -42,6 +43,11 @@ import {Game} from './game';
  * @cssprop [--hexchess-label-size=12px]             - The font size of the column and row labels.
  * @cssprop [--hexchess-possible-move-bg=#a68a2d]    - The fill color of the small dot shown on a hexagon indicating this is a legal move.
  * @cssprop [--hexchess-attempted-move-bg=#a68a2d88] - The fill color of a hexgon when the user drags over a square, trying to move there.
+ *
+ * Custom events
+ * @fires move      - Fired when a move is made on the board.
+ * @fires promoting - Fired when a pawn is ready to promote.
+ * @fires promoted  - Fired when a pawn has been promoted to a piece.
  */
 @customElement('hexchess-board')
 export class HexchessBoard extends LitElement {
@@ -226,10 +232,7 @@ export class HexchessBoard extends LitElement {
       }
     }
 
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   private _handleMouseEnter(square: Square) {
@@ -241,10 +244,7 @@ export class HexchessBoard extends LitElement {
       name: 'MOUSE_MOVE_SQUARE',
       square,
     });
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   private _handleMouseUp(event: MouseEvent | PointerEvent) {
@@ -291,10 +291,7 @@ export class HexchessBoard extends LitElement {
     this._draggedPiece = null;
     this._originalDragPosition = null;
 
-    if (newState?.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   private _handleMouseMove(event: MouseEvent | PointerEvent) {
@@ -334,15 +331,31 @@ export class HexchessBoard extends LitElement {
       });
     }
 
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   // ----------------------
   // Private helper methods
   // ----------------------
+
+  private _reconcileNewState(newState: BoardChange) {
+    if (newState.didChange) {
+      if (newState.state.game.state() === GameState.PROMOTING && this._state.game.state() !== GameState.PROMOTING) {
+        const move = newState.state.moves[newState.state.moves.length - 1];
+        this.dispatchEvent(new CustomEvent('promoting', { detail: { location: move.to }}));
+      } else if (this._state.game.state() === GameState.PROMOTING && newState.state.game.state() !== GameState.PROMOTING) {
+        // TODO
+        this.dispatchEvent(new CustomEvent('promoted'));
+      } else if (newState.state.moves.length > this._state.moves.length) {
+        const move = newState.state.moves[newState.state.moves.length - 1];
+        this.dispatchEvent(
+          new CustomEvent('move', {detail: {from: move.from, to: move.to}})
+        );
+      }
+      this._state = newState.state;
+      this.requestUpdate('board');
+    }
+  }
 
   private _calculateHexagonPoints(width: number, height: number): number[][] {
     const quarterWidth = width / 4;
@@ -1003,10 +1016,7 @@ export class HexchessBoard extends LitElement {
    */
   rewind() {
     const newState = getNewState(this._state, {name: 'REWIND'});
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   /**
@@ -1015,10 +1025,7 @@ export class HexchessBoard extends LitElement {
    */
   fastForward() {
     const newState = getNewState(this._state, {name: 'FAST_FORWARD'});
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
   }
 
   /**
@@ -1044,10 +1051,7 @@ export class HexchessBoard extends LitElement {
       name: 'PROGRAMMATIC_MOVE',
       move: [from, to],
     });
-    if (newState.didChange) {
-      this._state = newState.state;
-      this.requestUpdate('board');
-    }
+    this._reconcileNewState(newState);
     return newState.didChange;
   }
 

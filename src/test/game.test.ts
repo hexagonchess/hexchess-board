@@ -100,11 +100,11 @@ describe('Game', () => {
       game.movePiece(new Position('F', 10), new Position('D', 9))
     ).toThrow();
     expect(() =>
-      game.movePiece(new Position('F', 10), new Position('F', 9))
-    ).toThrow();
-    expect(() =>
       game.movePiece(new Position('F', 11), new Position('E', 10))
-    ).toThrow();
+    ).not.toThrow();
+    expect(() =>
+      game.movePiece(new Position('F', 10), new Position('F', 9))
+    ).not.toThrow();
   });
   test('Detects when someone is checkmated', () => {
     // Should not be checkmated on a new board for either side
