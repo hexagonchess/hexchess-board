@@ -40,12 +40,18 @@ export const styles = css`
     left: 0px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     justify-content: space-between;
     pointer-events: none;
     width: 100%;
     height: 100%;
     z-index: 3;
+  }
+
+  .hexagon {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .label {
@@ -72,7 +78,6 @@ export const styles = css`
     display: flex;
     flex-direction: column;
     justify-content: start;
-    align-items: flex-start;
   }
 
   .possible-move > polygon {
@@ -124,5 +129,28 @@ export const styles = css`
   .drag-piece {
     position: absolute;
     z-index: 2;
+  }
+
+  .promotion {
+    cursor: pointer;
+    filter: drop-shadow(2px 4px 6px black);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    z-index: 1;
+  }
+
+  .game-over {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
   }
 `;

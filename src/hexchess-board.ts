@@ -173,6 +173,14 @@ export class HexchessBoard extends LitElement {
     window.removeEventListener('pointermove', this._handleMouseMove);
   }
 
+  private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
+    const newState = getNewState(this._state, {
+      name: 'PROMOTE',
+      piece,
+    });
+    this._reconcileNewState(newState);
+  }
+
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
     event.preventDefault();
 
@@ -554,6 +562,39 @@ export class HexchessBoard extends LitElement {
   // Rendering methods
   // -----------------
 
+  private _renderPromotionOptions() {
+    if (this._state.name !== 'PROMOTING') {
+      return nothing;
+    }
+
+    const square = this._state.moves[this._state.moves.length - 1].to;
+    const column = square[0] as Column;
+    const x = this._columnConfig[column].x;
+    const y = this._columnConfig[column].y;
+
+    const options: Piece[] =
+      this._state.game.turn % 2 === 0
+        ? ['Q', 'R', 'B', 'N']
+        : ['q', 'r', 'b', 'n'];
+
+    return html`
+      <div class="promotion" style="top: ${y}px; left: ${x}px;">
+        ${options.map((option) => {
+          return html`
+            <div
+              class="hexagon"
+              style="width: ${this._polygonWidth}px; height: ${this
+                ._polygonHeight}px; background-color: var(--hexchess-board-bg, #fcfaf2);"
+              @click=${() => this._handlePromotion(option)}
+            >
+              ${renderPiece(option, DEFAULT_PIECE_SIZE, false)}
+            </div>
+          `;
+        })}
+      </div>
+    `;
+  }
+
   private _renderScore(score: number | undefined) {
     if (!score) {
       return nothing;
@@ -674,7 +715,10 @@ export class HexchessBoard extends LitElement {
     const blackScore = this._state.scoreBlack - this._state.scoreWhite;
 
     return html`
-      <div class="player-info" style="row-gap: ${this._capturedPieceSize / 2}px;">
+      <div
+        class="player-info"
+        style="row-gap: ${this._capturedPieceSize / 2}px;"
+      >
         ${this._renderPlayer(
           isOrientationWhite ? this.blackPlayerName : this.whitePlayerName
         )}
@@ -683,7 +727,10 @@ export class HexchessBoard extends LitElement {
           isOrientationWhite ? blackScore : whiteScore
         )}
       </div>
-      <div class="player-info" style="row-gap: ${this._capturedPieceSize / 2}px">
+      <div
+        class="player-info"
+        style="row-gap: ${this._capturedPieceSize / 2}px"
+      >
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? blackPieces : whitePieces,
           isOrientationWhite ? whiteScore : blackScore
@@ -799,6 +846,7 @@ export class HexchessBoard extends LitElement {
           const isSelected =
             this._state.name !== 'WAITING' &&
             this._state.name !== 'REWOUND' &&
+            this._state.name !== 'PROMOTING' &&
             this._state.square === square;
           const selectedClass = isSelected ? 'selected' : '';
           let isPossibleMove;
@@ -852,7 +900,11 @@ export class HexchessBoard extends LitElement {
     column: Column,
     row: number
   ) {
-    if (this._state.name === 'WAITING' || this._state.name === 'REWOUND') {
+    if (
+      this._state.name === 'WAITING' ||
+      this._state.name === 'REWOUND' ||
+      this._state.name === 'PROMOTING'
+    ) {
       return nothing;
     }
 
@@ -910,6 +962,7 @@ export class HexchessBoard extends LitElement {
         <div class="game-info" style="padding-left: 17px">
           ${this._renderGameInfo()}
         </div>
+        ${this._renderPromotionOptions()}
       </div>
     `;
   }

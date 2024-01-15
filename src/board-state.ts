@@ -71,6 +71,15 @@ export type RewoundState = {
   scoreBlack: number;
   scoreWhite: number;
 };
+export type PromotionState = {
+  game: Game;
+  capturedPieces: Partial<Record<Piece, number>>;
+  legalMoves: LegalMoves;
+  moves: Move[];
+  name: 'PROMOTING';
+  scoreBlack: number;
+  scoreWhite: number;
+};
 
 // TODO - handle all state transitions for this
 // Flagging, resigning, accepting draw, and making moves to cause this
@@ -91,7 +100,8 @@ export type BoardState =
   | MouseUpPieceSelected
   | DragPieceState
   | CancelSelectionSoonState
-  | RewoundState;
+  | RewoundState
+  | PromotionState;
 
 export type Transition =
   | {
@@ -127,6 +137,10 @@ export type Transition =
     }
   | {
       name: 'RESET';
+    }
+  | {
+      name: 'PROMOTE';
+      piece: Omit<Piece, 'K' | 'k' | 'P' | 'p'>;
     };
 
 export const getNewState = (
@@ -146,6 +160,8 @@ export const getNewState = (
       return _cancelSelectionSoonStateTransition(state, transition);
     case 'REWOUND':
       return _rewoundStateTransition(state, transition);
+    case 'PROMOTING':
+      return _promotingStateTransition(state, transition);
   }
 };
 
@@ -196,6 +212,24 @@ const _capturePieceOrMakeMove = (
       newCapturedPieces[capturedPieceAsString] = 1;
     }
   }
+
+  if (
+    fromPiece instanceof Pawn &&
+    (Position.fromString(to).isBeginningOfColumn() ||
+      Position.fromString(to).isEndOfColumn())
+  ) {
+    return {
+      state: {
+        ...state,
+        capturedPieces: newCapturedPieces,
+        moves: state.moves.concat(newMove),
+        name: 'PROMOTING',
+        scoreBlack: newBlackScore,
+        scoreWhite: newWhiteScore,
+      },
+      didChange: true,
+    };
+  }
   return {
     state: {
       ...state,
@@ -208,6 +242,81 @@ const _capturePieceOrMakeMove = (
     },
     didChange: true,
   };
+};
+
+const _promotingStateTransition = (
+  state: PromotionState,
+  transition: Transition
+): BoardChange => {
+  switch (transition.name) {
+    case 'PROMOTE': {
+      const isWhite = state.game.turn % 2 === 0;
+      let scoreBump: number;
+      switch (transition.piece) {
+        case 'Q':
+        case 'q':
+          scoreBump = 8;
+          break;
+        case 'R':
+        case 'r':
+          scoreBump = 4;
+          break;
+        case 'B':
+        case 'b':
+        case 'N':
+        case 'n':
+        default:
+          scoreBump = 2;
+          break;
+      }
+      state.game.promotePawn(transition.piece);
+      const newCapturedPieces = JSON.parse(
+        JSON.stringify(state.capturedPieces)
+      );
+      if (isWhite) {
+        if (!newCapturedPieces['P']) {
+          newCapturedPieces['P'] = 1;
+        } else {
+          newCapturedPieces['P'] += 1;
+        }
+        if (!newCapturedPieces[transition.piece.toLowerCase()]) {
+          newCapturedPieces[transition.piece.toLowerCase()] = 1;
+        } else {
+          newCapturedPieces[transition.piece.toLowerCase()] += 1;
+        }
+      } else {
+        if (!newCapturedPieces['p']) {
+          newCapturedPieces['p'] = 1;
+        } else {
+          newCapturedPieces['p'] += 1;
+        }
+        if (!newCapturedPieces[transition.piece.toUpperCase()]) {
+          newCapturedPieces[transition.piece.toUpperCase()] = 1;
+        } else {
+          newCapturedPieces[transition.piece.toUpperCase()] += 1;
+        }
+      }
+      return {
+        didChange: true,
+        state: {
+          ...state,
+          capturedPieces: newCapturedPieces,
+          legalMoves: state.game.allLegalMoves(),
+          name: 'WAITING',
+          scoreBlack: !isWhite
+            ? state.scoreBlack + scoreBump
+            : state.scoreBlack,
+          scoreWhite: isWhite ? state.scoreWhite + scoreBump : state.scoreWhite,
+        },
+      };
+    }
+    default: {
+      return {
+        didChange: false,
+        state,
+      };
+    }
+  }
 };
 
 const _rewoundStateTransition = (

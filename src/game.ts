@@ -208,7 +208,7 @@ export class Game {
     }
   }
 
-  promotePawn(piece: Piece) {
+  promotePawn(piece: Omit<Piece, 'p' | 'P' | 'K' | 'k'>) {
     const pawns = this.pawnAtEnd();
     if (pawns.length !== 1) {
       throw new Error('Must have exactly one pawn to promote');
@@ -223,10 +223,6 @@ export class Game {
     }
     if (!pawn.canBePromoted()) {
       throw new Error('Pawn must be promotable');
-    }
-
-    if (piece === 'k' || piece === 'K' || piece === 'p' || piece === 'P') {
-      throw new Error('Can only promote to knight, bishop, rook or queen');
     }
 
     this.board.promotePawn(pawn.position.toSquare(), piece);

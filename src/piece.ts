@@ -20,7 +20,8 @@ export const DEFAULT_PIECE_SIZE = 60;
 
 export const renderPiece = (
   piece: Piece,
-  size: number = DEFAULT_PIECE_SIZE
+  size: number = DEFAULT_PIECE_SIZE,
+  translate = true
 ) => {
   if (piece === null) return nothing;
   let id: keyof typeof pieceUrls;
@@ -62,9 +63,12 @@ export const renderPiece = (
       id = 'white-pawn';
       break;
   }
+  const style = translate
+    ? `transform: translate(-${size / 2}px, -${size / 2}px)`
+    : '';
   return html`<img
     src="${pieceUrls[id]}"
-    style="transform: translate(-${size / 2}px, -${size / 2}px)"
+    style="${style}"
     class="piece"
     height="${size}"
     width="${size}"
