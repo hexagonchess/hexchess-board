@@ -53,8 +53,8 @@ import {Game, GameState} from './game';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
-  private _capturedPiecePadding = -1 * Math.round(DEFAULT_PIECE_SIZE / 1.5);
-  private _capturedPieceGroupPadding = Math.round(DEFAULT_PIECE_SIZE / 2);
+  private _capturedPiecePadding = 0.2;
+  private _capturedPieceGroupPadding = 0.5;
   private _columnConfig: ColumnConfig = {} as ColumnConfig;
   private _draggedPiece: SVGElement | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
@@ -569,16 +569,17 @@ export class HexchessBoard extends LitElement {
   private _renderCapturedPieceGroup(
     piece: Piece,
     numPieces: number,
+    capturedPieceSize: number,
     x: number,
     y: number
   ) {
     return html`
       ${[...Array(numPieces).keys()].map((numPiece) => {
         const padding =
-          numPiece * (DEFAULT_PIECE_SIZE + this._capturedPiecePadding);
+          numPiece * capturedPieceSize * this._capturedPiecePadding;
         return html`
           <div style="position: absolute; left: ${x + padding}px; top: ${y}px">
-            ${renderPiece(piece)}
+            ${renderPiece(piece, capturedPieceSize)}
           </div>
         `;
       })}
@@ -597,48 +598,76 @@ export class HexchessBoard extends LitElement {
     const rook = 'r' in pieces ? 'r' : 'R' in pieces ? 'R' : undefined;
     const queen = 'q' in pieces ? 'q' : 'Q' in pieces ? 'Q' : undefined;
 
+    const capturedPieceSize = Math.floor(this._columnConfig.E.x / 10);
+
     const bishopX = pawn
       ? x +
-        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
-          (pieces[pawn] ?? 0) +
-        this._capturedPieceGroupPadding
+        capturedPieceSize * this._capturedPiecePadding * (pieces[pawn] ?? 0) +
+        this._capturedPieceGroupPadding * capturedPieceSize
       : x;
     const knightX = bishop
       ? bishopX +
-        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
-          (pieces[bishop] ?? 0) +
-        this._capturedPieceGroupPadding
+        capturedPieceSize * this._capturedPiecePadding * (pieces[bishop] ?? 0) +
+        this._capturedPieceGroupPadding * capturedPieceSize
       : bishopX;
     const rookX = knight
       ? knightX +
-        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
-          (pieces[knight] ?? 0) +
-        this._capturedPieceGroupPadding
+        capturedPieceSize * this._capturedPiecePadding * (pieces[knight] ?? 0) +
+        this._capturedPieceGroupPadding * capturedPieceSize
       : knightX;
     const queenX = rook
       ? rookX +
-        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
-          (pieces[rook] ?? 0) +
-        this._capturedPieceGroupPadding
+        capturedPieceSize * this._capturedPiecePadding * (pieces[rook] ?? 0) +
+        this._capturedPieceGroupPadding * capturedPieceSize
       : rookX;
     const scoreX = queen
-      ? queenX + DEFAULT_PIECE_SIZE + this._capturedPieceGroupPadding
+      ? queenX + capturedPieceSize * this._capturedPieceGroupPadding
       : queenX * this._capturedPieceGroupPadding;
 
     const capturedPawns = pawn
-      ? this._renderCapturedPieceGroup(pawn, pieces[pawn]!, x, y)
+      ? this._renderCapturedPieceGroup(
+          pawn,
+          pieces[pawn]!,
+          capturedPieceSize,
+          x,
+          y
+        )
       : nothing;
     const capturedBishops = bishop
-      ? this._renderCapturedPieceGroup(bishop, pieces[bishop]!, bishopX, y)
+      ? this._renderCapturedPieceGroup(
+          bishop,
+          pieces[bishop]!,
+          capturedPieceSize,
+          bishopX,
+          y
+        )
       : nothing;
     const capturedKnights = knight
-      ? this._renderCapturedPieceGroup(knight, pieces[knight]!, knightX, y)
+      ? this._renderCapturedPieceGroup(
+          knight,
+          pieces[knight]!,
+          capturedPieceSize,
+          knightX,
+          y
+        )
       : nothing;
     const capturedRooks = rook
-      ? this._renderCapturedPieceGroup(rook, pieces[rook]!, rookX, y)
+      ? this._renderCapturedPieceGroup(
+          rook,
+          pieces[rook]!,
+          capturedPieceSize,
+          rookX,
+          y
+        )
       : nothing;
     const capturedQueens = queen
-      ? this._renderCapturedPieceGroup(queen, pieces[queen]!, queenX, y)
+      ? this._renderCapturedPieceGroup(
+          queen,
+          pieces[queen]!,
+          capturedPieceSize,
+          queenX,
+          y
+        )
       : nothing;
 
     return html`
