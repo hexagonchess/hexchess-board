@@ -23,13 +23,19 @@
           document.querySelector('hexchess-board').rewind();
         }
       });
+      window.addEventListener('resize', () => {
+        document.querySelector('hexchess-board').resize();
+      });
+      window.onload = () => {
+        document.querySelector('hexchess-board').resize();
+      };
     </script>
-    <hexchess-board
-      id="hexchess-board"
-      height="930"
-      width="930"
-      board="start"
-      orientation="white"
-    ></hexchess-board>
+    <div id="blah" style="width: 100vw; height: 100vh">
+      <hexchess-board
+        id="hexchess-board"
+        board="start"
+        orientation="white"
+      ></hexchess-board>
+    </div>
   </body>
 </html>

@@ -53,8 +53,8 @@ import {Game, GameState} from './game';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
-  private _capturedPieceScaleFactor = 0.6;
-  private _capturedPieceGroupPadding = 10;
+  private _capturedPiecePadding = -1 * Math.round(DEFAULT_PIECE_SIZE / 1.5);
+  private _capturedPieceGroupPadding = Math.round(DEFAULT_PIECE_SIZE / 2);
   private _columnConfig: ColumnConfig = {} as ColumnConfig;
   private _draggedPiece: SVGElement | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
@@ -65,7 +65,6 @@ export class HexchessBoard extends LitElement {
     Square,
     string
   >;
-  private _lastKnownWidth: number | null = null;
   private _polygonWidth = 0;
   private _polygonHeight = 0;
   private _originalDragPosition: {x: number; y: number} | null = null;
@@ -147,27 +146,14 @@ export class HexchessBoard extends LitElement {
   hideCoordinates = false;
 
   /**
-   * The height of the board.
-   */
-  @property({type: Number})
-  height = 1000;
-
-  /**
    * Do not allow any other moves beyond the predetermined ones set in the `moves` property.
    */
   @property({type: Boolean})
   frozen = false;
 
-  /**
-   * The width of the board.
-   * If not provided, the board will use the default width.
-   */
-  @property({type: Number})
-  width = 1150;
-
   constructor() {
     super();
-    this._recalculateBoardCoordinates(this.width, this.height);
+    this._recalculateBoardCoordinates();
   }
 
   // ---------------
@@ -311,11 +297,11 @@ export class HexchessBoard extends LitElement {
     if (this._draggedPiece) {
       const newXPos = Math.min(
         Math.max(DEFAULT_PIECE_SIZE / 2, event.clientX),
-        this.width - DEFAULT_PIECE_SIZE / 2
+        this.offsetWidth - DEFAULT_PIECE_SIZE / 2
       );
       const newYPos = Math.min(
         Math.max(DEFAULT_PIECE_SIZE / 2, event.clientY),
-        this.height - DEFAULT_PIECE_SIZE / 2
+        this.offsetHeight - DEFAULT_PIECE_SIZE / 2
       );
       const deltaX = newXPos - this._originalDragPosition!.x;
       const deltaY = newYPos - this._originalDragPosition!.y;
@@ -536,10 +522,13 @@ export class HexchessBoard extends LitElement {
     }
   }
 
-  private _recalculateBoardCoordinates(width: number, height: number) {
-    this._polygonWidth = width / 8.5;
-    this._polygonHeight = height / 11;
-    this._columnConfig = this._calculateColumnConfig(width, height);
+  private _recalculateBoardCoordinates() {
+    this._polygonWidth = this.offsetWidth / 8.5;
+    this._polygonHeight = this.offsetHeight / 11;
+    this._columnConfig = this._calculateColumnConfig(
+      this.offsetWidth,
+      this.offsetHeight
+    );
     this._squareCenters = this._calculateSquareCenters(this._columnConfig);
     for (const column of COLUMN_ARRAY) {
       const numHexagons = this._numberOfHexagons(column);
@@ -572,7 +561,9 @@ export class HexchessBoard extends LitElement {
       return nothing;
     }
 
-    return svg`<text class="score" dominant-baseline="hanging" x="${x}" y="${y}">(+${score})</text>`;
+    return html`<p class="score" style="left:${x}px; top:${y};">
+      (+${score})
+    </p>`;
   }
 
   private _renderCapturedPieceGroup(
@@ -581,13 +572,15 @@ export class HexchessBoard extends LitElement {
     x: number,
     y: number
   ) {
-    return svg`
+    return html`
       ${[...Array(numPieces).keys()].map((numPiece) => {
-        return renderPiece(
-          piece,
-          x + DEFAULT_PIECE_SIZE * this._capturedPieceScaleFactor * numPiece,
-          y
-        );
+        const padding =
+          numPiece * (DEFAULT_PIECE_SIZE + this._capturedPiecePadding);
+        return html`
+          <div style="position: absolute; left: ${x + padding}px; top: ${y}px">
+            ${renderPiece(piece)}
+          </div>
+        `;
       })}
     `;
   }
@@ -606,35 +599,31 @@ export class HexchessBoard extends LitElement {
 
     const bishopX = pawn
       ? x +
-        DEFAULT_PIECE_SIZE *
-          this._capturedPieceScaleFactor *
+        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
           (pieces[pawn] ?? 0) +
         this._capturedPieceGroupPadding
       : x;
     const knightX = bishop
       ? bishopX +
-        DEFAULT_PIECE_SIZE *
-          this._capturedPieceScaleFactor *
+        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
           (pieces[bishop] ?? 0) +
         this._capturedPieceGroupPadding
       : bishopX;
     const rookX = knight
       ? knightX +
-        DEFAULT_PIECE_SIZE *
-          this._capturedPieceScaleFactor *
+        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
           (pieces[knight] ?? 0) +
         this._capturedPieceGroupPadding
       : knightX;
     const queenX = rook
       ? rookX +
-        DEFAULT_PIECE_SIZE *
-          this._capturedPieceScaleFactor *
+        (DEFAULT_PIECE_SIZE + this._capturedPiecePadding) *
           (pieces[rook] ?? 0) +
         this._capturedPieceGroupPadding
       : rookX;
     const scoreX = queen
-      ? queenX + DEFAULT_PIECE_SIZE + 2 * this._capturedPieceGroupPadding
-      : queenX + 2 * this._capturedPieceGroupPadding;
+      ? queenX + DEFAULT_PIECE_SIZE + this._capturedPieceGroupPadding
+      : queenX * this._capturedPieceGroupPadding;
 
     const capturedPawns = pawn
       ? this._renderCapturedPieceGroup(pawn, pieces[pawn]!, x, y)
@@ -652,21 +641,12 @@ export class HexchessBoard extends LitElement {
       ? this._renderCapturedPieceGroup(queen, pieces[queen]!, queenX, y)
       : nothing;
 
-    return svg`
-      <g class="captured-pieces" transform="scale(${
-        this._capturedPieceScaleFactor
-      })">
-        ${capturedPawns}
-        ${capturedBishops}
-        ${capturedKnights}
-        ${capturedRooks}
+    return html`
+      <div class="captured-pieces">
+        ${capturedPawns} ${capturedBishops} ${capturedKnights} ${capturedRooks}
         ${capturedQueens}
-        ${this._renderScore(
-          scoreX,
-          y + DEFAULT_PIECE_SIZE * this._capturedPieceScaleFactor,
-          score
-        )}
-      </g>
+        ${this._renderScore(scoreX, y + DEFAULT_PIECE_SIZE, score)}
+      </div>
     `;
   }
 
@@ -680,12 +660,10 @@ export class HexchessBoard extends LitElement {
       this._columnConfig
     )[1];
     const bottomY =
-      (this._getOffsets(
+      this._getOffsets(
         isOrientationWhite ? 'E1' : 'E10',
         this._columnConfig
-      )[1] +
-        this._polygonHeight) /
-      this._capturedPieceScaleFactor;
+      )[1] + this._polygonHeight;
 
     const whitePieceKeys = Object.keys(this._state.capturedPieces).filter(
       (letter) => letter.toUpperCase() === letter
@@ -713,23 +691,23 @@ export class HexchessBoard extends LitElement {
     const whiteScore = this._state.scoreWhite - this._state.scoreBlack;
     const blackScore = this._state.scoreBlack - this._state.scoreWhite;
 
-    return svg`
-      <g id="captured-pieces-top">
-      ${this._renderOneSideCapturedPieces(
-        isOrientationWhite ? whitePieces : blackPieces,
-        x,
-        topY,
-        isOrientationWhite ? blackScore : whiteScore
-      )}
-      </g>
-      <g id="captured-pieces-bottom">
-      ${this._renderOneSideCapturedPieces(
-        isOrientationWhite ? blackPieces : whitePieces,
-        x,
-        bottomY,
-        isOrientationWhite ? whiteScore : blackScore
-      )}
-      </g>
+    return html`
+      <div id="captured-pieces-top">
+        ${this._renderOneSideCapturedPieces(
+          isOrientationWhite ? whitePieces : blackPieces,
+          x + DEFAULT_PIECE_SIZE / 2,
+          topY,
+          isOrientationWhite ? blackScore : whiteScore
+        )}
+      </div>
+      <div id="captured-pieces-bottom">
+        ${this._renderOneSideCapturedPieces(
+          isOrientationWhite ? blackPieces : whitePieces,
+          x + DEFAULT_PIECE_SIZE / 2,
+          bottomY,
+          isOrientationWhite ? whiteScore : blackScore
+        )}
+      </div>
     `;
   }
 
@@ -744,7 +722,7 @@ export class HexchessBoard extends LitElement {
     const [x, y] = this._squareCenters![square];
     return html`
       <div style="left: ${x}px; top: ${y}px" class="piece piece-${square}">
-        ${renderPiece(piece.toString(), x, y)}
+        ${renderPiece(piece.toString())}
       </div>
     `;
   }
@@ -925,11 +903,11 @@ export class HexchessBoard extends LitElement {
         : 'cursor-grab';
 
     return html`
-      <div>
+      <div style="width: 100%; height: 100%;">
         <svg
-          width="${this.width}"
-          height="${this.height}"
-          viewbox="0 0 ${this.width} ${this.height}"
+          width="${this.offsetWidth}"
+          height="${this.offsetHeight}"
+          viewbox="0 0 ${this.offsetWidth} ${this.offsetHeight}"
           class="board ${cursorClass}"
           @pointerdown=${(event: MouseEvent | PointerEvent) =>
             this._handleMouseDown(event)}
@@ -945,7 +923,8 @@ export class HexchessBoard extends LitElement {
           </g>
           <g>${this._renderPlayers()}</g>
         </svg>
-        ${this._renderPieces()} ${this._renderCapturedPieces()}
+        <div>${this._renderPieces()}</div>
+        <div>${this._renderCapturedPieces()}</div>
       </div>
     `;
   }
@@ -988,9 +967,6 @@ export class HexchessBoard extends LitElement {
   }
 
   override render() {
-    if (this.width && this._lastKnownWidth !== this.width) {
-      this._recalculateBoardCoordinates(this.width, this.height);
-    }
     return html` ${this._renderBoard()} `;
   }
 
@@ -1014,6 +990,14 @@ export class HexchessBoard extends LitElement {
     } else {
       this.orientation = 'white';
     }
+  }
+
+  /**
+   * Resize the board based on the latest dimensions given to the shadow root.
+   */
+  resize() {
+    this._recalculateBoardCoordinates();
+    this.requestUpdate('board');
   }
 
   /**
@@ -1066,15 +1050,18 @@ export class HexchessBoard extends LitElement {
    */
   reset() {
     const newGame = new Game();
-    this._state = {
-      capturedPieces: {},
-      game: newGame,
-      legalMoves: newGame.allLegalMoves(),
-      moves: [],
-      name: 'WAITING',
-      scoreBlack: 42,
-      scoreWhite: 42,
-    };
+    this._reconcileNewState({
+      didChange: true,
+      state: {
+        capturedPieces: {},
+        game: newGame,
+        legalMoves: newGame.allLegalMoves(),
+        moves: [],
+        name: 'WAITING',
+        scoreBlack: 42,
+        scoreWhite: 42,
+      },
+    });
     this.frozen = false;
   }
 }

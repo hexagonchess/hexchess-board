@@ -20,8 +20,6 @@ export const DEFAULT_PIECE_SIZE = 60;
 
 export const renderPiece = (
   piece: Piece,
-  _x: number,
-  _y: number,
   size: number = DEFAULT_PIECE_SIZE
 ) => {
   if (piece === null) return nothing;

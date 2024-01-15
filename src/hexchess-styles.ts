@@ -52,6 +52,7 @@ export const styles = css`
   }
 
   .score {
+    position: absolute;
     color: var(--hexchess-score-color, black);
     font-size: var(--hexchess-score-size, 1.4rem);
   }
