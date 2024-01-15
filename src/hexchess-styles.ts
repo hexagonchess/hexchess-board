@@ -19,12 +19,33 @@ export const styles = css`
     background-color: var(--hexchess-board-bg, #fcfaf2);
   }
 
+  .captured-pieces {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+  }
+
   .cursor-grab {
     cursor: grab;
   }
 
   .cursor-grabbing {
     cursor: grabbing;
+  }
+
+  .game-info {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
   }
 
   .label {
@@ -47,19 +68,29 @@ export const styles = css`
     z-index: 1;
   }
 
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: flex-start;
+  }
+
   .possible-move > polygon {
     fill: var(--hexchess-possible-move-bg, #a68a2d88);
   }
 
   .score {
-    position: absolute;
+    margin: 0;
+    padding: 0;
     color: var(--hexchess-score-color, black);
-    font-size: var(--hexchess-score-size, 1.4rem);
+    font-size: var(--hexchess-score-size, 1.2rem);
   }
 
   .username {
     color: var(--hexchess-playername-color, black);
     font-size: var(--hexchess-playername-size, 1.4rem);
+    margin: 0;
+    padding: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -92,6 +123,6 @@ export const styles = css`
 
   .drag-piece {
     position: absolute;
-    z-index: 10;
+    z-index: 2;
   }
 `;

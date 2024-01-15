@@ -53,8 +53,9 @@ import {Game, GameState} from './game';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
+  private _capturedPieceSize = 0;
   private _capturedPiecePadding = 0.2;
-  private _capturedPieceGroupPadding = 0.5;
+  private _capturedPieceGroupPadding = 1;
   private _columnConfig: ColumnConfig = {} as ColumnConfig;
   private _draggedPiece: SVGElement | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
@@ -530,6 +531,7 @@ export class HexchessBoard extends LitElement {
       this.offsetHeight
     );
     this._squareCenters = this._calculateSquareCenters(this._columnConfig);
+    this._capturedPieceSize = Math.floor(this._columnConfig.E.x / 10);
     for (const column of COLUMN_ARRAY) {
       const numHexagons = this._numberOfHexagons(column);
       for (let row = 1; row <= numHexagons; row++) {
@@ -552,7 +554,7 @@ export class HexchessBoard extends LitElement {
   // Rendering methods
   // -----------------
 
-  private _renderScore(x: number, y: number, score: number | undefined) {
+  private _renderScore(score: number | undefined) {
     if (!score) {
       return nothing;
     }
@@ -561,35 +563,31 @@ export class HexchessBoard extends LitElement {
       return nothing;
     }
 
-    return html`<p class="score" style="left:${x}px; top:${y};">
-      (+${score})
-    </p>`;
+    return html`<p class="score">(+${score})</p>`;
   }
 
   private _renderCapturedPieceGroup(
     piece: Piece,
     numPieces: number,
-    capturedPieceSize: number,
-    x: number,
-    y: number
+    capturedPieceSize: number
   ) {
     return html`
-      ${[...Array(numPieces).keys()].map((numPiece) => {
-        const padding =
-          numPiece * capturedPieceSize * this._capturedPiecePadding;
-        return html`
-          <div style="position: absolute; left: ${x + padding}px; top: ${y}px">
-            ${renderPiece(piece, capturedPieceSize)}
-          </div>
-        `;
-      })}
+      <div class="captured-piece-group">
+        ${[...Array(numPieces).keys()].map((numPiece) => {
+          const padding =
+            numPiece * capturedPieceSize * this._capturedPiecePadding;
+          return html`
+            <div style="position: relative; left: ${padding}px">
+              ${renderPiece(piece, capturedPieceSize)}
+            </div>
+          `;
+        })}
+      </div>
     `;
   }
 
   private _renderOneSideCapturedPieces(
     pieces: Partial<Record<Piece, number>>,
-    x: number,
-    y: number,
     score: number
   ) {
     const pawn = 'p' in pieces ? 'p' : 'P' in pieces ? 'P' : undefined;
@@ -598,101 +596,60 @@ export class HexchessBoard extends LitElement {
     const rook = 'r' in pieces ? 'r' : 'R' in pieces ? 'R' : undefined;
     const queen = 'q' in pieces ? 'q' : 'Q' in pieces ? 'Q' : undefined;
 
-    const capturedPieceSize = Math.floor(this._columnConfig.E.x / 10);
-
-    const bishopX = pawn
-      ? x +
-        capturedPieceSize * this._capturedPiecePadding * (pieces[pawn] ?? 0) +
-        this._capturedPieceGroupPadding * capturedPieceSize
-      : x;
-    const knightX = bishop
-      ? bishopX +
-        capturedPieceSize * this._capturedPiecePadding * (pieces[bishop] ?? 0) +
-        this._capturedPieceGroupPadding * capturedPieceSize
-      : bishopX;
-    const rookX = knight
-      ? knightX +
-        capturedPieceSize * this._capturedPiecePadding * (pieces[knight] ?? 0) +
-        this._capturedPieceGroupPadding * capturedPieceSize
-      : knightX;
-    const queenX = rook
-      ? rookX +
-        capturedPieceSize * this._capturedPiecePadding * (pieces[rook] ?? 0) +
-        this._capturedPieceGroupPadding * capturedPieceSize
-      : rookX;
-    const scoreX = queen
-      ? queenX + capturedPieceSize * this._capturedPieceGroupPadding
-      : queenX * this._capturedPieceGroupPadding;
-
     const capturedPawns = pawn
       ? this._renderCapturedPieceGroup(
           pawn,
           pieces[pawn]!,
-          capturedPieceSize,
-          x,
-          y
+          this._capturedPieceSize
         )
       : nothing;
     const capturedBishops = bishop
       ? this._renderCapturedPieceGroup(
           bishop,
           pieces[bishop]!,
-          capturedPieceSize,
-          bishopX,
-          y
+          this._capturedPieceSize
         )
       : nothing;
     const capturedKnights = knight
       ? this._renderCapturedPieceGroup(
           knight,
           pieces[knight]!,
-          capturedPieceSize,
-          knightX,
-          y
+          this._capturedPieceSize
         )
       : nothing;
     const capturedRooks = rook
       ? this._renderCapturedPieceGroup(
           rook,
           pieces[rook]!,
-          capturedPieceSize,
-          rookX,
-          y
+          this._capturedPieceSize
         )
       : nothing;
     const capturedQueens = queen
       ? this._renderCapturedPieceGroup(
           queen,
           pieces[queen]!,
-          capturedPieceSize,
-          queenX,
-          y
+          this._capturedPieceSize
         )
       : nothing;
 
     return html`
-      <div class="captured-pieces">
+      <div
+        class="captured-pieces"
+        style="column-gap: ${this._capturedPieceSize *
+        this._capturedPieceGroupPadding}px;"
+      >
         ${capturedPawns} ${capturedBishops} ${capturedKnights} ${capturedRooks}
-        ${capturedQueens}
-        ${this._renderScore(scoreX, y + DEFAULT_PIECE_SIZE, score)}
+        ${capturedQueens} ${this._renderScore(score)}
       </div>
     `;
   }
 
-  private _renderCapturedPieces() {
+  private _renderPlayer(name: string) {
+    return html` <p class="username">${name}</p> `;
+  }
+
+  private _renderGameInfo() {
     const isOrientationWhite = this.orientation === 'white';
-    const x = isOrientationWhite
-      ? this._columnConfig.A.x
-      : this._columnConfig.L.x;
-    const topY = this._getOffsets(
-      isOrientationWhite ? 'E10' : 'E1',
-      this._columnConfig
-    )[1];
-    const bottomY =
-      this._getOffsets(
-        isOrientationWhite ? 'E1' : 'E10',
-        this._columnConfig
-      )[1] + this._polygonHeight;
 
     const whitePieceKeys = Object.keys(this._state.capturedPieces).filter(
       (letter) => letter.toUpperCase() === letter
@@ -700,10 +657,6 @@ export class HexchessBoard extends LitElement {
     const blackPieceKeys = Object.keys(this._state.capturedPieces).filter(
       (letter) => letter.toLowerCase() === letter
     );
-
-    if (whitePieceKeys.length === 0 && blackPieceKeys.length === 0) {
-      return nothing;
-    }
 
     const whitePieces = whitePieceKeys.reduce((acc, piece) => {
       const p = piece as Piece;
@@ -721,20 +674,22 @@ export class HexchessBoard extends LitElement {
     const blackScore = this._state.scoreBlack - this._state.scoreWhite;
 
     return html`
-      <div id="captured-pieces-top">
+      <div class="player-info" style="row-gap: ${this._capturedPieceSize / 2}px;">
+        ${this._renderPlayer(
+          isOrientationWhite ? this.blackPlayerName : this.whitePlayerName
+        )}
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? whitePieces : blackPieces,
-          x + DEFAULT_PIECE_SIZE / 2,
-          topY,
           isOrientationWhite ? blackScore : whiteScore
         )}
       </div>
-      <div id="captured-pieces-bottom">
+      <div class="player-info" style="row-gap: ${this._capturedPieceSize / 2}px">
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? blackPieces : whitePieces,
-          x + DEFAULT_PIECE_SIZE / 2,
-          bottomY,
           isOrientationWhite ? whiteScore : blackScore
+        )}
+        ${this._renderPlayer(
+          isOrientationWhite ? this.whitePlayerName : this.blackPlayerName
         )}
       </div>
     `;
@@ -950,48 +905,12 @@ export class HexchessBoard extends LitElement {
               return svg`${this._renderColumn(column)}`;
             })}
           </g>
-          <g>${this._renderPlayers()}</g>
         </svg>
         <div>${this._renderPieces()}</div>
-        <div>${this._renderCapturedPieces()}</div>
+        <div class="game-info" style="padding-left: 17px">
+          ${this._renderGameInfo()}
+        </div>
       </div>
-    `;
-  }
-
-  private _renderPlayer(
-    name: string,
-    x: number,
-    y: number,
-    alignment: 'auto' | 'hanging'
-  ) {
-    return svg`
-      <text dominant-baseline="${alignment}" x="${x}" y="${y}" class="username">${name}</text>
-    `;
-  }
-
-  private _renderPlayers() {
-    const isOrientationWhite = this.orientation === 'white';
-    const x = isOrientationWhite
-      ? this._columnConfig.A.x
-      : this._columnConfig.L.x;
-    const topY = this._getOffsets(
-      isOrientationWhite ? 'F11' : 'F1',
-      this._columnConfig
-    )[1];
-    const bottomY =
-      this._getOffsets(
-        isOrientationWhite ? 'F1' : 'F11',
-        this._columnConfig
-      )[1] + this._polygonHeight;
-    const topName = isOrientationWhite
-      ? this.blackPlayerName
-      : this.whitePlayerName;
-    const bottomName = isOrientationWhite
-      ? this.whitePlayerName
-      : this.blackPlayerName;
-    return svg`
-      ${this._renderPlayer(topName, x, topY, 'hanging')}
-      ${this._renderPlayer(bottomName, x, bottomY, 'auto')}
     `;
   }
 
