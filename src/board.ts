@@ -117,6 +117,20 @@ export class Board {
       .some((pos) => pos.col === to.col && pos.row === to.row);
   }
 
+  private _resetPawnsDidMoveTwoSquares() {
+    Object.entries(this.pieces).forEach(([square, piece]) => {
+      if (piece === null || !(piece instanceof Pawn)) {
+        return;
+      }
+
+      this.pieces[square as Square] = new Pawn(
+        piece.color,
+        piece.position,
+        false
+      );
+    });
+  }
+
   getKing(color: Omit<Color, 'grey'>): King {
     for (const [_square, piece] of Object.entries(this.pieces)) {
       if (piece instanceof King && piece.color === color) {
@@ -214,6 +228,8 @@ export class Board {
       );
     }
 
+    this._resetPawnsDidMoveTwoSquares();
+
     const piece = this.getPiece(from.toSquare());
     this.pieces[from.toSquare()] = null;
     if (piece instanceof Pawn) {
@@ -278,6 +294,7 @@ export class Board {
         break;
       }
     }
+    this._resetPawnsDidMoveTwoSquares();
   }
 
   capturePiece(from: Position, to: Position) {
@@ -313,6 +330,8 @@ export class Board {
     } else {
       throw new Error('Invalid piece type');
     }
+
+    this._resetPawnsDidMoveTwoSquares();
   }
 
   enPassant(from: Position, to: Position) {
@@ -328,5 +347,6 @@ export class Board {
       this.pieces[to.getTopPosition()!.toSquare()] = null;
     }
     this.pieces[to.toSquare()] = new Pawn(fromPiece.color, to, false);
+    this._resetPawnsDidMoveTwoSquares();
   }
 }

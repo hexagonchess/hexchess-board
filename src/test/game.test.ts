@@ -263,4 +263,26 @@ describe('Game', () => {
     });
     expect(game.board.getPiece(new Position('F', 5).toSquare())).toBe(null);
   });
+
+  test('Can only en passant for one turn after the pawn moves', () => {
+    const game = new Game();
+    game.movePiece(new Position('D', 3), new Position('D', 5));
+    game.movePiece(new Position('E', 7), new Position('E', 5));
+
+    let whitePawn = game.board.getPiece('D5');
+    expect(whitePawn).toBeInstanceOf(Pawn);
+    expect((whitePawn as Pawn).didMoveTwoSquares).toBe(false);
+
+    let blackPawn = game.board.getPiece('E5');
+    expect(blackPawn).toBeInstanceOf(Pawn);
+    expect((blackPawn as Pawn).didMoveTwoSquares).toBe(true);
+
+    game.movePiece(new Position('B', 1), new Position('B', 2));
+    blackPawn = game.board.getPiece('E5');
+    expect((blackPawn as Pawn).didMoveTwoSquares).toBe(false);
+
+    whitePawn = game.board.getPiece('D5');
+    const allMoves = whitePawn!.allSquareMoves(game.board);
+    expect(allMoves.find((move) => move.toSquare() === 'E6')).toBe(undefined);
+  });
 });
