@@ -338,7 +338,10 @@ export class HexchessBoard extends LitElement {
   // ----------------------
 
   private _reconcileNewState(newState: BoardChange) {
-    if (newState.didChange) {
+    if (!newState.didChange) {
+      return;
+    }
+    if (newState.state.name !== 'REWOUND') {
       if (
         newState.state.game.state() === GameState.PROMOTING &&
         this._state.game.state() !== GameState.PROMOTING
@@ -359,9 +362,9 @@ export class HexchessBoard extends LitElement {
           new CustomEvent('move', {detail: {from: move.from, to: move.to}})
         );
       }
-      this._state = newState.state;
-      this.requestUpdate('board');
     }
+    this._state = newState.state;
+    this.requestUpdate('board');
   }
 
   private _calculateHexagonPoints(width: number, height: number): number[][] {
@@ -847,6 +850,7 @@ export class HexchessBoard extends LitElement {
             this._state.name !== 'WAITING' &&
             this._state.name !== 'REWOUND' &&
             this._state.name !== 'PROMOTING' &&
+            this._state.name !== 'GAMEOVER' &&
             this._state.square === square;
           const selectedClass = isSelected ? 'selected' : '';
           let isPossibleMove;
@@ -903,7 +907,8 @@ export class HexchessBoard extends LitElement {
     if (
       this._state.name === 'WAITING' ||
       this._state.name === 'REWOUND' ||
-      this._state.name === 'PROMOTING'
+      this._state.name === 'PROMOTING' ||
+      this._state.name === 'GAMEOVER'
     ) {
       return nothing;
     }

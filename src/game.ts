@@ -279,14 +279,60 @@ export class Game {
         Position.fromString(move.to)
       );
     }
+
+    switch (move.promotion) {
+      case 'Q':
+        this.board.addPiece(new Queen('white', Position.fromString(move.to)));
+        break;
+      case 'q':
+        this.board.addPiece(new Queen('black', Position.fromString(move.to)));
+        break;
+      case 'R':
+        this.board.addPiece(new Rook('white', Position.fromString(move.to)));
+        break;
+      case 'r':
+        this.board.addPiece(new Rook('black', Position.fromString(move.to)));
+        break;
+      case 'B':
+        this.board.addPiece(new Bishop('white', Position.fromString(move.to)));
+        break;
+      case 'b':
+        this.board.addPiece(new Bishop('black', Position.fromString(move.to)));
+        break;
+      case 'N':
+        this.board.addPiece(new Knight('white', Position.fromString(move.to)));
+        break;
+      case 'n':
+        this.board.addPiece(new Knight('black', Position.fromString(move.to)));
+        break;
+      default:
+        break;
+    }
   }
 
   rewind(move: Move) {
+    if (move.promotion) {
+      let color: Color = 'white';
+      switch (move.promotion) {
+        case 'q':
+        case 'r':
+        case 'b':
+        case 'n':
+          color = 'black';
+          break;
+        default:
+          break;
+      }
+      this.board.removePiece(move.from);
+      this.board.addPiece(new Pawn(color, Position.fromString(move.to), false));
+    }
+
     this.board.movePiece(
       Position.fromString(move.to),
       Position.fromString(move.from),
       true
     );
+
     if (move.capturedPiece) {
       if (move.capturedPiece === 'p') {
         if (move.enPassant) {

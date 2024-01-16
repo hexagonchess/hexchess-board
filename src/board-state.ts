@@ -1,4 +1,4 @@
-import {Game} from './game';
+import {Game, GameState} from './game';
 import {Pawn} from './pawn';
 import {PIECE_VALUES} from './piece';
 import {Position} from './position';
@@ -81,12 +81,9 @@ export type PromotionState = {
   scoreWhite: number;
 };
 
-// TODO - handle all state transitions for this
-// Flagging, resigning, accepting draw, and making moves to cause this
 export type GameOverState = {
   game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
-  currentTurn: number;
   moves: Move[];
   name: 'GAMEOVER';
   outcome: 'WHITE_WINS' | 'BLACK_WINS' | 'DRAW';
@@ -101,7 +98,8 @@ export type BoardState =
   | DragPieceState
   | CancelSelectionSoonState
   | RewoundState
-  | PromotionState;
+  | PromotionState
+  | GameOverState;
 
 export type Transition =
   | {
@@ -162,6 +160,8 @@ export const getNewState = (
       return _rewoundStateTransition(state, transition);
     case 'PROMOTING':
       return _promotingStateTransition(state, transition);
+    case 'GAMEOVER':
+      return {state, didChange: false};
   }
 };
 
@@ -189,6 +189,7 @@ const _capturePieceOrMakeMove = (
     to,
     capturedPiece: capturedPiece ? capturedPiece.toString() : undefined,
     enPassant,
+    promotion: null,
   };
   const newWhiteScore =
     capturedPiece?.color === 'white'
@@ -296,6 +297,7 @@ const _promotingStateTransition = (
           newCapturedPieces[transition.piece.toUpperCase()] += 1;
         }
       }
+      state.moves[state.moves.length - 1].promotion = transition.piece;
       return {
         didChange: true,
         state: {
@@ -330,8 +332,13 @@ const _rewoundStateTransition = (
       }
       const move = state.moves[state.currentTurn];
       state.game.fastForward(move);
-      const newName =
-        state.currentTurn === state.game.turn - 1 ? 'WAITING' : 'REWOUND';
+      let newName: BoardState['name'];
+      if (state.currentTurn === state.game.turn - 1) {
+        newName =
+          state.game.state() === GameState.PROMOTING ? 'PROMOTING' : 'WAITING';
+      } else {
+        newName = 'REWOUND';
+      }
       return {
         state: {
           ...state,

@@ -9,6 +9,7 @@ export type Move = {
   to: Square;
   capturedPiece?: Piece;
   enPassant: boolean;
+  promotion: Omit<Piece, 'k' | 'K' | 'p' | 'P'> | null;
 };
 export type Orientation = 'white' | 'black';
 export type TileColor = 'white' | 'black' | 'grey';

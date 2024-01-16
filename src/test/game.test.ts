@@ -234,25 +234,31 @@ describe('Game', () => {
     const game = new Game();
     game.movePiece(new Position('B', 1), new Position('B', 2));
 
-    game.rewind({from: 'B1', to: 'B2', enPassant: false});
+    game.rewind({from: 'B1', to: 'B2', enPassant: false, promotion: null});
     expect(game.board.getPiece(new Position('B', 2).toSquare())).toBe(null);
 
-    game.fastForward({from: 'B1', to: 'B2', enPassant: false});
+    game.fastForward({from: 'B1', to: 'B2', enPassant: false, promotion: null});
     expect(game.board.getPiece(new Position('B', 2).toSquare())).not.toBe(null);
 
     game.movePiece(new Position('E', 7), new Position('E', 5));
     game.movePiece(new Position('F', 5), new Position('E', 5));
     expect(game.board.getPiece(new Position('F', 5).toSquare())).toBe(null);
 
-    game.rewind({from: 'F5', to: 'E5', capturedPiece: 'p', enPassant: false});
+    game.rewind({
+      from: 'F5',
+      to: 'E5',
+      capturedPiece: 'p',
+      enPassant: false,
+      promotion: null,
+    });
     expect(game.board.getPiece(new Position('F', 5).toSquare())).not.toBe(null);
     expect(game.board.getPiece(new Position('E', 7).toSquare())).toBe(null);
 
-    game.rewind({from: 'E7', to: 'E5', enPassant: false});
+    game.rewind({from: 'E7', to: 'E5', enPassant: false, promotion: null});
     expect(game.board.getPiece(new Position('E', 5).toSquare())).toBe(null);
     expect(game.board.getPiece(new Position('E', 7).toSquare())).not.toBe(null);
 
-    game.fastForward({from: 'E7', to: 'E5', enPassant: false});
+    game.fastForward({from: 'E7', to: 'E5', enPassant: false, promotion: null});
     expect(game.board.getPiece(new Position('E', 5).toSquare())).not.toBe(null);
 
     game.fastForward({
@@ -260,6 +266,7 @@ describe('Game', () => {
       to: 'E5',
       capturedPiece: 'p',
       enPassant: false,
+      promotion: null,
     });
     expect(game.board.getPiece(new Position('F', 5).toSquare())).toBe(null);
   });

@@ -160,6 +160,10 @@ export class Board {
     return piece !== null && piece.color !== color;
   }
 
+  removePiece(square: Square) {
+    this.pieces[square] = null;
+  }
+
   addPiece(piece: HexchessPiece) {
     this.pieces[piece.position.toSquare()] = piece;
   }
