@@ -140,17 +140,4 @@ export const styles = css`
     justify-content: start;
     z-index: 1;
   }
-
-  .game-over {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    z-index: 4;
-  }
 `;

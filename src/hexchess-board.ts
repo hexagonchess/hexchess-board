@@ -688,8 +688,26 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  private _renderPlayer(name: string) {
-    return html` <p class="username">${name}</p> `;
+  private _renderPlayer(name: string, isWhite: boolean) {
+    let outcome = '';
+    if (this._state.name === 'GAMEOVER') {
+      if (this._state.outcome === 'DRAW') {
+        outcome = '🤝'
+      } else if (this._state.outcome === 'WHITE_WINS') {
+        if (isWhite) {
+          outcome = '🏆'
+        } else {
+          outcome = '🏳️'
+        }
+      } else {
+        if (isWhite) {
+          outcome = '🏳️'
+        } else {
+          outcome = '🏆'
+        }
+      }
+    }
+    return html`<p class="username">${name} ${outcome}</p>`;
   }
 
   private _renderGameInfo() {
@@ -723,7 +741,8 @@ export class HexchessBoard extends LitElement {
         style="row-gap: ${this._capturedPieceSize / 2}px;"
       >
         ${this._renderPlayer(
-          isOrientationWhite ? this.blackPlayerName : this.whitePlayerName
+          isOrientationWhite ? this.blackPlayerName : this.whitePlayerName,
+          !isOrientationWhite
         )}
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? whitePieces : blackPieces,
@@ -739,7 +758,8 @@ export class HexchessBoard extends LitElement {
           isOrientationWhite ? whiteScore : blackScore
         )}
         ${this._renderPlayer(
-          isOrientationWhite ? this.whitePlayerName : this.blackPlayerName
+          isOrientationWhite ? this.whitePlayerName : this.blackPlayerName,
+          isOrientationWhite
         )}
       </div>
     `;

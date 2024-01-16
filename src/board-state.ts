@@ -81,12 +81,13 @@ export type PromotionState = {
   scoreWhite: number;
 };
 
+type Outcome = 'WHITE_WINS' | 'BLACK_WINS' | 'DRAW';
 export type GameOverState = {
   game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   moves: Move[];
   name: 'GAMEOVER';
-  outcome: 'WHITE_WINS' | 'BLACK_WINS' | 'DRAW';
+  outcome: Outcome;
   scoreBlack: number;
   scoreWhite: number;
 };
@@ -215,6 +216,26 @@ const _capturePieceOrMakeMove = (
   }
 
   if (
+    state.game.state() !== GameState.IN_PROGRESS &&
+    state.game.state() !== GameState.PROMOTING
+  ) {
+    let outcome: Outcome = 'DRAW';
+    if (state.game.state() === GameState.CHECKMATE) {
+      outcome = state.game.turn % 2 === 0 ? 'BLACK_WINS' : 'WHITE_WINS';
+    }
+    return {
+      state: {
+        ...state,
+        capturedPieces: newCapturedPieces,
+        moves: state.moves.concat(newMove),
+        name: 'GAMEOVER',
+        outcome,
+        scoreBlack: newBlackScore,
+        scoreWhite: newWhiteScore,
+      },
+      didChange: true,
+    };
+  } else if (
     fromPiece instanceof Pawn &&
     (Position.fromString(to).isBeginningOfColumn() ||
       Position.fromString(to).isEndOfColumn())
