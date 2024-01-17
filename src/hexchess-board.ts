@@ -941,6 +941,15 @@ export class HexchessBoard extends LitElement {
       return nothing;
     }
 
+    if (this._state.game.board.getPiece(square) !== null) {
+      return svg`<circle
+        class="possible-capture"
+        cx=${width / 2}
+        cy=${height / 2}
+        r=${Math.min(this._polygonHeight, this._polygonWidth) / 2.2} />
+      `;
+    }
+
     const radius = Math.min(this._polygonHeight, this._polygonWidth) / 6;
     return svg`<circle
       cx=${width / 2}

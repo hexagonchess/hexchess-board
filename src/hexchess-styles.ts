@@ -80,6 +80,12 @@ export const styles = css`
     justify-content: start;
   }
 
+  .possible-capture {
+    stroke: var(--hexchess-possible-capture-bg, #a68a2d);
+    stroke-width: 5;
+    fill: none;
+  }
+
   .possible-move > polygon {
     fill: var(--hexchess-possible-move-bg, #a68a2d88);
   }
