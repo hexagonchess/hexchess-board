@@ -973,7 +973,7 @@ export class HexchessBoard extends LitElement {
         : 'cursor-grab';
 
     return html`
-      <div style="width: 100%; height: 100%;">
+      <div style="width: 100%; height: 100%; position: relative;">
         <svg
           width="${this.offsetWidth}"
           height="${this.offsetHeight}"
