@@ -67,6 +67,7 @@ export class HexchessBoard extends LitElement {
     string
   >;
   private _boundingRect: null | DOMRect = null;
+  private _pieceSize = DEFAULT_PIECE_SIZE;
   private _polygonWidth = 0;
   private _polygonHeight = 0;
   private _originalDragPosition: {x: number; y: number} | null = null;
@@ -609,7 +610,7 @@ export class HexchessBoard extends LitElement {
                 ._polygonHeight}px; background-color: var(--hexchess-board-bg, #fcfaf2);"
               @click=${() => this._handlePromotion(option)}
             >
-              ${renderPiece(option, DEFAULT_PIECE_SIZE, false)}
+              ${renderPiece(option, this._pieceSize, false)}
             </div>
           `;
         })}
@@ -795,7 +796,7 @@ export class HexchessBoard extends LitElement {
     const [x, y] = this._squareCenters![square];
     return html`
       <div style="left: ${x}px; top: ${y}px" class="piece piece-${square}">
-        ${renderPiece(piece.toString())}
+        ${renderPiece(piece.toString(), this._pieceSize)}
       </div>
     `;
   }
@@ -1053,6 +1054,7 @@ export class HexchessBoard extends LitElement {
   resize() {
     this._recalculateBoardCoordinates();
     this._boundingRect = this.renderRoot.querySelector('#root')?.getBoundingClientRect() ?? null;
+    this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
     this.requestUpdate('board');
   }
 
