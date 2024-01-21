@@ -1045,6 +1045,7 @@ export class HexchessBoard extends LitElement {
     } else {
       this.orientation = 'white';
     }
+    this._recalculateBoardCoordinates();
     this.requestUpdate('board');
   }
 
