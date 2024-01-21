@@ -15,7 +15,7 @@ import {
   WHITE_COLUMN_LABEL_SQUARES,
   stringToMoves,
 } from './utils';
-import {LitElement, html, svg, nothing} from 'lit';
+import {LitElement, html, svg, nothing, PropertyValues} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {Column, ColumnConfig, Square, boardToFen, fenToBoard} from './utils';
 import {styles} from './hexchess-styles';
@@ -171,6 +171,10 @@ export class HexchessBoard extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('pointerup', this._handleMouseUp);
     window.removeEventListener('pointermove', this._handleMouseMove);
+  }
+
+  protected override firstUpdated(_changedProperties: PropertyValues): void {
+    this.resize();
   }
 
   private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
@@ -692,18 +696,18 @@ export class HexchessBoard extends LitElement {
     let outcome = '';
     if (this._state.name === 'GAMEOVER') {
       if (this._state.outcome === 'DRAW') {
-        outcome = '🤝'
+        outcome = '🤝';
       } else if (this._state.outcome === 'WHITE_WINS') {
         if (isWhite) {
-          outcome = '🏆'
+          outcome = '🏆';
         } else {
-          outcome = '🏳️'
+          outcome = '🏳️';
         }
       } else {
         if (isWhite) {
-          outcome = '🏳️'
+          outcome = '🏳️';
         } else {
-          outcome = '🏆'
+          outcome = '🏆';
         }
       }
     }
