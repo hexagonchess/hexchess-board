@@ -53,6 +53,8 @@ import {Game, GameState} from './game';
 export class HexchessBoard extends LitElement {
   static override styles = styles;
 
+  private _boardHeight = 250;
+  private _boardWidth = 250;
   private _capturedPieceSize = 0;
   private _capturedPiecePadding = 0.2;
   private _capturedPieceGroupPadding = 1;
@@ -68,8 +70,8 @@ export class HexchessBoard extends LitElement {
   >;
   private _boundingRect: null | DOMRect = null;
   private _pieceSize = DEFAULT_PIECE_SIZE;
-  private _polygonWidth = 0;
-  private _polygonHeight = 0;
+  private _polygonWidth = 29;
+  private _polygonHeight = 22;
   private _originalDragPosition: {x: number; y: number} | null = null;
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
@@ -555,11 +557,13 @@ export class HexchessBoard extends LitElement {
   }
 
   private _recalculateBoardCoordinates() {
-    this._polygonWidth = this.offsetWidth / 8.5;
-    this._polygonHeight = this.offsetHeight / 11;
+    this._boardWidth = Math.max(this.offsetWidth, 250);
+    this._boardHeight = Math.max(this.offsetHeight, 250);
+    this._polygonWidth = Math.max(this._boardWidth / 8.5, 10);
+    this._polygonHeight = Math.max(this._boardHeight / 11, 10);
     this._columnConfig = this._calculateColumnConfig(
-      this.offsetWidth,
-      this.offsetHeight
+      this._boardWidth,
+      this._boardHeight
     );
     this._squareCenters = this._calculateSquareCenters(this._columnConfig);
     this._capturedPieceSize = Math.floor(this._columnConfig.E.x / 10);
@@ -995,9 +999,9 @@ export class HexchessBoard extends LitElement {
     return html`
       <div id="root" style="width: 100%; height: 100%; position: relative;">
         <svg
-          width="${this.offsetWidth}"
-          height="${this.offsetHeight}"
-          viewbox="0 0 ${this.offsetWidth} ${this.offsetHeight}"
+          width="100%"
+          height="100%"
+          viewbox="0 0 ${this._boardWidth} ${this._boardHeight}"
           class="board ${cursorClass}"
           @pointerdown=${(event: MouseEvent | PointerEvent) =>
             this._handleMouseDown(event)}
@@ -1054,7 +1058,8 @@ export class HexchessBoard extends LitElement {
    */
   resize() {
     this._recalculateBoardCoordinates();
-    this._boundingRect = this.renderRoot.querySelector('#root')?.getBoundingClientRect() ?? null;
+    this._boundingRect =
+      this.renderRoot.querySelector('#root')?.getBoundingClientRect() ?? null;
     this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
     this.requestUpdate('board');
   }
