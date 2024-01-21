@@ -187,6 +187,9 @@ export class HexchessBoard extends LitElement {
 
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
     event.preventDefault();
+    if (this.frozen) {
+      return;
+    }
 
     // Only primary button interactions
     if (event.button !== 0) {
@@ -236,7 +239,7 @@ export class HexchessBoard extends LitElement {
   }
 
   private _handleMouseEnter(square: Square) {
-    if (this._state.name !== 'DRAG_PIECE') {
+    if (this._state.name !== 'DRAG_PIECE' || this.frozen) {
       return;
     }
 
@@ -248,6 +251,10 @@ export class HexchessBoard extends LitElement {
   }
 
   private _handleMouseUp(event: MouseEvent | PointerEvent) {
+    if (this.frozen) {
+      return;
+    }
+
     const square = this._getSquareFromClick(event);
     let newState;
     if (!square) {
@@ -304,6 +311,10 @@ export class HexchessBoard extends LitElement {
       this._state.name !== 'MOUSE_DOWN_PIECE_SELECTED' &&
       this._state.name !== 'CANCEL_SELECTION_SOON'
     ) {
+      return;
+    }
+
+    if (this.frozen) {
       return;
     }
 
@@ -1029,6 +1040,7 @@ export class HexchessBoard extends LitElement {
     } else {
       this.orientation = 'white';
     }
+    this.requestUpdate('board');
   }
 
   /**
