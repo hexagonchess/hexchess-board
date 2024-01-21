@@ -133,7 +133,6 @@ export const styles = css`
   }
 
   .drag-piece {
-    position: absolute;
     z-index: 2;
   }
 

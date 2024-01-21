@@ -66,6 +66,7 @@ export class HexchessBoard extends LitElement {
     Square,
     string
   >;
+  private _boundingRect: null | DOMRect = null;
   private _polygonWidth = 0;
   private _polygonHeight = 0;
   private _originalDragPosition: {x: number; y: number} | null = null;
@@ -319,13 +320,16 @@ export class HexchessBoard extends LitElement {
     }
 
     if (this._draggedPiece) {
+      console.log(this._boundingRect)
+      const left = this._boundingRect?.left ?? 0;
       const newXPos = Math.min(
-        Math.max(DEFAULT_PIECE_SIZE / 2, event.clientX),
-        this.offsetWidth - DEFAULT_PIECE_SIZE / 2
+        Math.max(left + DEFAULT_PIECE_SIZE / 2, event.clientX),
+        left + this.offsetWidth - DEFAULT_PIECE_SIZE / 2
       );
+      const top = this._boundingRect?.top ?? 0;
       const newYPos = Math.min(
-        Math.max(DEFAULT_PIECE_SIZE / 2, event.clientY),
-        this.offsetHeight - DEFAULT_PIECE_SIZE / 2
+        Math.max(top + DEFAULT_PIECE_SIZE / 2, event.clientY),
+        top + this.offsetHeight - DEFAULT_PIECE_SIZE / 2
       );
       const deltaX = newXPos - this._originalDragPosition!.x;
       const deltaY = newYPos - this._originalDragPosition!.y;
@@ -988,7 +992,7 @@ export class HexchessBoard extends LitElement {
         : 'cursor-grab';
 
     return html`
-      <div style="width: 100%; height: 100%; position: relative;">
+      <div id="root" style="width: 100%; height: 100%; position: relative;">
         <svg
           width="${this.offsetWidth}"
           height="${this.offsetHeight}"
@@ -1048,6 +1052,7 @@ export class HexchessBoard extends LitElement {
    */
   resize() {
     this._recalculateBoardCoordinates();
+    this._boundingRect = this.renderRoot.querySelector('#root')?.getBoundingClientRect() ?? null;
     this.requestUpdate('board');
   }
 
