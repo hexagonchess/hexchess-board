@@ -1,46 +1,29 @@
 ---
 layout: page.11ty.cjs
-title: <my-element> ⌲ Home
+title: <hexchess-board> ⌲ Home
 ---
 
-# &lt;my-element>
+# &lt;hexchess-board>
 
-`<my-element>` is an awesome element. It's a great introduction to building web components with LitElement, with nice documentation site as well.
+`<hexchess-board>` is a fully functional chess engine for hexagonal chess. You can either play a full game from start to finish or analyze a game by passing in a predetermined set of moves. It enforces all the moves of hexagonal chess, from en passant to checkmate.
 
 ## As easy as HTML
 
 <section class="columns">
   <div>
 
-`<my-element>` is just an HTML element. You can it anywhere you can use HTML!
+`<hexchess-board>` is just an HTML element. You can it anywhere you can use HTML!
 
 ```html
-<my-element></my-element>
+<hexchess-board board="start" orientation="white" />
 ```
 
   </div>
   <div>
 
-<my-element></my-element>
-
-  </div>
-</section>
-
-## Configure with attributes
-
-<section class="columns">
-  <div>
-
-`<my-element>` can be configured with attributed in plain HTML.
-
-```html
-<my-element name="HTML"></my-element>
-```
-
-  </div>
-  <div>
-
-<my-element name="HTML"></my-element>
+<div style="width: 575px; height: 500px">
+<hexchess-board id="board-one" board="start" orientation="white" />
+</div>
 
   </div>
 </section>
@@ -50,7 +33,7 @@ title: <my-element> ⌲ Home
 <section class="columns">
   <div>
 
-`<my-element>` can be used with declarative rendering libraries like Angular, React, Vue, and lit-html
+`<hexchess-board>` can be used with declarative rendering libraries like Angular, React, Vue, and lit-html
 
 ```js
 import {html, render} from 'lit-html';
@@ -59,8 +42,8 @@ const name = 'lit-html';
 
 render(
   html`
-    <h2>This is a &lt;my-element&gt;</h2>
-    <my-element .name=${name}></my-element>
+    <h2>This is a &lt;hexchess-board&gt;</h2>
+    <hexchess-board board="start" orientation="black" />
   `,
   document.body
 );
@@ -69,8 +52,9 @@ render(
   </div>
   <div>
 
-<h2>This is a &lt;my-element&gt;</h2>
-<my-element name="lit-html"></my-element>
+<div style="width: 575px; height: 500px">
+<hexchess-board id="board-two" board="start" orientation="black" />
+</div>
 
   </div>
 </section>

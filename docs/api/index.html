@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><my-element> ⌲ Docs</title>
+    <title><hexchess-board> ⌲ Docs</title>
     <link rel="stylesheet" href="../docs.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Roboto+Mono">
     <link href="../prism-okaidia.css" rel="stylesheet" />
     <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script src="/node_modules/lit/polyfill-support.js"></script>
-    <script type="module" src="../my-element.bundled.js"></script>
+    <script type="module" src="../hexchess-board.bundled.js"></script>
   </head>
   <body>
     
 <header>
-  <h1>&lt;my-element></h1>
-  <h2>A web component just for me.</h2>
+  <h1>&lt;hexchess-board></h1>
+  <h2>Chess is better with hexagons</h2>
 </header>
     
 <nav>
@@ -31,9 +31,11 @@
         
      <h1>API</h1>
      
-       <h2>&lt;my-element></h2>
+       <h2>&lt;hexchess-board></h2>
        <div>
-         An example element.
+         A hexagonal chess board used for playing Glinsky-style hex chess.
+
+Player variables
        </div>
        
    <h3>Attributes</h3>
@@ -43,32 +45,37 @@
      </tr>
      
        <tr>
-         <td>name</td><td>The name to say "Hello" to.</td><td>string</td><td>'World'</td>
+         <td>board</td><td>A hex-FEN notation describing the state of the board.
+If the string is empty, no pieces will be rendered.</td><td>Board</td><td></td>
        </tr>
      
        <tr>
-         <td>count</td><td>The number of times the button has been clicked.</td><td>number</td><td>0</td>
+         <td>moves</td><td>A list of moves made on the board.
+This is useful for analyzing games already played or certain pre-determined openings.</td><td>Move[]</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>blackPlayerName</td><td>Black's player name</td><td>string</td><td>'Black'</td>
+       </tr>
+     
+       <tr>
+         <td>whitePlayerName</td><td>White's player name</td><td>string</td><td>'White'</td>
+       </tr>
+     
+       <tr>
+         <td>orientation</td><td>The orientation of the board.</td><td>Orientation</td><td>'white'</td>
+       </tr>
+     
+       <tr>
+         <td>hideCoordinates</td><td>Show the board coordinates on the bottom and left sides of the board.</td><td>boolean</td><td>false</td>
+       </tr>
+     
+       <tr>
+         <td>frozen</td><td>Do not allow any other moves beyond the predetermined ones set in the `moves` property.</td><td>boolean</td><td>false</td>
        </tr>
      
    </table>
  
-       
-   <h3>Properties</h3>
-   <table>
-     <tr>
-       <th>Name</th><th>Attribute</th><th>Description</th><th>Type</th><th>Default</th>
-     </tr>
-     
-       <tr>
-         <td>name</td><td>name</td><td>The name to say "Hello" to.</td><td>string</td><td>'World'</td>
-       </tr>
-     
-       <tr>
-         <td>count</td><td>count</td><td>The number of times the button has been clicked.</td><td>number</td><td>0</td>
-       </tr>
-     
-   </table>
-   
        
    <h3>Methods</h3>
    <table>
@@ -77,7 +84,34 @@
      </tr>
      
        <tr>
-         <td>sayHello</td><td>
+         <td>fen</td><td></td><td>Converts to a hex-FEN notation describing the state of the board.</td><td>string</td>
+       </tr>
+     
+       <tr>
+         <td>flip</td><td></td><td>Flip the orientation of the board.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>resize</td><td></td><td>Resize the board based on the latest dimensions given to the shadow root.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>rewind</td><td></td><td>Rewinds one move to a previous position.
+If there are no previous moves, this does nothing.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>fastForward</td><td></td><td>Fast forwards one move to the next position.
+If there are no next moves, this does nothing.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>freeze</td><td></td><td>Prevent any more moves to the game.
+Usually called when the game is over.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>move</td><td>
    
    <table>
      <tr>
@@ -85,11 +119,19 @@
      </tr>
      
        <tr>
-         <td>name</td><td>The name to say "Hello" to</td><td>string</td>
+         <td>from</td><td></td><td>Square</td>
+       </tr>
+     
+       <tr>
+         <td>to</td><td></td><td>Square</td>
        </tr>
      
    </table>
- </td><td>Formats a greeting</td><td>string</td>
+ </td><td>Make a move on the board.</td><td></td>
+       </tr>
+     
+       <tr>
+         <td>reset</td><td></td><td>Resets and unfreezes the board to the default start state.</td><td></td>
        </tr>
      
    </table>
@@ -102,38 +144,82 @@
      </tr>
      
        <tr>
-         <td>count-changed</td><td>Indicates when the count changes</td>
+         <td>promoting</td><td>Fired when a pawn is ready to promote.</td>
+       </tr>
+     
+       <tr>
+         <td>promoted</td><td>Fired when a pawn has been promoted to a piece.</td>
+       </tr>
+     
+       <tr>
+         <td>move</td><td>Fired when a move is made on the board.</td>
        </tr>
      
    </table>
      
+         
        
-   <h3>Slots</h3>
+       
+   <h3>CSS Custom Properties</h3>
    <table>
      <tr>
        <th>Name</th><th>Description</th>
      </tr>
      
        <tr>
-         <td>(default)</td><td>This element has a slot</td>
+         <td>--hexchess-playername-size</td><td>The font size of the player names.</td>
        </tr>
      
-   </table>
-   
-       
-   <h3>CSS Shadow Parts</h3>
-   <table>
-     <tr>
-       <th>Name</th><th>Description</th>
-     </tr>
+       <tr>
+         <td>--hexchess-playername-color</td><td>The color of the player names. Board variables</td>
+       </tr>
      
        <tr>
-         <td>button</td><td>The button</td>
+         <td>--hexchess-board-bg</td><td>The background color of the whitespace of the board (not tiles).</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-white-bg</td><td>The background color of the white tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-white-bg</td><td>The background color of a white tile that's selected to be moved.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-black-bg</td><td>The background color of the black tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-black-bg</td><td>The background color of a black tile that's selected to be moved.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-grey-bg</td><td>The background color of the grey tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-grey-bg</td><td>The background color of a grey tile that's selected to be moved.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-label-bg</td><td>The background color of the column and row labels.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-label-size</td><td>The font size of the column and row labels.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-bg</td><td>The fill color of the small dot shown on a hexagon indicating this is a legal move.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-attempted-move-bg</td><td>The fill color of a hexgon when the user drags over a square, trying to move there. Custom events</td>
        </tr>
      
    </table>
  
-       
        
    
       </main>

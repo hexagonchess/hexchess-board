@@ -9,9 +9,9 @@ import {HexchessBoard} from '../hexchess-board.js';
 import {fixture, assert} from '@open-wc/testing';
 import {html} from 'lit/static-html.js';
 
-suite('my-element', () => {
+suite('hexchess-board', () => {
   test('is defined', () => {
-    const el = document.createElement('my-element');
+    const el = document.createElement('hexchess-board');
     assert.instanceOf(el, HexchessBoard);
   });
 
@@ -60,7 +60,7 @@ suite('my-element', () => {
 
   test('styling applied', async () => {
     const el = (await fixture(
-      html`<my-element></my-element>`
+      html`<hexchess-board></hexchess-board>`
     )) as HexchessBoard;
     await el.updateComplete;
     assert.equal(getComputedStyle(el).paddingTop, '16px');

@@ -5,19 +5,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><my-element> ⌲ Examples ⌲ Basic</title>
+    <title><hexchess-board> ⌲ Examples ⌲ Basic</title>
     <link rel="stylesheet" href="../docs.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Roboto+Mono">
     <link href="../prism-okaidia.css" rel="stylesheet" />
     <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script src="/node_modules/lit/polyfill-support.js"></script>
-    <script type="module" src="../my-element.bundled.js"></script>
+    <script type="module" src="../hexchess-board.bundled.js"></script>
   </head>
   <body>
     
 <header>
-  <h1>&lt;my-element></h1>
-  <h2>A web component just for me.</h2>
+  <h1>&lt;hexchess-board></h1>
+  <h2>Chess is better with hexagons</h2>
 </header>
     
 <nav>
@@ -29,35 +29,55 @@
     <div id="main-wrapper">
       <main>
         
-    <h1>Example: Basic</h1>
+    <h1>Example: Keyboard input</h1>
     <section class="examples">
       <nav class="collection">
         <ul>
           
-                  <li class=selected>
-                    <a href="">A basic example</a>
+                  <li class=>
+                    <a href="hexfen/">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
                   <li class=>
-                    <a href="name-property/">Setting the name property</a>
+                    <a href="preset-moves/">Analyzing a game that has a specific set of moves played.</a>
+                  </li>
+                
+                  <li class=selected>
+                    <a href="">Common keyboard operations</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="change-look/">Changing the look and feel of the board</a>
                   </li>
                 
         </ul>
       </nav>
       <div>
-        <style>
-  my-element p {
-    border: solid 1px blue;
-    padding: 8px;
-  }
-</style>
-<my-element>
-  <p>This is child content</p>
-</my-element>
-<h3>CSS</h3>
-<pre class="language-css"><code class="language-css"><span class="token selector">p</span> <span class="token punctuation">{</span><br>  <span class="token property">border</span><span class="token punctuation">:</span> solid 1px blue<span class="token punctuation">;</span><br>  <span class="token property">padding</span><span class="token punctuation">:</span> 8px<span class="token punctuation">;</span><br><span class="token punctuation">}</span></code></pre>
+        <script>
+  document.addEventListener('keydown', (event) => {
+    event.preventDefault();
+  });
+  document.addEventListener('keyup', (event) => {
+    event.preventDefault();
+    if (event.code === 'KeyF') {
+      document.querySelector('hexchess-board').flip();
+    } else if (event.code === 'ArrowRight') {
+      document.querySelector('hexchess-board').fastForward();
+    } else if (event.code === 'ArrowLeft') {
+      document.querySelector('hexchess-board').rewind();
+    }
+  });
+</script>
+<div style="width: 575px; height: 500px">
+  <hexchess-board
+    id="hexchess-board"
+    board="start"
+    orientation="white"
+  ></hexchess-board>
+</div>
 <h3>HTML</h3>
-<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>my-element</span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>This is child content<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>my-element</span><span class="token punctuation">></span></span></code></pre>
+<p>This chessboard responds to the rewind and fast forward commands along with flipping the orientation of the board.</p>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript"><br>  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'keydown'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span><br>    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'keyup'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span><br>    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>code <span class="token operator">===</span> <span class="token string">'KeyF'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>      document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'hexchess-board'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">flip</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>code <span class="token operator">===</span> <span class="token string">'ArrowRight'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>      document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'hexchess-board'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">fastForward</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>code <span class="token operator">===</span> <span class="token string">'ArrowLeft'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>      document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'hexchess-board'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">rewind</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span><br>  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">width</span><span class="token punctuation">:</span> 100vw<span class="token punctuation">;</span> <span class="token property">height</span><span class="token punctuation">:</span> 100vh</span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span><br>    <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hexchess-board<span class="token punctuation">"</span></span><br>    <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><br>    <span class="token attr-name">orientation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>white<span class="token punctuation">"</span></span><br>  <span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>hexchess-board</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span></code></pre>
 
       </div>
     </section>

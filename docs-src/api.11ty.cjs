@@ -6,7 +6,7 @@ module.exports = class Docs {
   data() {
     return {
       layout: 'page.11ty.cjs',
-      title: '<my-element> ⌲ Docs',
+      title: '<hexchess-board> ⌲ Docs',
     };
   }
 
@@ -33,11 +33,6 @@ module.exports = class Docs {
          ['name', 'description', 'type.text', 'default'],
          element.attributes
        )}
-       ${renderTable(
-         'Properties',
-         ['name', 'attribute', 'description', 'type.text', 'default'],
-         element.members.filter((m) => m.kind === 'field')
-       )}  
        ${renderTable(
          'Methods',
          ['name', 'parameters', 'description', 'return.type.text'],
