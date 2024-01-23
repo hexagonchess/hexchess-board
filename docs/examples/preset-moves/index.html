@@ -75,7 +75,7 @@
 <p>Here we're building on the keyboard listener example, so you can use your left and right arrow keys to fast forward and rewind.</p>
 <p>Because Hexchess is much newer, we've decided to disambiguate the moves as much as possible. So while a king's pawn opening might be notated as <code>1. E4</code> followed by <code>1. E5</code>, in HexChess we want to show both the starting and the ending squares. So the white pawn moving from <code>B1</code> to <code>B3</code> would be notated as <code>B1-B3</code>.</p>
 <p>To indicate a capture, we use the <code>x</code> instead of the <code>-</code> sign. So if a pawn on B4 captured a piece on C4, we would say <code>B4xC4</code>.</p>
-<p>Because we always specify the starting and ending squares, there is no need for a special character to signify en passant. Simply use the <code>x</code> as any other capture.</p>
+<p>En passant captures are notated with an <code>$</code> at the end. This is done to simplify the format of notations into a standard of a square, followed by <code>x</code> or <code>-</code>, followed by a square, and then either <code>$</code> or <code>=</code>.</p>
 <p>Since hexagonal chess has no castling, we do not need to deal with that notation.</p>
 <p>Lastly, promotion is handled with the <code>=</code> sign. So a white pawn that moved from <code>A5</code> to <code>A6</code> and became a Rook would be written as <code>A5-A6=R</code>.</p>
 <p>For your convenience, the moves string is case insensitive. In the case of promotions, even if it was written as <code>a5-a6=r</code>, the board would know to place a <em>white</em> rook because we maintain state and know the pawn was white.</p>

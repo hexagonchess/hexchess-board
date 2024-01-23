@@ -33,7 +33,7 @@ Because Hexchess is much newer, we've decided to disambiguate the moves as much 
 
 To indicate a capture, we use the `x` instead of the `-` sign. So if a pawn on B4 captured a piece on C4, we would say `B4xC4`.
 
-Because we always specify the starting and ending squares, there is no need for a special character to signify en passant. Simply use the `x` as any other capture.
+En passant captures are notated with an `$` at the end. This is done to simplify the format of notations into a standard of a square, followed by `x` or `-`, followed by a square, and then either `$` or `=`.
 
 Since hexagonal chess has no castling, we do not need to deal with that notation.
 

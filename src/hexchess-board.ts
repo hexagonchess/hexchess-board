@@ -13,6 +13,7 @@ import {
   BLACK_COLUMN_LABEL_SQUARES,
   COLUMN_ARRAY,
   WHITE_COLUMN_LABEL_SQUARES,
+  movesToString,
   stringToMoves,
 } from './utils';
 import {LitElement, html, svg, nothing, PropertyValues} from 'lit';
@@ -1032,6 +1033,13 @@ export class HexchessBoard extends LitElement {
   // --------------
   // Public methods
   // --------------
+
+  /**
+   * Exports the current game to a CSV list of moves that can be fed back into this same component.
+   */
+  export(): string {
+    return movesToString(this._state.moves);
+  }
 
   /**
    * Converts to a hex-FEN notation describing the state of the board.

@@ -1,5 +1,5 @@
 import {Board} from './board';
-import {Color, Piece} from './types';
+import {Color, Move, Piece} from './types';
 
 export const COLUMN_ARRAY = [
   'A',
@@ -186,6 +186,23 @@ export const fenToBoard = (position: string | null): Board => {
     return Board.empty();
   }
   return converted;
+};
+
+export const movesToString = (moves: Move[]): string => {
+  const result: string[] = [];
+  for (const move of moves) {
+    let newString = move.capturedPiece
+      ? `${move.from}x${move.to}`
+      : `${move.from}-${move.to}`;
+    if (move.promotion) {
+      newString += `=${move.promotion.toString()}`;
+    }
+    if (move.enPassant) {
+      newString += '$';
+    }
+    result.push(newString);
+  }
+  return result.join(',');
 };
 
 export const stringToMoves = (movesStr: string): Square[][] => {
