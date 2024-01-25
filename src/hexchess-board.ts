@@ -119,9 +119,25 @@ export class HexchessBoard extends LitElement {
   }
 
   set moves(moves: Move[]) {
-    const oldValue = this._state.moves;
-    this._state.moves = moves;
-    this.requestUpdate('moves', oldValue);
+    for (const move of moves) {
+      const newState = getNewState(this._state, {
+        name: 'PROGRAMMATIC_MOVE',
+        move: [move.from, move.to],
+      });
+      this._reconcileNewState(newState);
+      if (move.promotion) {
+        const newState = getNewState(this._state, {
+          name: 'PROMOTE',
+          piece: move.promotion,
+        });
+        this._reconcileNewState(newState);
+      }
+    }
+    for (const _move of moves) {
+      const newState = getNewState(this._state, {name: 'REWIND'});
+      this._reconcileNewState(newState);
+    }
+    this.requestUpdate('board');
   }
 
   /**

@@ -192,7 +192,7 @@ export const movesToString = (moves: Move[]): string => {
   const result: string[] = [];
   for (const move of moves) {
     let newString = move.capturedPiece
-      ? `${move.from}x${move.to}`
+      ? `${move.from}x${move.to}${move.capturedPiece}`
       : `${move.from}-${move.to}`;
     if (move.promotion) {
       newString += `=${move.promotion.toString()}`;
@@ -205,31 +205,59 @@ export const movesToString = (moves: Move[]): string => {
   return result.join(',');
 };
 
-export const stringToMoves = (movesStr: string): Square[][] => {
+const moveRegex =
+  /^[A-L^J](10|11|[1-9])(-|x)[A-L^J](10|11|[1-9])([pPnNqQrRbB])?\$?(=[QqRrBbNn])?$/;
+export const stringToMoves = (movesStr: string): Move[] => {
   if (movesStr === '') {
     return [];
   }
 
   const moves = movesStr.split(',');
-  const result: Square[][] = [];
+  const result: Move[] = [];
   for (const move of moves) {
-    const individualMoves = move.split('-');
-    // Check invalid format
-    if (individualMoves.length !== 2) {
-      return [];
-    }
-    const from = individualMoves[0];
-    const to = individualMoves[1];
-
-    // Check invalid squares
-    if (
-      !ALL_SQUARES.includes(from as Square) ||
-      !ALL_SQUARES.includes(to as Square)
-    ) {
-      return [];
+    if (!moveRegex.test(move)) {
+      throw new Error(`Invalid move: ${move}`);
     }
 
-    result.push([from as Square, to as Square]);
+    const newMove: Partial<Move> = {};
+    const isCapture = move.includes('x');
+    const chunks = isCapture ? move.split('x') : move.split('-');
+    const from = chunks[0];
+    if (!ALL_SQUARES.includes(from as Square)) {
+      throw new Error(`Invalid move: ${move}`);
+    }
+    newMove.from = from as Square;
+
+    const isEnpassant = chunks[1].includes('$');
+    const isPromotion = chunks[1].includes('=');
+    let promotionPiece: Piece | null = null;
+    let toSquare;
+    if (isPromotion) {
+      promotionPiece = chunks[1].split('=')[1] as Piece;
+      toSquare = chunks[1].split('=')[0];
+    } else if (isEnpassant) {
+      toSquare = chunks[1].split('$')[0];
+    } else {
+      toSquare = chunks[1];
+    }
+    if (isCapture) {
+      toSquare = toSquare.slice(0, -1);
+    }
+
+    if (!ALL_SQUARES.includes(toSquare as Square)) {
+      throw new Error(`Invalid move: ${move}`);
+    }
+
+    if (isCapture) {
+      const capturedPiece = chunks[1].split('$')[0].split('=')[0].slice(-1);
+      newMove.capturedPiece = capturedPiece as Piece;
+    }
+
+    newMove.to = toSquare as Square;
+    newMove.enPassant = isEnpassant;
+    newMove.promotion = promotionPiece as Piece | null;
+
+    result.push(newMove as Move);
   }
 
   return result;

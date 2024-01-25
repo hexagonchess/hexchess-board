@@ -38,16 +38,16 @@
                     <a href="../hexfen/">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
-                  <li class=selected>
-                    <a href="">Analyzing a game that has a specific set of moves played.</a>
-                  </li>
-                
                   <li class=>
                     <a href="../">Common keyboard operations</a>
                   </li>
                 
                   <li class=>
                     <a href="../change-look/">Changing the look and feel of the board</a>
+                  </li>
+                
+                  <li class=selected>
+                    <a href="">Analyzing a game that has a specific set of moves played.</a>
                   </li>
                 
         </ul>
@@ -74,19 +74,17 @@
 <h3>HTML</h3>
 <p>Here we're building on the keyboard listener example, so you can use your left and right arrow keys to fast forward and rewind.</p>
 <p>Because Hexchess is much newer, we've decided to disambiguate the moves as much as possible. So while a king's pawn opening might be notated as <code>1. E4</code> followed by <code>1. E5</code>, in HexChess we want to show both the starting and the ending squares. So the white pawn moving from <code>B1</code> to <code>B3</code> would be notated as <code>B1-B3</code>.</p>
-<p>To indicate a capture, we use the <code>x</code> instead of the <code>-</code> sign. So if a pawn on B4 captured a piece on C4, we would say <code>B4xC4</code>.</p>
+<p>To indicate a capture, we use the <code>x</code> instead of the <code>-</code> sign. Additionally, we add the piece to the end to specify what was captured. So if a white pawn on B4 captured a piece on C4, we would say <code>B4xC4p</code>.</p>
 <p>En passant captures are notated with an <code>$</code> at the end. This is done to simplify the format of notations into a standard of a square, followed by <code>x</code> or <code>-</code>, followed by a square, and then either <code>$</code> or <code>=</code>.</p>
 <p>Since hexagonal chess has no castling, we do not need to deal with that notation.</p>
 <p>Lastly, promotion is handled with the <code>=</code> sign. So a white pawn that moved from <code>A5</code> to <code>A6</code> and became a Rook would be written as <code>A5-A6=R</code>.</p>
-<p>For your convenience, the moves string is case insensitive. In the case of promotions, even if it was written as <code>a5-a6=r</code>, the board would know to place a <em>white</em> rook because we maintain state and know the pawn was white.</p>
-<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">width</span><span class="token punctuation">:</span> 575px<span class="token punctuation">;</span> <span class="token property">height</span><span class="token punctuation">:</span> 500px</span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span><br>    <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hexchess-board<span class="token punctuation">"</span></span><br>    <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><br>    <span class="token attr-name">frozen</span><br>    <span class="token attr-name">orientation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>white<span class="token punctuation">"</span></span><br>    <span class="token attr-name">moves</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>B1-B3,B7-B5<span class="token punctuation">"</span></span><br>  <span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>hexchess-board</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span></code></pre>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">width</span><span class="token punctuation">:</span> 575px<span class="token punctuation">;</span> <span class="token property">height</span><span class="token punctuation">:</span> 500px</span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span><br>    <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hexchess-board<span class="token punctuation">"</span></span><br>    <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><br>    <span class="token attr-name">orientation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>white<span class="token punctuation">"</span></span><br>    <span class="token attr-name">moves</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>B1-B3,B7-B5,C2-C4,D7-D5,C4xD5p,F11xB3P,C1xC7p<span class="token punctuation">"</span></span><br>  <span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>hexchess-board</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span></code></pre>
 <div style="width: 575px; height: 500px">
   <hexchess-board
     id="hexchess-board"
     board="start"
-    frozen=true
     orientation="white"
-    moves="B1-B3,B7-B5"
+    moves="B1-B3,B7-B5,C2-C4,D7-D5,C4xD5p,F11xB3P,C1xC7p"
   ></hexchess-board>
 </div>
       </div>
