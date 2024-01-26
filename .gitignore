@@ -24,3 +24,4 @@ utils.js
 *.d.ts.map
 # only generated for size check
 hexchess-board.bundled.js
+.npmrc

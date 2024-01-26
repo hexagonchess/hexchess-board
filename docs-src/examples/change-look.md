@@ -6,6 +6,9 @@ name: Customizing colors
 description: Changing the look and feel of the board
 ---
 
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
+
 <style>
     hexchess-board {
         --hexchess-label-bg: #0a10bf;

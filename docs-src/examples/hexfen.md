@@ -14,6 +14,9 @@ We also keep all the same notation as traditional FEN, so `K` means a white king
 
 We do enforce that each side must at least have one King, so imaginary positions consisting of all pawns for example will produce errors!
 
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
+
 <div style="display: flex; flex-wrap: wrap;">
   <div>
 

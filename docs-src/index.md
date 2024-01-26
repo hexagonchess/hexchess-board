@@ -3,6 +3,9 @@ layout: page.11ty.cjs
 title: <hexchess-board> ⌲ Home
 ---
 
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
+
 # &lt;hexchess-board>
 
 `<hexchess-board>` is a fully functional chess engine for hexagonal chess. You can either play a full game from start to finish or analyze a game by passing in a predetermined set of moves. It enforces all the moves of hexagonal chess, from en passant to checkmate.

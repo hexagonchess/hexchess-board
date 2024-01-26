@@ -6,6 +6,9 @@ name: Preset Moves
 description: Analyzing a game that has a specific set of moves played.
 ---
 
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
+
 <script>
   document.addEventListener('keydown', (event) => {
     event.preventDefault();

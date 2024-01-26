@@ -34,16 +34,16 @@
       <nav class="collection">
         <ul>
           
+                  <li class=>
+                    <a href="../change-look/">Changing the look and feel of the board</a>
+                  </li>
+                
                   <li class=selected>
                     <a href="">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
                   <li class=>
                     <a href="../">Common keyboard operations</a>
-                  </li>
-                
-                  <li class=>
-                    <a href="../change-look/">Changing the look and feel of the board</a>
                   </li>
                 
                   <li class=>
@@ -57,6 +57,8 @@
 <p>With Hex-FEN, we start column by column, starting with column A and ending with column L. Just like in traditional FEN, a number is used to convey the number of empty squares. So a completely empty board can be represented as <code>6/7/8/9/10/11/10/9/8/7/6</code>.</p>
 <p>We also keep all the same notation as traditional FEN, so <code>K</code> means a white king, while <code>k</code> means a black king. <code>N</code> and <code>n</code> are for knights, <code>P</code> and <code>p</code> for pawns, etc.</p>
 <p>We do enforce that each side must at least have one King, so imaginary positions consisting of all pawns for example will produce errors!</p>
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
 <div style="display: flex; flex-wrap: wrap;">
   <div>
 <pre class="language-html"><code class="language-html"><span class="token comment">&lt;!-- The starting position, but with only pawns and kings --></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span> <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>6/P5p/1P4p1/2P3p2/3P2p3/4P1p4/K2P2p2k/2P3p2/1P4p1/P5p/6<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><br></code></pre>

@@ -1,11 +1,27 @@
 {
-  "name": "@lit/lit-starter-ts",
-  "private": true,
-  "version": "2.0.0",
+  "name": "@hexchess/hexchess-board",
+  "version": "1.0.1",
   "description": "A simple web component",
   "main": "hexchess-board.js",
   "module": "hexchess-board.js",
   "type": "module",
+  "files": [
+    "bishop.js",
+    "board-state.js",
+    "board.js",
+    "game.js",
+    "hexchess-board.d.ts",
+    "hexchess-styles.js",
+    "king.js",
+    "knight.js",
+    "pawn.js",
+    "piece.js",
+    "position.js",
+    "queen.js",
+    "rook.js",
+    "types.js",
+    "utils.js"
+  ],
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
@@ -34,12 +50,15 @@
     "checksize": "rollup -c ; cat hexchess-board.bundled.js | gzip -9 | wc -c ; rm hexchess-board.bundled.js"
   },
   "keywords": [
+    "chess",
+    "hexchess",
+    "hexagon-chess",
     "web-components",
     "lit-element",
     "typescript",
     "lit"
   ],
-  "author": "Google LLC",
+  "author": "hexchess",
   "license": "BSD-3-Clause",
   "dependencies": {
     "lit": "^3.0.0"
@@ -75,5 +94,18 @@
     "ts-jest": "29.1.1",
     "typescript": "~5.2.0"
   },
-  "customElements": "custom-elements.json"
+  "customElements": "custom-elements.json",
+  "types": "./hexchess-board.d.ts",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexagonchess/hexchess-board.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hexagonchess/hexchess-board/issues"
+  },
+  "homepage": "https://github.com/hexagonchess/hexchess-board#readme"
 }
