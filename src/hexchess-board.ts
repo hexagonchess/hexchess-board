@@ -69,7 +69,6 @@ export class HexchessBoard extends LitElement {
     Square,
     string
   >;
-  private _boundingRect: null | DOMRect = null;
   private _pieceSize = DEFAULT_PIECE_SIZE;
   private _polygonWidth = 29;
   private _polygonHeight = 22;
@@ -340,19 +339,8 @@ export class HexchessBoard extends LitElement {
     }
 
     if (this._draggedPiece) {
-      console.log(this._boundingRect)
-      const left = this._boundingRect?.left ?? 0;
-      const newXPos = Math.min(
-        Math.max(left + DEFAULT_PIECE_SIZE / 2, event.clientX),
-        left + this.offsetWidth - DEFAULT_PIECE_SIZE / 2
-      );
-      const top = this._boundingRect?.top ?? 0;
-      const newYPos = Math.min(
-        Math.max(top + DEFAULT_PIECE_SIZE / 2, event.clientY),
-        top + this.offsetHeight - DEFAULT_PIECE_SIZE / 2
-      );
-      const deltaX = newXPos - this._originalDragPosition!.x;
-      const deltaY = newYPos - this._originalDragPosition!.y;
+      const deltaX = event.clientX - this._originalDragPosition!.x;
+      const deltaY = event.clientY - this._originalDragPosition!.y;
       this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
@@ -1082,8 +1070,6 @@ export class HexchessBoard extends LitElement {
    */
   resize() {
     this._recalculateBoardCoordinates();
-    this._boundingRect =
-      this.renderRoot.querySelector('#root')?.getBoundingClientRect() ?? null;
     this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
     this.requestUpdate('board');
   }
