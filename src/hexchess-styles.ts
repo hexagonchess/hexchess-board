@@ -16,7 +16,7 @@ export const styles = css`
   }
 
   .board {
-    background-color: var(--hexchess-board-bg, #fcfaf2);
+    background-color: var(--hexchess-board-bg, #ffffff);
   }
 
   .captured-pieces {
@@ -81,13 +81,13 @@ export const styles = css`
   }
 
   .possible-capture {
-    stroke: var(--hexchess-possible-capture-bg, #a68a2d);
+    stroke: var(--hexchess-possible-capture-bg, #a96a41);
     stroke-width: 5;
     fill: none;
   }
 
   .possible-move > polygon {
-    fill: var(--hexchess-possible-move-bg, #a68a2d88);
+    fill: var(--hexchess-possible-move-bg, #e4c7b7);
   }
 
   .score {
@@ -108,28 +108,28 @@ export const styles = css`
   }
 
   .white {
-    fill: var(--hexchess-white-bg, #0fafdb);
+    fill: var(--hexchess-white-bg, #a5c8df);
   }
   .selected .white {
-    fill: var(--hexchess-selected-white-bg, #a68a2d);
+    fill: var(--hexchess-selected-white-bg, #a96a41);
   }
 
   .black {
-    fill: var(--hexchess-black-bg, #2a5966);
+    fill: var(--hexchess-black-bg, #4180a9);
   }
   .selected .black {
-    fill: var(--hexchess-selected-black-bg, #a68a2d);
+    fill: var(--hexchess-selected-black-bg, #a96a41);
   }
 
   .grey {
-    fill: var(--hexchess-grey-bg, #24829c);
+    fill: var(--hexchess-grey-bg, #80b1d0);
   }
   .selected .grey {
-    fill: var(--hexchess-selected-grey-bg, #a68a2d);
+    fill: var(--hexchess-selected-grey-bg, #a96a41);
   }
 
   .possible-move {
-    fill: var(--hexchess-possible-move-bg, #a68a2d);
+    fill: var(--hexchess-possible-move-bg, #a96a41);
   }
 
   .drag-piece {
