@@ -86,8 +86,22 @@ export const styles = css`
     fill: none;
   }
 
-  .possible-move > polygon {
-    fill: var(--hexchess-possible-move-bg, #e4c7b7);
+  .possible-move-grey,
+  .possible-move-black,
+  .possible-move-white {
+    stroke-width: 5;
+    fill: none;
+    pointer-events: none;
+  }
+
+  polygon.possible-move-white {
+    stroke: var(--hexchess-possible-move-stroke-white, #e4c7b7);
+  }
+  polygon.possible-move-black {
+    stroke: var(--hexchess-possible-move-stroke-black, #e4c7b7);
+  }
+  polygon.possible-move-grey {
+    stroke: var(--hexchess-possible-move-stroke-grey, #e4c7b7);
   }
 
   .score {
