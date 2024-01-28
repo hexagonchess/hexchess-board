@@ -86,7 +86,9 @@ export const styles = css`
     fill: none;
   }
 
-  .possible-move-grey, .possible-move-black, .possible-move-white {
+  .possible-move-grey,
+  .possible-move-black,
+  .possible-move-white {
     stroke-width: 5;
     fill: none;
     pointer-events: none;

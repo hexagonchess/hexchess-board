@@ -595,7 +595,11 @@ export class HexchessBoard extends LitElement {
   private _getColorForSquare(square: Square): TileColor {
     const colors = this._columnConfig[square[0] as Column].colors;
     const number = parseInt(square.slice(1));
-    return number % 3 === 0 ? colors[0] : number % 3 === 1 ? colors[1] : colors[2];
+    return number % 3 === 0
+      ? colors[0]
+      : number % 3 === 1
+      ? colors[1]
+      : colors[2];
   }
 
   // -----------------
@@ -959,11 +963,11 @@ export class HexchessBoard extends LitElement {
         ${this._renderHexagon(
           this._polygonWidth,
           this._polygonHeight,
-          `possible-move-${this._getColorForSquare(this._state.dragSquare)}`,
+          `possible-move-${this._getColorForSquare(this._state.dragSquare)}`
         )}
       </g>
     `;
-}
+  }
 
   private _renderDot(
     width: number,
@@ -1005,7 +1009,15 @@ export class HexchessBoard extends LitElement {
       class="possible-move" />`;
   }
 
-  private _renderHexagon(width: number, height: number, className: TileColor | 'possible-move-white' | 'possible-move-black' | 'possible-move-grey') {
+  private _renderHexagon(
+    width: number,
+    height: number,
+    className:
+      | TileColor
+      | 'possible-move-white'
+      | 'possible-move-black'
+      | 'possible-move-grey'
+  ) {
     return svg`<polygon
       points=${this._calculateHexagonPointsAsString(width, height)}
       class="${className}" />`;
