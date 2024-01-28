@@ -904,13 +904,22 @@ export class HexchessBoard extends LitElement {
           const color = this._getColorForSquare(square);
 
           // Rendering classes
+          const isRecentFrom =
+            this._state.name !== 'REWOUND' &&
+            this._state.moves.length > 0 &&
+            this._state.moves[this._state.moves.length - 1].from === square;
+          const isRecentTo =
+            this._state.name !== 'REWOUND' &&
+            this._state.moves.length > 0 &&
+            this._state.moves[this._state.moves.length - 1].to === square;
           const isSelected =
             this._state.name !== 'WAITING' &&
             this._state.name !== 'REWOUND' &&
             this._state.name !== 'PROMOTING' &&
             this._state.name !== 'GAMEOVER' &&
             this._state.square === square;
-          const selectedClass = isSelected ? 'selected' : '';
+          const selectedClass =
+            isSelected || isRecentFrom || isRecentTo ? 'selected' : '';
 
           // Offsets
           const offset = this._getOffsets(square, this._columnConfig);
