@@ -95,13 +95,13 @@ export const styles = css`
   }
 
   polygon.possible-move-white {
-    stroke: var(--hexchess-possible-move-stroke-white, #e4c7b7);
+    stroke: var(--hexchess-possible-move-stroke-white, #a96a41);
   }
   polygon.possible-move-black {
-    stroke: var(--hexchess-possible-move-stroke-black, #e4c7b7);
+    stroke: var(--hexchess-possible-move-stroke-black, #a96a41);
   }
   polygon.possible-move-grey {
-    stroke: var(--hexchess-possible-move-stroke-grey, #e4c7b7);
+    stroke: var(--hexchess-possible-move-stroke-grey, #a96a41);
   }
 
   .score {
@@ -125,21 +125,21 @@ export const styles = css`
     fill: var(--hexchess-white-bg, #a5c8df);
   }
   .selected .white {
-    fill: var(--hexchess-selected-white-bg, #a96a41);
+    fill: var(--hexchess-selected-white-bg, #e4c7b7);
   }
 
   .black {
     fill: var(--hexchess-black-bg, #4180a9);
   }
   .selected .black {
-    fill: var(--hexchess-selected-black-bg, #a96a41);
+    fill: var(--hexchess-selected-black-bg, #e4c7b7);
   }
 
   .grey {
     fill: var(--hexchess-grey-bg, #80b1d0);
   }
   .selected .grey {
-    fill: var(--hexchess-selected-grey-bg, #a96a41);
+    fill: var(--hexchess-selected-grey-bg, #e4c7b7);
   }
 
   .possible-move {

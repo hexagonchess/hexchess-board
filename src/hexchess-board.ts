@@ -42,7 +42,8 @@ import {Game, GameState} from './game';
  * @cssprop [--hexchess-selected-grey-bg=#a96a41]            - The background color of a grey tile that's selected to be moved.
  * @cssprop [--hexchess-label-bg=#ffffff]                    - The background color of the column and row labels.
  * @cssprop [--hexchess-label-size=12px]                     - The font size of the column and row labels.
- * @cssprop [--hexchess-possible-move-bg=#a96a41]            - The fill color of the small dot shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-possible-move-bg=#e4c7b7]            - The fill color of the small dot shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-possible-capture-bg=#e4c7b7]         - The stroke color of the large circle outlining a piece that can be captured.
  * @cssprop [--hexchess-attempted-move-white-stroke=#e4c7b7] - The outline color of a hexagon when the user drags over a white square, trying to move there.
  * @cssprop [--hexchess-attempted-move-grey-stroke=#e4c7b7]  - The outline color of a hexagon when the user drags over a grey square, trying to move there.
  * @cssprop [--hexchess-attempted-move-black-stroke=#e4c7b7] - The outline color of a hexagon when the user drags over a black square, trying to move there.
