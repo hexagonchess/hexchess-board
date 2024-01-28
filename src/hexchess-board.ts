@@ -616,7 +616,8 @@ export class HexchessBoard extends LitElement {
     const column = square[0] as Column;
     const isWhite = this._state.game.turn % 2 === 0;
     const isTop =
-      this._state.game.turn % 2 === 0 && this.orientation === 'white';
+      (this._state.game.turn % 2 === 0 && this.orientation === 'white') ||
+      (this._state.game.turn % 2 === 1 && this.orientation === 'black');
     const x = this._columnConfig[column].x;
     const y = isTop
       ? this._columnConfig[column].y
