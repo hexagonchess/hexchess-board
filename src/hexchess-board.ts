@@ -614,13 +614,24 @@ export class HexchessBoard extends LitElement {
 
     const square = this._state.moves[this._state.moves.length - 1].to;
     const column = square[0] as Column;
+    const isWhite = this._state.game.turn % 2 === 0;
+    const isTop =
+      (this._state.game.turn % 2 === 0 && this.orientation === 'white') ||
+      (this._state.game.turn % 2 === 1 && this.orientation === 'black');
     const x = this._columnConfig[column].x;
-    const y = this._columnConfig[column].y;
+    const y = isTop
+      ? this._columnConfig[column].y
+      : this._columnConfig[column].y +
+        this._polygonHeight * (this._numberOfHexagons(column) - 4);
 
     const options: Piece[] =
-      this._state.game.turn % 2 === 0
+      isWhite && isTop
         ? ['Q', 'R', 'B', 'N']
-        : ['q', 'r', 'b', 'n'];
+        : isWhite && !isTop
+        ? ['N', 'B', 'R', 'Q']
+        : !isWhite && isTop
+        ? ['q', 'r', 'b', 'n']
+        : ['n', 'b', 'r', 'q'];
 
     return html`
       <div class="promotion" style="top: ${y}px; left: ${x}px;">
