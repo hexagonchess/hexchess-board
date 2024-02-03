@@ -2,6 +2,9 @@ import {css} from 'lit';
 
 export const styles = css`
   :host {
+    display: block;
+    height: 100%;
+    width: 100%;
     font-family: var(
       --hexchess-font,
       -apple-system,
