@@ -30,7 +30,7 @@
     "lint:eslint": "eslint 'src/**/*.ts'",
     "lint:lit-analyzer": "lit-analyzer",
     "format": "npx @biomejs/biome format docs-src/**/**.cjs docs-src/**/**.js src/**/**.ts ./*.cjs ./*.mts ./*.js ./*.json --write",
-    "format-check": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --check",
+    "format-check": "npx @biomejs/biome format docs-src/**/**.cjs docs-src/**/**.js src/**/**.ts ./*.cjs ./*.mts ./*.js ./*.json",
     "docs": "npm run docs:clean && npm run build && npm run analyze && npm run docs:build && npm run docs:assets && npm run docs:gen",
     "docs:clean": "rimraf docs",
     "docs:gen": "eleventy --config=.eleventy.cjs",
