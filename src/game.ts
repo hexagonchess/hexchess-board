@@ -10,10 +10,10 @@ import { Color, HexchessPiece, LegalMoves, Move, Piece } from './types';
 import { Square } from './utils';
 
 export enum GameState {
-  CHECKMATE,
-  STALEMATE,
-  IN_PROGRESS,
-  PROMOTING,
+  CHECKMATE = 0,
+  STALEMATE = 1,
+  IN_PROGRESS = 2,
+  PROMOTING = 3,
 }
 
 export class Game {
@@ -109,14 +109,12 @@ export class Game {
       this.board
         .getPieces(color === 'white' ? 'black' : 'white')
         .filter((piece) => !(piece instanceof Pawn))
-        .map((piece) => piece.allSquareMoves(this.board))
-        .flat()
+        .flatMap((piece) => piece.allSquareMoves(this.board))
         .map((pos) => pos.toSquare()),
     );
     const defendedPositions = this.board
       .getPieces(color === 'white' ? 'black' : 'white')
-      .map((piece) => piece.defendedSquares(this.board))
-      .flat();
+      .flatMap((piece) => piece.defendedSquares(this.board));
     for (const position of defendedPositions) {
       checkPositions.add(position.toSquare());
     }
