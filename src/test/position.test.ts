@@ -279,7 +279,7 @@ describe('Position', () => {
           break;
         }
       }
-    };
+    }
   });
 
   test('Detects isEndOfRow correctly', () => {
@@ -320,7 +320,7 @@ describe('Position', () => {
           break;
         }
       }
-    };
+    }
   });
 
   test('Correctly converts to string and square', () => {
@@ -372,7 +372,7 @@ describe('Position', () => {
           new Position(pos.col, pos.row + 1),
         );
       }
-    };
+    }
   });
 
   test('Gets the top right position for any position correctly', () => {
@@ -800,7 +800,7 @@ describe('Position', () => {
           new Position(pos.col, pos.row - 1),
         );
       }
-    };
+    }
   });
 
   test('Gets the bottom left position for any position correctly', () => {

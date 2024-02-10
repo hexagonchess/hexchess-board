@@ -128,7 +128,7 @@ export class Board {
         piece.position,
         false,
       );
-    };
+    }
   }
 
   getKing(color: Omit<Color, 'grey'>): King {
@@ -309,16 +309,16 @@ export class Board {
     const toPiece = this.getPiece(to.toSquare());
     if (fromPiece === null || toPiece === null) {
       throw new Error(
-        "Both pieces must be non-null to capture - did you mean move?",
+        'Both pieces must be non-null to capture - did you mean move?',
       );
     }
 
     if (fromPiece.color === toPiece.color) {
-      throw new Error("Cannot capture your own piece");
+      throw new Error('Cannot capture your own piece');
     }
 
     if (toPiece instanceof King) {
-      throw new Error("Cannot capture a king");
+      throw new Error('Cannot capture a king');
     }
 
     this.pieces[from.toSquare()] = null;

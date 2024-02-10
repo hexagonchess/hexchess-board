@@ -145,7 +145,7 @@ export class HexchessBoard extends LitElement {
     for (let i = 0; i < moves.length; i++) {
       const newState = getNewState(this._state, { name: 'REWIND' });
       this._reconcileNewState(newState);
-    };
+    }
     this.requestUpdate('board');
   }
 
@@ -349,7 +349,11 @@ export class HexchessBoard extends LitElement {
     }
 
     if (this._draggedPiece) {
-      if (!this._originalDragPosition || !this._originalDragPosition.x || !this._originalDragPosition.y) {
+      if (
+        !this._originalDragPosition ||
+        !this._originalDragPosition.x ||
+        !this._originalDragPosition.y
+      ) {
         throw new Error('Cannot drag when originalDragPosition is not defined');
       }
       const deltaX = event.clientX - this._originalDragPosition.x;
@@ -845,14 +849,16 @@ export class HexchessBoard extends LitElement {
     }
     const piece = this._state.game.board.getPiece(square);
     if (!piece) {
-      throw new Error('This is impossible')
+      throw new Error('This is impossible');
     }
     const pos = this._squareCenters?.[square];
     if (!pos) {
-      throw new Error('This is impossible')
+      throw new Error('This is impossible');
     }
     return html`
-      <div style="left: ${pos[0]}px; top: ${pos[1]}px" class="piece piece-${square}">
+      <div style="left: ${pos[0]}px; top: ${
+        pos[1]
+      }px" class="piece piece-${square}">
         ${renderPiece(piece.toString(), this._pieceSize)}
       </div>
     `;

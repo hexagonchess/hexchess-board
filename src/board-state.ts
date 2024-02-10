@@ -210,10 +210,9 @@ const _capturePieceOrMakeMove = (
     if (capturedPiece.toString() in newCapturedPieces) {
       const capturedPieces = newCapturedPieces[capturedPieceAsString];
       if (capturedPieces == null) {
-        throw new Error('This is impossible')
+        throw new Error('This is impossible');
       }
-      newCapturedPieces[capturedPieceAsString] =
-        capturedPieces + 1;
+      newCapturedPieces[capturedPieceAsString] = capturedPieces + 1;
     } else {
       newCapturedPieces[capturedPieceAsString] = 1;
     }

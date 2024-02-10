@@ -341,12 +341,7 @@ export class Game {
           if (!newPosition) {
             throw new Error('This is impossible');
           }
-          this.board.addPiece(
-            new Pawn(
-              'black',
-              newPosition,
-            ),
-          );
+          this.board.addPiece(new Pawn('black', newPosition));
         } else {
           this.board.addPiece(new Pawn('black', Position.fromString(move.to)));
         }
@@ -356,9 +351,7 @@ export class Game {
           if (!newPosition) {
             throw new Error('This is impossible');
           }
-          this.board.addPiece(
-            new Pawn('white', newPosition),
-          );
+          this.board.addPiece(new Pawn('white', newPosition));
         } else {
           this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
         }

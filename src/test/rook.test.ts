@@ -25,25 +25,25 @@ describe('Rooks', () => {
 
     // Left white rook
     let piece = board.getPiece('C1');
-    assert(piece !== null)
+    assert(piece !== null);
     board.addPiece(piece);
     expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Right white rook
     piece = board.getPiece('I1');
-    assert(piece !== null)
+    assert(piece !== null);
     board.addPiece(piece);
     expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Left black rook
     piece = board.getPiece('C8');
-    assert(piece !== null)
+    assert(piece !== null);
     board.addPiece(piece);
     expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Right black rook
     piece = board.getPiece('I8');
-    assert(piece !== null)
+    assert(piece !== null);
     board.addPiece(piece);
     expect(piece?.allSquareMoves(board).length).toBe(3);
   });

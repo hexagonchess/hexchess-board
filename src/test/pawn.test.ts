@@ -8,14 +8,14 @@ describe('Pawns', () => {
     for (const pos of Position.allPositions()) {
       const pawn = new Pawn('black', pos);
       expect(pawn.canBePromoted()).toBe(pos.isBeginningOfColumn());
-    };
+    }
   });
 
   test('White pawns can only be promoted on the last rank', () => {
     for (const pos of Position.allPositions()) {
       const pawn = new Pawn('white', pos);
       expect(pawn.canBePromoted()).toBe(pos.isEndOfColumn());
-    };
+    }
   });
 
   test('Calculates movement square properly', () => {
