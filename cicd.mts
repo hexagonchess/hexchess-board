@@ -24,6 +24,9 @@ connect(
     // Check build
     runner.withExec(["npm", "run", "build"]).sync()
 
+    // Lint
+    runner.withExec(["npm", "run", "lint"]).sync()
+
     // Check unit tests
     runner.withExec(["npm", "run", "test:unit"]).sync()
   },

@@ -174,7 +174,7 @@ export class Game {
     return this._isInCheck(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
-  movePiece(from: Position, to: Position) {
+  movePiece(from: Position, to: Position): void {
     if (!this.canMoveTo(from, to)) {
       throw new Error(`Cannot move ${from} to ${to}`);
     }
@@ -208,7 +208,7 @@ export class Game {
     }
   }
 
-  promotePawn(piece: Omit<Piece, 'p' | 'P' | 'K' | 'k'>) {
+  promotePawn(piece: Omit<Piece, 'p' | 'P' | 'K' | 'k'>): void {
     const pawns = this.pawnAtEnd();
     if (pawns.length !== 1) {
       throw new Error('Must have exactly one pawn to promote');
@@ -262,7 +262,7 @@ export class Game {
     return moves as LegalMoves;
   }
 
-  fastForward(move: Move) {
+  fastForward(move: Move): void {
     if (move.enPassant) {
       this.board.enPassant(
         Position.fromString(move.from),
@@ -310,7 +310,7 @@ export class Game {
     }
   }
 
-  rewind(move: Move) {
+  rewind(move: Move): void {
     if (move.promotion) {
       let color: Color = 'white';
       switch (move.promotion) {

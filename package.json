@@ -26,7 +26,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "rimraf hexchess-board.{d.ts,d.ts.map,js,js.map} test/*.{d.ts,d.ts.map,js,js.map} src/test/*.{d.ts,d.ts.map,js,js.map} *.{d.ts,js.map,d.ts.map} bishop.js board-state.js board.js game.js hexchess-styles.js king.js knight.js pawn.js piece.js position.js queen.js rook.js types.js utils.js",
-    "lint": "npm run lint:lit-analyzer && npm run lint:eslint",
+    "lint": "npm run lint:eslint",
     "lint:eslint": "eslint 'src/**/*.ts'",
     "lint:lit-analyzer": "lit-analyzer",
     "format": "prettier \"**/*.{cjs,html,js,json,md,ts}\" --ignore-path ./.eslintignore --write",

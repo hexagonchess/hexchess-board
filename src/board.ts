@@ -13,7 +13,7 @@ export class Board {
 
   static clone(board: Board): Board {
     const clone = Board.empty();
-    for (const [_square, piece] of Object.entries(board.pieces)) {
+    for (const piece of Object.values(board.pieces)) {
       if (piece === null) {
         continue;
       }
@@ -132,7 +132,7 @@ export class Board {
   }
 
   getKing(color: Omit<Color, 'grey'>): King {
-    for (const [_square, piece] of Object.entries(this.pieces)) {
+    for (const piece of Object.values(this.pieces)) {
       if (piece instanceof King && piece.color === color) {
         return piece;
       }
@@ -160,15 +160,15 @@ export class Board {
     return piece !== null && piece.color !== color;
   }
 
-  removePiece(square: Square) {
+  removePiece(square: Square): void {
     this.pieces[square] = null;
   }
 
-  addPiece(piece: HexchessPiece) {
+  addPiece(piece: HexchessPiece): void {
     this.pieces[piece.position.toSquare()] = piece;
   }
 
-  addPieceFromString(square: Square, piece: Piece | null) {
+  addPieceFromString(square: Square, piece: Piece | null): void {
     if (piece === null) {
       this.pieces[square] = null;
       return;
@@ -225,7 +225,7 @@ export class Board {
     }
   }
 
-  movePiece(from: Position, to: Position, override = false) {
+  movePiece(from: Position, to: Position, override = false): void {
     if (!this._canMoveTo(from, to) && !override) {
       throw new Error(
         `Invalid move from ${from.toSquare()} to ${to.toSquare()}`
@@ -254,7 +254,7 @@ export class Board {
     }
   }
 
-  promotePawn(square: Square, newPiece: Omit<Piece, 'k' | 'K' | 'p' | 'P'>) {
+  promotePawn(square: Square, newPiece: Omit<Piece, 'k' | 'K' | 'p' | 'P'>): void {
     const possiblePawn = this.getPiece(square);
     if (possiblePawn === null || !(possiblePawn instanceof Pawn)) {
       throw new Error(`No pawn found at ${square}`);
@@ -301,7 +301,7 @@ export class Board {
     this._resetPawnsDidMoveTwoSquares();
   }
 
-  capturePiece(from: Position, to: Position) {
+  capturePiece(from: Position, to: Position): void {
     const fromPiece = this.getPiece(from.toSquare());
     const toPiece = this.getPiece(to.toSquare());
     if (fromPiece === null || toPiece === null) {
@@ -338,7 +338,7 @@ export class Board {
     this._resetPawnsDidMoveTwoSquares();
   }
 
-  enPassant(from: Position, to: Position) {
+  enPassant(from: Position, to: Position): void {
     const fromPiece = this.getPiece(from.toSquare());
     if (fromPiece === null || !(fromPiece instanceof Pawn)) {
       throw new Error(`No pawn found at ${from.toSquare()}`);

@@ -135,10 +135,10 @@ export class HexchessBoard extends LitElement {
         this._reconcileNewState(newState);
       }
     }
-    for (const _move of moves) {
+    moves.forEach(() => {
       const newState = getNewState(this._state, {name: 'REWIND'});
       this._reconcileNewState(newState);
-    }
+    })
     this.requestUpdate('board');
   }
 
@@ -1082,7 +1082,7 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  override render() {
+  override render(): void {
     return html` ${this._renderBoard()} `;
   }
 
@@ -1107,7 +1107,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Flip the orientation of the board.
    */
-  flip() {
+  flip(): void {
     if (this.orientation === 'white') {
       this.orientation = 'black';
     } else {
@@ -1120,7 +1120,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Resize the board based on the latest dimensions given to the shadow root.
    */
-  resize() {
+  resize(): void {
     this._recalculateBoardCoordinates();
     this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
     this.requestUpdate('board');
@@ -1130,7 +1130,7 @@ export class HexchessBoard extends LitElement {
    * Rewinds one move to a previous position.
    * If there are no previous moves, this does nothing.
    */
-  rewind() {
+  rewind(): void {
     const newState = getNewState(this._state, {name: 'REWIND'});
     this._reconcileNewState(newState);
   }
@@ -1139,7 +1139,7 @@ export class HexchessBoard extends LitElement {
    * Fast forwards one move to the next position.
    * If there are no next moves, this does nothing.
    */
-  fastForward() {
+  fastForward(): void {
     const newState = getNewState(this._state, {name: 'FAST_FORWARD'});
     this._reconcileNewState(newState);
   }
@@ -1148,7 +1148,7 @@ export class HexchessBoard extends LitElement {
    * Prevent any more moves to the game.
    * Usually called when the game is over.
    */
-  freeze() {
+  freeze(): void {
     this.frozen = true;
   }
 
@@ -1174,7 +1174,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Resets and unfreezes the board to the default start state.
    */
-  reset() {
+  reset(): void {
     const newGame = new Game();
     this._reconcileNewState({
       didChange: true,

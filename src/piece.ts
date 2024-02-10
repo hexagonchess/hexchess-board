@@ -1,4 +1,4 @@
-import {html, nothing} from 'lit';
+import {TemplateResult, html, nothing} from 'lit';
 import {Piece} from './types';
 
 export const PIECE_VALUES: Record<Piece, number> = {
@@ -22,7 +22,7 @@ export const renderPiece = (
   piece: Piece,
   size: number = DEFAULT_PIECE_SIZE,
   translate = true
-) => {
+): TemplateResult | typeof nothing => {
   if (piece === null) return nothing;
   let id: keyof typeof pieceUrls;
   switch (piece) {

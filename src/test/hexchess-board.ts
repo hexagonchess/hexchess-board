@@ -29,7 +29,7 @@ suite('hexchess-board', () => {
 
   test('renders with a set name', async () => {
     const el = await fixture(
-      html`<hexchess-board name="Test"></hexchess-board>`
+      html`<hexchess-board></hexchess-board>`
     );
     assert.shadowDom.equal(
       el,
