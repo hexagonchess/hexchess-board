@@ -21,21 +21,21 @@ describe('Queens', () => {
 
   test('Gets all possible moves on the starting board', () => {
     const board = Board.new();
-    const piece = board.getPiece('E1')!;
-    const moves = piece.allSquareMoves(board);
-    expect(moves.length).toBe(6);
+    const piece = board.getPiece('E1');
+    const moves = piece?.allSquareMoves(board);
+    expect(moves?.length).toBe(6);
 
-    const piece2 = board.getPiece('E10')!;
-    const moves2 = piece2.allSquareMoves(board);
-    expect(moves2.length).toBe(6);
+    const piece2 = board.getPiece('E10');
+    const moves2 = piece2?.allSquareMoves(board);
+    expect(moves2?.length).toBe(6);
   });
 
   test('Gets all defended squares correctly', () => {
     const board = Board.new();
-    const piece = board.getPiece('E1')!;
-    expect(piece.defendedSquares(board).length).toBe(12);
+    const piece = board.getPiece('E1');
+    expect(piece?.defendedSquares(board).length).toBe(12);
 
-    const piece2 = board.getPiece('E10')!;
-    expect(piece2.defendedSquares(board).length).toBe(12);
+    const piece2 = board.getPiece('E10');
+    expect(piece2?.defendedSquares(board).length).toBe(12);
   });
 });

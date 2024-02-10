@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import { Board } from '../board';
 import { Rook } from '../rook';
 import { Position } from '../position';
+import { assert } from '@open-wc/testing';
 
 describe('Rooks', () => {
   test('Converts rooks to strings', () => {
@@ -23,29 +24,34 @@ describe('Rooks', () => {
     const board = Board.new();
 
     // Left white rook
-    let piece = board.getPiece('C1')!;
+    let piece = board.getPiece('C1');
+    assert(piece !== null)
     board.addPiece(piece);
-    expect(piece.allSquareMoves(board).length).toBe(3);
+    expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Right white rook
-    piece = board.getPiece('I1')!;
+    piece = board.getPiece('I1');
+    assert(piece !== null)
     board.addPiece(piece);
-    expect(piece.allSquareMoves(board).length).toBe(3);
+    expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Left black rook
-    piece = board.getPiece('C8')!;
+    piece = board.getPiece('C8');
+    assert(piece !== null)
     board.addPiece(piece);
-    expect(piece.allSquareMoves(board).length).toBe(3);
+    expect(piece?.allSquareMoves(board).length).toBe(3);
 
     // Right black rook
-    piece = board.getPiece('I8')!;
+    piece = board.getPiece('I8');
+    assert(piece !== null)
     board.addPiece(piece);
+    expect(piece?.allSquareMoves(board).length).toBe(3);
   });
 
   test('Can get the defended squares of a rook correctly', () => {
     const board = Board.new();
-    const piece = board.getPiece('C1')!;
-    expect(piece.defendedSquares(board).length).toBe(7);
+    const piece = board.getPiece('C1');
+    expect(piece?.defendedSquares(board).length).toBe(7);
 
     const board2 = Board.empty();
     const piece2 = new Rook('white', new Position('G', 5));

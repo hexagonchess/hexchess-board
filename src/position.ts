@@ -156,7 +156,6 @@ export class Position {
       case 'E':
       case 'G':
         return this.row === 10;
-      case 'F':
       default:
         return this.row === 11;
     }

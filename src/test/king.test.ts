@@ -22,19 +22,19 @@ describe('Kings', () => {
 
   test('Can get all possible squares for a king on the starting configuration board', () => {
     const board = Board.new();
-    let king = board.getPiece('G1')!;
-    expect(king.allSquareMoves(board).length).toBe(2);
+    let king = board.getPiece('G1');
+    expect(king?.allSquareMoves(board).length).toBe(2);
 
-    king = board.getPiece('G10')!;
-    expect(king.allSquareMoves(board).length).toBe(2);
+    king = board.getPiece('G10');
+    expect(king?.allSquareMoves(board).length).toBe(2);
   });
 
   test('Can get all defended squares for a king', () => {
     const board = Board.new();
-    let king = board.getPiece('G1')!;
-    expect(king.defendedSquares(board).length).toBe(7);
+    let king = board.getPiece('G1');
+    expect(king?.defendedSquares(board).length).toBe(7);
 
-    king = board.getPiece('G10')!;
-    expect(king.defendedSquares(board).length).toBe(7);
+    king = board.getPiece('G10');
+    expect(king?.defendedSquares(board).length).toBe(7);
   });
 });

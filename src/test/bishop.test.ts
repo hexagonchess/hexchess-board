@@ -8,8 +8,8 @@ describe('Bishops', () => {
     const blackBishop = new Bishop('black', new Position('B', 1));
     const whiteBishop = new Bishop('white', new Position('B', 1));
 
-    expect(blackBishop.toString()).toBe('b');
-    expect(whiteBishop.toString()).toBe('B');
+    expect(blackbishop?.toString()).toBe('b');
+    expect(whitebishop?.toString()).toBe('B');
   });
 
   test('Calculates all available bishop positions on an empty board', () => {
@@ -21,35 +21,35 @@ describe('Bishops', () => {
 
   test('Can get all the defended squares for the starting position', () => {
     const board = Board.new();
-    let bishop = board.getPiece('F1')!;
-    expect(bishop.defendedSquares(board).length).toBe(4);
+    let bishop = board.getPiece('F1');
+    expect(bishop?.defendedSquares(board).length).toBe(4);
 
-    bishop = board.getPiece('F2')!;
-    expect(bishop.defendedSquares(board).length).toBe(10);
+    bishop = board.getPiece('F2');
+    expect(bishop?.defendedSquares(board).length).toBe(10);
 
-    bishop = board.getPiece('F3')!;
-    expect(bishop.defendedSquares(board).length).toBe(8);
+    bishop = board.getPiece('F3');
+    expect(bishop?.defendedSquares(board).length).toBe(8);
   });
 
   test('Can get all possible squares for a bishop on the starting configuration board', () => {
     const board = Board.new();
 
-    let bishop = board.getPiece('F1')!;
-    expect(bishop.allSquareMoves(board).length).toBe(2);
+    let bishop = board.getPiece('F1');
+    expect(bishop?.allSquareMoves(board).length).toBe(2);
 
-    bishop = board.getPiece('F2')!;
-    expect(bishop.allSquareMoves(board).length).toBe(8);
+    bishop = board.getPiece('F2');
+    expect(bishop?.allSquareMoves(board).length).toBe(8);
 
-    bishop = board.getPiece('F3')!;
-    expect(bishop.allSquareMoves(board).length).toBe(2);
+    bishop = board.getPiece('F3');
+    expect(bishop?.allSquareMoves(board).length).toBe(2);
 
-    bishop = board.getPiece('F11')!;
-    expect(bishop.allSquareMoves(board).length).toBe(2);
+    bishop = board.getPiece('F11');
+    expect(bishop?.allSquareMoves(board).length).toBe(2);
 
-    bishop = board.getPiece('F10')!;
-    expect(bishop.allSquareMoves(board).length).toBe(8);
+    bishop = board.getPiece('F10');
+    expect(bishop?.allSquareMoves(board).length).toBe(8);
 
-    bishop = board.getPiece('F9')!;
-    expect(bishop.allSquareMoves(board).length).toBe(2);
+    bishop = board.getPiece('F9');
+    expect(bishop?.allSquareMoves(board).length).toBe(2);
   });
 });

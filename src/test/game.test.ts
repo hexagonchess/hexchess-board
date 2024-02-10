@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { BoardUtils } from './board-utils';
+import * as BoardUtils from './board-utils';
 import { Game, GameState } from '../game';
 import { Board } from '../board';
 import { King } from '../king';
@@ -299,7 +299,7 @@ describe('Game', () => {
     expect((blackPawn as Pawn).didMoveTwoSquares).toBe(false);
 
     whitePawn = game.board.getPiece('D5');
-    const allMoves = whitePawn!.allSquareMoves(game.board);
-    expect(allMoves.find((move) => move.toSquare() === 'E6')).toBe(undefined);
+    const allMoves = whitePawn?.allSquareMoves(game.board);
+    expect(allMoves?.find((move) => move.toSquare() === 'E6')).toBe(undefined);
   });
 });

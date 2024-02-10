@@ -8,15 +8,14 @@ import { Rook } from '../rook';
 import { Queen } from '../queen';
 import { Position } from './../position';
 
-export class BoardUtils {
-  static insufficientMaterialStalemate(): Board {
+  export function insufficientMaterialStalemate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 1)));
     board.addPiece(new King('black', new Position('F', 3)));
     return board;
   }
 
-  static whiteNoMoveStalemate(): Board {
+  export function whiteNoMoveStalemate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 1)));
     board.addPiece(new King('black', new Position('F', 3)));
@@ -24,7 +23,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackNoMoveStalemate(): Board {
+  export function blackNoMoveStalemate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 1)));
     board.addPiece(new King('black', new Position('F', 3)));
@@ -32,7 +31,7 @@ export class BoardUtils {
     return board;
   }
 
-  static whiteCheckmateOrStalematePromotion(): Board {
+  export function whiteCheckmateOrStalematePromotion(): Board {
     const board = Board.empty();
     board.addPiece(new King('black', new Position('A', 1)));
     board.addPiece(new King('white', new Position('C', 3)));
@@ -40,7 +39,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackCheckmateOrStalematePromotion(): Board {
+  export function blackCheckmateOrStalematePromotion(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('A', 2)));
     board.addPiece(new King('black', new Position('C', 6)));
@@ -48,7 +47,7 @@ export class BoardUtils {
     return board;
   }
 
-  static whiteCheckPromotion(): Board {
+  export function whiteCheckPromotion(): Board {
     const board = Board.empty();
     board.addPiece(new King('black', new Position('F', 1)));
     board.addPiece(new King('white', new Position('A', 1)));
@@ -56,7 +55,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackKingAndQueenCheckmate(): Board {
+  export function blackKingAndQueenCheckmate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));
     board.addPiece(new Queen('black', new Position('F', 10)));
@@ -64,7 +63,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackKingAndRookCheckmate(): Board {
+  export function blackKingAndRookCheckmate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));
     board.addPiece(new Rook('black', new Position('F', 10)));
@@ -72,7 +71,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackKingAndKnightCheckmate(): Board {
+  export function blackKingAndKnightCheckmate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));
     board.addPiece(new Knight('black', new Position('G', 8)));
@@ -80,7 +79,7 @@ export class BoardUtils {
     return board;
   }
 
-  static blackKingAndBishopCheckmate(): Board {
+  export function blackKingAndBishopCheckmate(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));
     board.addPiece(new Bishop('black', new Position('E', 9)));
@@ -88,7 +87,7 @@ export class BoardUtils {
     return board;
   }
 
-  static pinnedPiece(): Board {
+  export function pinnedPiece(): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));
     board.addPiece(new Bishop('white', new Position('F', 10)));
@@ -97,7 +96,7 @@ export class BoardUtils {
     return board;
   }
 
-  static genericCapturePiece(
+  export function genericCapturePiece(
     createPiece: (position: Position) => HexchessPiece,
   ): Board {
     const board = Board.empty();
@@ -106,4 +105,3 @@ export class BoardUtils {
     board.addPiece(new King('black', new Position('A', 1)));
     return board;
   }
-}

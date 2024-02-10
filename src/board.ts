@@ -49,50 +49,50 @@ export class Board {
     const positions = Object.fromEntries(
       Position.allPositions().map((pos) => [pos.toSquare(), null]),
     ) as Record<Square, HexchessPiece | null>;
-    positions['B1'] = new Pawn('white', new Position('B', 1));
-    positions['B7'] = new Pawn('black', new Position('B', 7));
+    positions.B1 = new Pawn('white', new Position('B', 1));
+    positions.B7 = new Pawn('black', new Position('B', 7));
 
-    positions['C1'] = new Rook('white', new Position('C', 1));
-    positions['C2'] = new Pawn('white', new Position('C', 2));
-    positions['C7'] = new Pawn('black', new Position('C', 7));
-    positions['C8'] = new Rook('black', new Position('C', 8));
+    positions.C1 = new Rook('white', new Position('C', 1));
+    positions.C2 = new Pawn('white', new Position('C', 2));
+    positions.C7 = new Pawn('black', new Position('C', 7));
+    positions.C8 = new Rook('black', new Position('C', 8));
 
-    positions['D1'] = new Knight('white', new Position('D', 1));
-    positions['D3'] = new Pawn('white', new Position('D', 3));
-    positions['D7'] = new Pawn('black', new Position('D', 7));
-    positions['D9'] = new Knight('black', new Position('D', 9));
+    positions.D1 = new Knight('white', new Position('D', 1));
+    positions.D3 = new Pawn('white', new Position('D', 3));
+    positions.D7 = new Pawn('black', new Position('D', 7));
+    positions.D9 = new Knight('black', new Position('D', 9));
 
-    positions['E1'] = new Queen('white', new Position('E', 1));
-    positions['E4'] = new Pawn('white', new Position('E', 4));
-    positions['E7'] = new Pawn('black', new Position('E', 7));
-    positions['E10'] = new Queen('black', new Position('E', 10));
+    positions.E1 = new Queen('white', new Position('E', 1));
+    positions.E4 = new Pawn('white', new Position('E', 4));
+    positions.E7 = new Pawn('black', new Position('E', 7));
+    positions.E10 = new Queen('black', new Position('E', 10));
 
-    positions['F1'] = new Bishop('white', new Position('F', 1));
-    positions['F2'] = new Bishop('white', new Position('F', 2));
-    positions['F3'] = new Bishop('white', new Position('F', 3));
-    positions['F5'] = new Pawn('white', new Position('F', 5));
-    positions['F7'] = new Pawn('black', new Position('F', 7));
-    positions['F9'] = new Bishop('black', new Position('F', 9));
-    positions['F10'] = new Bishop('black', new Position('F', 10));
-    positions['F11'] = new Bishop('black', new Position('F', 11));
+    positions.F1 = new Bishop('white', new Position('F', 1));
+    positions.F2 = new Bishop('white', new Position('F', 2));
+    positions.F3 = new Bishop('white', new Position('F', 3));
+    positions.F5 = new Pawn('white', new Position('F', 5));
+    positions.F7 = new Pawn('black', new Position('F', 7));
+    positions.F9 = new Bishop('black', new Position('F', 9));
+    positions.F10 = new Bishop('black', new Position('F', 10));
+    positions.F11 = new Bishop('black', new Position('F', 11));
 
-    positions['G1'] = new King('white', new Position('G', 1));
-    positions['G4'] = new Pawn('white', new Position('G', 4));
-    positions['G7'] = new Pawn('black', new Position('G', 7));
-    positions['G10'] = new King('black', new Position('G', 10));
+    positions.G1 = new King('white', new Position('G', 1));
+    positions.G4 = new Pawn('white', new Position('G', 4));
+    positions.G7 = new Pawn('black', new Position('G', 7));
+    positions.G10 = new King('black', new Position('G', 10));
 
-    positions['H1'] = new Knight('white', new Position('H', 1));
-    positions['H3'] = new Pawn('white', new Position('H', 3));
-    positions['H7'] = new Pawn('black', new Position('H', 7));
-    positions['H9'] = new Knight('black', new Position('H', 9));
+    positions.H1 = new Knight('white', new Position('H', 1));
+    positions.H3 = new Pawn('white', new Position('H', 3));
+    positions.H7 = new Pawn('black', new Position('H', 7));
+    positions.H9 = new Knight('black', new Position('H', 9));
 
-    positions['I1'] = new Rook('white', new Position('I', 1));
-    positions['I2'] = new Pawn('white', new Position('I', 2));
-    positions['I7'] = new Pawn('black', new Position('I', 7));
-    positions['I8'] = new Rook('black', new Position('I', 8));
+    positions.I1 = new Rook('white', new Position('I', 1));
+    positions.I2 = new Pawn('white', new Position('I', 2));
+    positions.I7 = new Pawn('black', new Position('I', 7));
+    positions.I8 = new Rook('black', new Position('I', 8));
 
-    positions['K1'] = new Pawn('white', new Position('K', 1));
-    positions['K7'] = new Pawn('black', new Position('K', 7));
+    positions.K1 = new Pawn('white', new Position('K', 1));
+    positions.K7 = new Pawn('black', new Position('K', 7));
 
     return new Board(positions);
   }
@@ -118,7 +118,7 @@ export class Board {
   }
 
   private _resetPawnsDidMoveTwoSquares() {
-    Object.entries(this.pieces).forEach(([square, piece]) => {
+    for (const [square, piece] of Object.entries(this.pieces)) {
       if (piece === null || !(piece instanceof Pawn)) {
         return;
       }
@@ -128,7 +128,7 @@ export class Board {
         piece.position,
         false,
       );
-    });
+    };
   }
 
   getKing(color: Omit<Color, 'grey'>): King {
@@ -309,16 +309,16 @@ export class Board {
     const toPiece = this.getPiece(to.toSquare());
     if (fromPiece === null || toPiece === null) {
       throw new Error(
-        `Both pieces must be non-null to capture - did you mean move?`,
+        "Both pieces must be non-null to capture - did you mean move?",
       );
     }
 
     if (fromPiece.color === toPiece.color) {
-      throw new Error(`Cannot capture your own piece`);
+      throw new Error("Cannot capture your own piece");
     }
 
     if (toPiece instanceof King) {
-      throw new Error(`Cannot capture a king`);
+      throw new Error("Cannot capture a king");
     }
 
     this.pieces[from.toSquare()] = null;
@@ -348,11 +348,16 @@ export class Board {
     }
 
     this.pieces[from.toSquare()] = null;
+    let newPosition: Position | null;
     if (fromPiece.color === 'white') {
-      this.pieces[to.getBottomPosition()!.toSquare()] = null;
+      newPosition = to.getBottomPosition();
     } else {
-      this.pieces[to.getTopPosition()!.toSquare()] = null;
+      newPosition = to.getTopPosition();
     }
+    if (newPosition === null) {
+      throw new Error('This is impossible');
+    }
+    this.pieces[newPosition.toSquare()] = null;
     this.pieces[to.toSquare()] = new Pawn(fromPiece.color, to, false);
     this._resetPawnsDidMoveTwoSquares();
   }

@@ -251,7 +251,10 @@ export class Game {
           if (!(piecePosition in moves)) {
             moves[piecePosition] = new Set([move.toSquare()]);
           } else {
-            moves[piecePosition]!.add(move.toSquare());
+            if (!moves[piecePosition]) {
+              throw new Error(`No moves for ${piecePosition}`);
+            }
+            moves[piecePosition]?.add(move.toSquare());
           }
         }
       }
@@ -334,10 +337,14 @@ export class Game {
     if (move.capturedPiece) {
       if (move.capturedPiece === 'p') {
         if (move.enPassant) {
+          const newPosition = Position.fromString(move.to).getTopPosition();
+          if (!newPosition) {
+            throw new Error('This is impossible');
+          }
           this.board.addPiece(
             new Pawn(
               'black',
-              Position.fromString(move.to).getBottomPosition()!,
+              newPosition,
             ),
           );
         } else {
@@ -345,8 +352,12 @@ export class Game {
         }
       } else if (move.capturedPiece === 'P') {
         if (move.enPassant) {
+          const newPosition = Position.fromString(move.to).getTopPosition();
+          if (!newPosition) {
+            throw new Error('This is impossible');
+          }
           this.board.addPiece(
-            new Pawn('white', Position.fromString(move.to).getTopPosition()!),
+            new Pawn('white', newPosition),
           );
         } else {
           this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
