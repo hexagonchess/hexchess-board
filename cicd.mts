@@ -1,34 +1,34 @@
-import { connect, Client } from "@dagger.io/dagger";
+import { connect, Client } from '@dagger.io/dagger';
 
 // Initialize Dagger client
 connect(
   async (client: Client) => {
     // Get local project reference
-    const source = client.host().directory(".", {
-      exclude: ["node_modules/**"],
-      include: ["**/*"],
+    const source = client.host().directory('.', {
+      exclude: ['node_modules/**'],
+      include: ['**/*'],
     });
 
     // Get Node image
-    const node = client.container().from("node:20");
+    const node = client.container().from('node:20');
 
     // Mount cloned repository into node image
     const runner = node
-      .withDirectory("/src", source)
-      .withWorkdir("/src")
-      .withExec(["npm", "install"]);
+      .withDirectory('/src', source)
+      .withWorkdir('/src')
+      .withExec(['npm', 'install']);
 
     // Check formatter
-    runner.withExec(["npm", "run", "format-check"]).sync();
+    runner.withExec(['npm', 'run', 'format-check']).sync();
 
     // Check build
-    runner.withExec(["npm", "run", "build"]).sync();
+    runner.withExec(['npm', 'run', 'build']).sync();
 
     // Lint
-    runner.withExec(["npm", "run", "lint"]).sync();
+    runner.withExec(['npm', 'run', 'lint']).sync();
 
     // Check unit tests
-    runner.withExec(["npm", "run", "test:unit"]).sync();
+    runner.withExec(['npm', 'run', 'test:unit']).sync();
   },
   { LogOutput: process.stderr },
 );

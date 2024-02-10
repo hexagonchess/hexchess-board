@@ -1,58 +1,58 @@
-import { describe, expect, test } from "@jest/globals";
-import { Board } from "../board";
-import { Rook } from "../rook";
-import { Position } from "../position";
+import { describe, expect, test } from '@jest/globals';
+import { Board } from '../board';
+import { Rook } from '../rook';
+import { Position } from '../position';
 
-describe("Rooks", () => {
-  test("Converts rooks to strings", () => {
-    const blackRook = new Rook("black", new Position("B", 1));
-    const whiteRook = new Rook("white", new Position("B", 1));
+describe('Rooks', () => {
+  test('Converts rooks to strings', () => {
+    const blackRook = new Rook('black', new Position('B', 1));
+    const whiteRook = new Rook('white', new Position('B', 1));
 
-    expect(blackRook.toString()).toBe("r");
-    expect(whiteRook.toString()).toBe("R");
+    expect(blackRook.toString()).toBe('r');
+    expect(whiteRook.toString()).toBe('R');
   });
 
-  test("Calculates all available rook positions on an empty board", () => {
+  test('Calculates all available rook positions on an empty board', () => {
     const board = Board.empty();
-    const piece = new Rook("white", new Position("F", 6));
+    const piece = new Rook('white', new Position('F', 6));
     board.addPiece(piece);
     expect(piece.allSquareMoves(board).length).toBe(30);
   });
 
-  test("Can get all squares for a rook on the starting board configuration", () => {
+  test('Can get all squares for a rook on the starting board configuration', () => {
     const board = Board.new();
 
     // Left white rook
-    let piece = board.getPiece("C1")!;
+    let piece = board.getPiece('C1')!;
     board.addPiece(piece);
     expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Right white rook
-    piece = board.getPiece("I1")!;
+    piece = board.getPiece('I1')!;
     board.addPiece(piece);
     expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Left black rook
-    piece = board.getPiece("C8")!;
+    piece = board.getPiece('C8')!;
     board.addPiece(piece);
     expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Right black rook
-    piece = board.getPiece("I8")!;
+    piece = board.getPiece('I8')!;
     board.addPiece(piece);
   });
 
-  test("Can get the defended squares of a rook correctly", () => {
+  test('Can get the defended squares of a rook correctly', () => {
     const board = Board.new();
-    const piece = board.getPiece("C1")!;
+    const piece = board.getPiece('C1')!;
     expect(piece.defendedSquares(board).length).toBe(7);
 
     const board2 = Board.empty();
-    const piece2 = new Rook("white", new Position("G", 5));
-    const piece3 = new Rook("black", new Position("G", 7));
+    const piece2 = new Rook('white', new Position('G', 5));
+    const piece3 = new Rook('black', new Position('G', 7));
     board2.addPiece(piece2);
     board2.addPiece(piece3);
     expect(piece2.defendedSquares(board2).length).toBe(25);
-    expect(piece2.defendedSquares(board2)).toContainEqual(new Position("G", 7));
+    expect(piece2.defendedSquares(board2)).toContainEqual(new Position('G', 7));
   });
 });

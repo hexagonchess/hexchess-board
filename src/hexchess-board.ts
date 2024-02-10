@@ -16,7 +16,7 @@ import {
   movesToString,
   stringToMoves,
 } from "./utils";
-import { LitElement, html, svg, nothing, PropertyValues } from "lit";
+import { LitElement, html, svg, nothing, PropertyValues, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from "./utils";
 import { styles } from "./hexchess-styles";
@@ -1090,7 +1090,7 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  override render(): void {
+  override render(): TemplateResult {
     return html` ${this._renderBoard()} `;
   }
 

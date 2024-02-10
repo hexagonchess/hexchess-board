@@ -98,6 +98,6 @@ const pieceUrls = {
     "https://upload.wikimedia.org/wikipedia/commons/4/49/Chess_qlt60.png?20120721213135",
   "black-rook":
     "https://upload.wikimedia.org/wikipedia/commons/a/a0/Chess_rdt60.png?20120721213136",
-  "white-rook":
+  'white-rook':
     "https://upload.wikimedia.org/wikipedia/commons/5/5c/Chess_rlt60.png?20120721213128",
 };
