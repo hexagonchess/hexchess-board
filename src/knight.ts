@@ -1,7 +1,7 @@
-import { Board } from "./board";
-import { King } from "./king";
-import { Position } from "./position";
-import { Color, HexchessPiece, Piece } from "./types";
+import { Board } from './board';
+import { King } from './king';
+import { Position } from './position';
+import { Color, HexchessPiece, Piece } from './types';
 
 export class Knight implements HexchessPiece {
   readonly color: Color;
@@ -205,6 +205,6 @@ export class Knight implements HexchessPiece {
   }
 
   toString(): Piece {
-    return this.color === "white" ? "N" : "n";
+    return this.color === 'white' ? 'N' : 'n';
   }
 }

@@ -1,13 +1,13 @@
-import { Bishop } from "./bishop";
-import { Board } from "./board";
-import { King } from "./king";
-import { Knight } from "./knight";
-import { Pawn } from "./pawn";
-import { Position } from "./position";
-import { Queen } from "./queen";
-import { Rook } from "./rook";
-import { Color, HexchessPiece, LegalMoves, Move, Piece } from "./types";
-import { Square } from "./utils";
+import { Bishop } from './bishop';
+import { Board } from './board';
+import { King } from './king';
+import { Knight } from './knight';
+import { Pawn } from './pawn';
+import { Position } from './position';
+import { Queen } from './queen';
+import { Rook } from './rook';
+import { Color, HexchessPiece, LegalMoves, Move, Piece } from './types';
+import { Square } from './utils';
 
 export enum GameState {
   CHECKMATE,
@@ -30,12 +30,12 @@ export class Game {
     this.turn = turn;
 
     this._promoting = this.pawnAtEnd().length === 1;
-    this._inCheck = this._isInCheck(this.turn % 2 === 0 ? "white" : "black");
+    this._inCheck = this._isInCheck(this.turn % 2 === 0 ? 'white' : 'black');
     this._checkmate = this._isCheckmate(
-      this.turn % 2 === 0 ? "white" : "black",
+      this.turn % 2 === 0 ? 'white' : 'black',
     );
     this._stalemate = this._isStalemate(
-      this.turn % 2 === 0 ? "white" : "black",
+      this.turn % 2 === 0 ? 'white' : 'black',
     );
   }
 
@@ -54,7 +54,7 @@ export class Game {
 
   pawnAtEnd(): HexchessPiece[] {
     const pieces = this.board.getPieces(
-      this.turn % 2 === 0 ? "white" : "black",
+      this.turn % 2 === 0 ? 'white' : 'black',
     );
     const pawns: Pawn[] = pieces.filter((p) => p instanceof Pawn) as Pawn[];
     return pawns.filter((pawn: Pawn) => pawn.canBePromoted());
@@ -69,7 +69,7 @@ export class Game {
     if (originPiece === null) {
       return false;
     }
-    if (originPiece.color !== (this.turn % 2 === 0 ? "white" : "black")) {
+    if (originPiece.color !== (this.turn % 2 === 0 ? 'white' : 'black')) {
       return false;
     }
 
@@ -104,17 +104,17 @@ export class Game {
       .some((pos) => pos.col === to.col && pos.row === to.row);
   }
 
-  private _getCheckedSquares(color: Omit<Color, "grey">): Set<Square> {
+  private _getCheckedSquares(color: Omit<Color, 'grey'>): Set<Square> {
     const checkPositions: Set<Square> = new Set(
       this.board
-        .getPieces(color === "white" ? "black" : "white")
+        .getPieces(color === 'white' ? 'black' : 'white')
         .filter((piece) => !(piece instanceof Pawn))
         .map((piece) => piece.allSquareMoves(this.board))
         .flat()
         .map((pos) => pos.toSquare()),
     );
     const defendedPositions = this.board
-      .getPieces(color === "white" ? "black" : "white")
+      .getPieces(color === 'white' ? 'black' : 'white')
       .map((piece) => piece.defendedSquares(this.board))
       .flat();
     for (const position of defendedPositions) {
@@ -123,11 +123,11 @@ export class Game {
     return checkPositions;
   }
 
-  private _getValidKingPositions(color: Omit<Color, "grey">): Position[] {
+  private _getValidKingPositions(color: Omit<Color, 'grey'>): Position[] {
     const checkedSquares = this._getCheckedSquares(color);
     const king = this.board.getKing(color);
     if (king === null) {
-      throw new Error("Must have a king on the board");
+      throw new Error('Must have a king on the board');
     }
 
     return king
@@ -135,22 +135,22 @@ export class Game {
       .filter((pos) => !checkedSquares.has(pos.toSquare()));
   }
 
-  private _isInCheck(color: Omit<Color, "grey">): boolean {
+  private _isInCheck(color: Omit<Color, 'grey'>): boolean {
     const king = this.board.getKing(color);
     if (king === null) {
-      throw new Error("Must have a king on the board");
+      throw new Error('Must have a king on the board');
     }
 
     const checkedSquares = this._getCheckedSquares(color);
     return checkedSquares.has(king.position.toSquare());
   }
 
-  private _isCheckmate(color: Omit<Color, "grey">): boolean {
+  private _isCheckmate(color: Omit<Color, 'grey'>): boolean {
     const kingPositions = this._getValidKingPositions(color);
     return kingPositions.length === 0 && this._inCheck;
   }
 
-  private _isStalemate(color: Omit<Color, "grey">): boolean {
+  private _isStalemate(color: Omit<Color, 'grey'>): boolean {
     const pieces = this.board.getPieces(color);
     const kingPositions = this._getValidKingPositions(color);
     // King has no legal moves, and no other piece exists to move
@@ -163,15 +163,15 @@ export class Game {
   }
 
   isCheckmate(): boolean {
-    return this._isCheckmate(this.turn % 2 === 0 ? "white" : "black");
+    return this._isCheckmate(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
   isStalemate(): boolean {
-    return this._isStalemate(this.turn % 2 === 0 ? "white" : "black");
+    return this._isStalemate(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
   isInCheck(): boolean {
-    return this._isInCheck(this.turn % 2 === 0 ? "white" : "black");
+    return this._isInCheck(this.turn % 2 === 0 ? 'white' : 'black');
   }
 
   movePiece(from: Position, to: Position): void {
@@ -208,21 +208,21 @@ export class Game {
     }
   }
 
-  promotePawn(piece: Omit<Piece, "p" | "P" | "K" | "k">): void {
+  promotePawn(piece: Omit<Piece, 'p' | 'P' | 'K' | 'k'>): void {
     const pawns = this.pawnAtEnd();
     if (pawns.length !== 1) {
-      throw new Error("Must have exactly one pawn to promote");
+      throw new Error('Must have exactly one pawn to promote');
     }
     if (!this._promoting) {
-      throw new Error("Must be in the promoting state");
+      throw new Error('Must be in the promoting state');
     }
 
     const pawn = pawns[0];
     if (!(pawn instanceof Pawn)) {
-      throw new Error("Must have a pawn to promote");
+      throw new Error('Must have a pawn to promote');
     }
     if (!pawn.canBePromoted()) {
-      throw new Error("Pawn must be promotable");
+      throw new Error('Pawn must be promotable');
     }
 
     this.board.promotePawn(pawn.position.toSquare(), piece);
@@ -241,7 +241,7 @@ export class Game {
   }
 
   allLegalMoves(): LegalMoves {
-    const color = this.turn % 2 === 0 ? "white" : "black";
+    const color = this.turn % 2 === 0 ? 'white' : 'black';
     const pieces = this.board.getPieces(color);
     const moves: Partial<Record<Square, Set<Square>>> = {};
 
@@ -281,29 +281,29 @@ export class Game {
     }
 
     switch (move.promotion) {
-      case "Q":
-        this.board.addPiece(new Queen("white", Position.fromString(move.to)));
+      case 'Q':
+        this.board.addPiece(new Queen('white', Position.fromString(move.to)));
         break;
-      case "q":
-        this.board.addPiece(new Queen("black", Position.fromString(move.to)));
+      case 'q':
+        this.board.addPiece(new Queen('black', Position.fromString(move.to)));
         break;
-      case "R":
-        this.board.addPiece(new Rook("white", Position.fromString(move.to)));
+      case 'R':
+        this.board.addPiece(new Rook('white', Position.fromString(move.to)));
         break;
-      case "r":
-        this.board.addPiece(new Rook("black", Position.fromString(move.to)));
+      case 'r':
+        this.board.addPiece(new Rook('black', Position.fromString(move.to)));
         break;
-      case "B":
-        this.board.addPiece(new Bishop("white", Position.fromString(move.to)));
+      case 'B':
+        this.board.addPiece(new Bishop('white', Position.fromString(move.to)));
         break;
-      case "b":
-        this.board.addPiece(new Bishop("black", Position.fromString(move.to)));
+      case 'b':
+        this.board.addPiece(new Bishop('black', Position.fromString(move.to)));
         break;
-      case "N":
-        this.board.addPiece(new Knight("white", Position.fromString(move.to)));
+      case 'N':
+        this.board.addPiece(new Knight('white', Position.fromString(move.to)));
         break;
-      case "n":
-        this.board.addPiece(new Knight("black", Position.fromString(move.to)));
+      case 'n':
+        this.board.addPiece(new Knight('black', Position.fromString(move.to)));
         break;
       default:
         break;
@@ -312,13 +312,13 @@ export class Game {
 
   rewind(move: Move): void {
     if (move.promotion) {
-      let color: Color = "white";
+      let color: Color = 'white';
       switch (move.promotion) {
-        case "q":
-        case "r":
-        case "b":
-        case "n":
-          color = "black";
+        case 'q':
+        case 'r':
+        case 'b':
+        case 'n':
+          color = 'black';
           break;
         default:
           break;
@@ -334,47 +334,47 @@ export class Game {
     );
 
     if (move.capturedPiece) {
-      if (move.capturedPiece === "p") {
+      if (move.capturedPiece === 'p') {
         if (move.enPassant) {
           this.board.addPiece(
             new Pawn(
-              "black",
+              'black',
               Position.fromString(move.to).getBottomPosition()!,
             ),
           );
         } else {
-          this.board.addPiece(new Pawn("black", Position.fromString(move.to)));
+          this.board.addPiece(new Pawn('black', Position.fromString(move.to)));
         }
-      } else if (move.capturedPiece === "P") {
+      } else if (move.capturedPiece === 'P') {
         if (move.enPassant) {
           this.board.addPiece(
-            new Pawn("white", Position.fromString(move.to).getTopPosition()!),
+            new Pawn('white', Position.fromString(move.to).getTopPosition()!),
           );
         } else {
-          this.board.addPiece(new Pawn("white", Position.fromString(move.to)));
+          this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
         }
-      } else if (move.capturedPiece === "k") {
-        this.board.addPiece(new King("black", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "K") {
-        this.board.addPiece(new King("white", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "q") {
-        this.board.addPiece(new Queen("black", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "Q") {
-        this.board.addPiece(new Queen("white", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "r") {
-        this.board.addPiece(new Rook("black", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "R") {
-        this.board.addPiece(new Rook("white", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "b") {
-        this.board.addPiece(new Bishop("black", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "B") {
-        this.board.addPiece(new Bishop("white", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "n") {
-        this.board.addPiece(new Knight("black", Position.fromString(move.to)));
-      } else if (move.capturedPiece === "N") {
-        this.board.addPiece(new Knight("white", Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'k') {
+        this.board.addPiece(new King('black', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'K') {
+        this.board.addPiece(new King('white', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'q') {
+        this.board.addPiece(new Queen('black', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'Q') {
+        this.board.addPiece(new Queen('white', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'r') {
+        this.board.addPiece(new Rook('black', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'R') {
+        this.board.addPiece(new Rook('white', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'b') {
+        this.board.addPiece(new Bishop('black', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'B') {
+        this.board.addPiece(new Bishop('white', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'n') {
+        this.board.addPiece(new Knight('black', Position.fromString(move.to)));
+      } else if (move.capturedPiece === 'N') {
+        this.board.addPiece(new Knight('white', Position.fromString(move.to)));
       } else {
-        throw new Error("Invalid piece");
+        throw new Error('Invalid piece');
       }
     }
   }

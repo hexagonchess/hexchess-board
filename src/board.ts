@@ -1,12 +1,12 @@
-import { Bishop } from "./bishop";
-import { King } from "./king";
-import { Knight } from "./knight";
-import { Pawn } from "./pawn";
-import { Position } from "./position";
-import { Queen } from "./queen";
-import { Rook } from "./rook";
-import { Color, HexchessPiece, Piece } from "./types";
-import { Square } from "./utils";
+import { Bishop } from './bishop';
+import { King } from './king';
+import { Knight } from './knight';
+import { Pawn } from './pawn';
+import { Position } from './position';
+import { Queen } from './queen';
+import { Rook } from './rook';
+import { Color, HexchessPiece, Piece } from './types';
+import { Square } from './utils';
 
 export class Board {
   readonly pieces: Record<Square, HexchessPiece | null>;
@@ -32,7 +32,7 @@ export class Board {
       } else if (piece instanceof Knight) {
         clone.addPiece(new Knight(piece.color, piece.position));
       } else {
-        throw new Error("Invalid piece type");
+        throw new Error('Invalid piece type');
       }
     }
     return clone;
@@ -49,50 +49,50 @@ export class Board {
     const positions = Object.fromEntries(
       Position.allPositions().map((pos) => [pos.toSquare(), null]),
     ) as Record<Square, HexchessPiece | null>;
-    positions["B1"] = new Pawn("white", new Position("B", 1));
-    positions["B7"] = new Pawn("black", new Position("B", 7));
+    positions['B1'] = new Pawn('white', new Position('B', 1));
+    positions['B7'] = new Pawn('black', new Position('B', 7));
 
-    positions["C1"] = new Rook("white", new Position("C", 1));
-    positions["C2"] = new Pawn("white", new Position("C", 2));
-    positions["C7"] = new Pawn("black", new Position("C", 7));
-    positions["C8"] = new Rook("black", new Position("C", 8));
+    positions['C1'] = new Rook('white', new Position('C', 1));
+    positions['C2'] = new Pawn('white', new Position('C', 2));
+    positions['C7'] = new Pawn('black', new Position('C', 7));
+    positions['C8'] = new Rook('black', new Position('C', 8));
 
-    positions["D1"] = new Knight("white", new Position("D", 1));
-    positions["D3"] = new Pawn("white", new Position("D", 3));
-    positions["D7"] = new Pawn("black", new Position("D", 7));
-    positions["D9"] = new Knight("black", new Position("D", 9));
+    positions['D1'] = new Knight('white', new Position('D', 1));
+    positions['D3'] = new Pawn('white', new Position('D', 3));
+    positions['D7'] = new Pawn('black', new Position('D', 7));
+    positions['D9'] = new Knight('black', new Position('D', 9));
 
-    positions["E1"] = new Queen("white", new Position("E", 1));
-    positions["E4"] = new Pawn("white", new Position("E", 4));
-    positions["E7"] = new Pawn("black", new Position("E", 7));
-    positions["E10"] = new Queen("black", new Position("E", 10));
+    positions['E1'] = new Queen('white', new Position('E', 1));
+    positions['E4'] = new Pawn('white', new Position('E', 4));
+    positions['E7'] = new Pawn('black', new Position('E', 7));
+    positions['E10'] = new Queen('black', new Position('E', 10));
 
-    positions["F1"] = new Bishop("white", new Position("F", 1));
-    positions["F2"] = new Bishop("white", new Position("F", 2));
-    positions["F3"] = new Bishop("white", new Position("F", 3));
-    positions["F5"] = new Pawn("white", new Position("F", 5));
-    positions["F7"] = new Pawn("black", new Position("F", 7));
-    positions["F9"] = new Bishop("black", new Position("F", 9));
-    positions["F10"] = new Bishop("black", new Position("F", 10));
-    positions["F11"] = new Bishop("black", new Position("F", 11));
+    positions['F1'] = new Bishop('white', new Position('F', 1));
+    positions['F2'] = new Bishop('white', new Position('F', 2));
+    positions['F3'] = new Bishop('white', new Position('F', 3));
+    positions['F5'] = new Pawn('white', new Position('F', 5));
+    positions['F7'] = new Pawn('black', new Position('F', 7));
+    positions['F9'] = new Bishop('black', new Position('F', 9));
+    positions['F10'] = new Bishop('black', new Position('F', 10));
+    positions['F11'] = new Bishop('black', new Position('F', 11));
 
-    positions["G1"] = new King("white", new Position("G", 1));
-    positions["G4"] = new Pawn("white", new Position("G", 4));
-    positions["G7"] = new Pawn("black", new Position("G", 7));
-    positions["G10"] = new King("black", new Position("G", 10));
+    positions['G1'] = new King('white', new Position('G', 1));
+    positions['G4'] = new Pawn('white', new Position('G', 4));
+    positions['G7'] = new Pawn('black', new Position('G', 7));
+    positions['G10'] = new King('black', new Position('G', 10));
 
-    positions["H1"] = new Knight("white", new Position("H", 1));
-    positions["H3"] = new Pawn("white", new Position("H", 3));
-    positions["H7"] = new Pawn("black", new Position("H", 7));
-    positions["H9"] = new Knight("black", new Position("H", 9));
+    positions['H1'] = new Knight('white', new Position('H', 1));
+    positions['H3'] = new Pawn('white', new Position('H', 3));
+    positions['H7'] = new Pawn('black', new Position('H', 7));
+    positions['H9'] = new Knight('black', new Position('H', 9));
 
-    positions["I1"] = new Rook("white", new Position("I", 1));
-    positions["I2"] = new Pawn("white", new Position("I", 2));
-    positions["I7"] = new Pawn("black", new Position("I", 7));
-    positions["I8"] = new Rook("black", new Position("I", 8));
+    positions['I1'] = new Rook('white', new Position('I', 1));
+    positions['I2'] = new Pawn('white', new Position('I', 2));
+    positions['I7'] = new Pawn('black', new Position('I', 7));
+    positions['I8'] = new Rook('black', new Position('I', 8));
 
-    positions["K1"] = new Pawn("white", new Position("K", 1));
-    positions["K7"] = new Pawn("black", new Position("K", 7));
+    positions['K1'] = new Pawn('white', new Position('K', 1));
+    positions['K7'] = new Pawn('black', new Position('K', 7));
 
     return new Board(positions);
   }
@@ -131,7 +131,7 @@ export class Board {
     });
   }
 
-  getKing(color: Omit<Color, "grey">): King {
+  getKing(color: Omit<Color, 'grey'>): King {
     for (const piece of Object.values(this.pieces)) {
       if (piece instanceof King && piece.color === color) {
         return piece;
@@ -145,7 +145,7 @@ export class Board {
     return squares.filter((s: Square) => this.getPiece(s) !== null).length;
   }
 
-  getPieces(color: Omit<Color, "grey">): HexchessPiece[] {
+  getPieces(color: Omit<Color, 'grey'>): HexchessPiece[] {
     return Object.values(this.pieces).filter(
       (piece) => piece !== null && piece.color === color,
     ) as HexchessPiece[];
@@ -155,7 +155,7 @@ export class Board {
     return this.pieces[square] || null;
   }
 
-  hasOppositeColorPiece(square: Square, color: Omit<Color, "grey">): boolean {
+  hasOppositeColorPiece(square: Square, color: Omit<Color, 'grey'>): boolean {
     const piece = this.getPiece(square);
     return piece !== null && piece.color !== color;
   }
@@ -174,52 +174,52 @@ export class Board {
       return;
     }
     switch (piece) {
-      case "p": {
-        this.pieces[square] = new Pawn("black", Position.fromString(square));
+      case 'p': {
+        this.pieces[square] = new Pawn('black', Position.fromString(square));
         break;
       }
-      case "P": {
-        this.pieces[square] = new Pawn("white", Position.fromString(square));
+      case 'P': {
+        this.pieces[square] = new Pawn('white', Position.fromString(square));
         break;
       }
-      case "r": {
-        this.pieces[square] = new Rook("black", Position.fromString(square));
+      case 'r': {
+        this.pieces[square] = new Rook('black', Position.fromString(square));
         break;
       }
-      case "R": {
-        this.pieces[square] = new Rook("white", Position.fromString(square));
+      case 'R': {
+        this.pieces[square] = new Rook('white', Position.fromString(square));
         break;
       }
-      case "n": {
-        this.pieces[square] = new Knight("black", Position.fromString(square));
+      case 'n': {
+        this.pieces[square] = new Knight('black', Position.fromString(square));
         break;
       }
-      case "N": {
-        this.pieces[square] = new Knight("white", Position.fromString(square));
+      case 'N': {
+        this.pieces[square] = new Knight('white', Position.fromString(square));
         break;
       }
-      case "b": {
-        this.pieces[square] = new Bishop("black", Position.fromString(square));
+      case 'b': {
+        this.pieces[square] = new Bishop('black', Position.fromString(square));
         break;
       }
-      case "B": {
-        this.pieces[square] = new Bishop("white", Position.fromString(square));
+      case 'B': {
+        this.pieces[square] = new Bishop('white', Position.fromString(square));
         break;
       }
-      case "q": {
-        this.pieces[square] = new Queen("black", Position.fromString(square));
+      case 'q': {
+        this.pieces[square] = new Queen('black', Position.fromString(square));
         break;
       }
-      case "Q": {
-        this.pieces[square] = new Queen("white", Position.fromString(square));
+      case 'Q': {
+        this.pieces[square] = new Queen('white', Position.fromString(square));
         break;
       }
-      case "k": {
-        this.pieces[square] = new King("black", Position.fromString(square));
+      case 'k': {
+        this.pieces[square] = new King('black', Position.fromString(square));
         break;
       }
-      case "K": {
-        this.pieces[square] = new King("white", Position.fromString(square));
+      case 'K': {
+        this.pieces[square] = new King('white', Position.fromString(square));
         break;
       }
     }
@@ -250,13 +250,13 @@ export class Board {
     } else if (piece instanceof Knight) {
       this.pieces[to.toSquare()] = new Knight(piece.color, to);
     } else {
-      throw new Error("Invalid piece type");
+      throw new Error('Invalid piece type');
     }
   }
 
   promotePawn(
     square: Square,
-    newPiece: Omit<Piece, "k" | "K" | "p" | "P">,
+    newPiece: Omit<Piece, 'k' | 'K' | 'p' | 'P'>,
   ): void {
     const possiblePawn = this.getPiece(square);
     if (possiblePawn === null || !(possiblePawn instanceof Pawn)) {
@@ -268,32 +268,32 @@ export class Board {
     }
 
     switch (newPiece) {
-      case "q":
-      case "Q": {
+      case 'q':
+      case 'Q': {
         this.pieces[square] = new Queen(
           possiblePawn.color,
           possiblePawn.position,
         );
         break;
       }
-      case "r":
-      case "R": {
+      case 'r':
+      case 'R': {
         this.pieces[square] = new Rook(
           possiblePawn.color,
           possiblePawn.position,
         );
         break;
       }
-      case "b":
-      case "B": {
+      case 'b':
+      case 'B': {
         this.pieces[square] = new Bishop(
           possiblePawn.color,
           possiblePawn.position,
         );
         break;
       }
-      case "n":
-      case "N": {
+      case 'n':
+      case 'N': {
         this.pieces[square] = new Knight(
           possiblePawn.color,
           possiblePawn.position,
@@ -335,7 +335,7 @@ export class Board {
     } else if (fromPiece instanceof Knight) {
       this.pieces[to.toSquare()] = new Knight(fromPiece.color, to);
     } else {
-      throw new Error("Invalid piece type");
+      throw new Error('Invalid piece type');
     }
 
     this._resetPawnsDidMoveTwoSquares();
@@ -348,7 +348,7 @@ export class Board {
     }
 
     this.pieces[from.toSquare()] = null;
-    if (fromPiece.color === "white") {
+    if (fromPiece.color === 'white') {
       this.pieces[to.getBottomPosition()!.toSquare()] = null;
     } else {
       this.pieces[to.getTopPosition()!.toSquare()] = null;

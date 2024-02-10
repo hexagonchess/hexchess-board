@@ -1,13 +1,13 @@
-import { Board } from "./board";
-import { Color } from "./types";
-import { COLUMN_ARRAY, Column, Square } from "./utils";
+import { Board } from './board';
+import { Color } from './types';
+import { COLUMN_ARRAY, Column, Square } from './utils';
 
 export class Position {
   readonly col: Column;
   readonly row: number;
 
   static canGetNextPosition(
-    color: Omit<Color, "grey">,
+    color: Omit<Color, 'grey'>,
     startingPosition: Position,
     board: Board,
     getNextPos: () => Position | null,
@@ -41,7 +41,7 @@ export class Position {
     const positions: Position[] = [];
     const originalPiece = board.getPiece(originalPosition.toSquare());
     if (!originalPiece) {
-      throw new Error("No piece at original position");
+      throw new Error('No piece at original position');
     }
 
     let currentPos = getNextPos(originalPosition);
@@ -74,36 +74,36 @@ export class Position {
 
   static validatePosition(column: string, row: number): boolean {
     if (
-      column !== "A" &&
-      column !== "B" &&
-      column !== "C" &&
-      column !== "D" &&
-      column !== "E" &&
-      column !== "F" &&
-      column !== "G" &&
-      column !== "H" &&
-      column !== "I" &&
-      column !== "K" &&
-      column !== "L"
+      column !== 'A' &&
+      column !== 'B' &&
+      column !== 'C' &&
+      column !== 'D' &&
+      column !== 'E' &&
+      column !== 'F' &&
+      column !== 'G' &&
+      column !== 'H' &&
+      column !== 'I' &&
+      column !== 'K' &&
+      column !== 'L'
     ) {
       return false;
     }
-    if (column === "A" || column === "L") {
+    if (column === 'A' || column === 'L') {
       return row >= 1 && row <= 6;
     }
-    if (column === "B" || column === "K") {
+    if (column === 'B' || column === 'K') {
       return row >= 1 && row <= 7;
     }
-    if (column === "C" || column === "I") {
+    if (column === 'C' || column === 'I') {
       return row >= 1 && row <= 8;
     }
-    if (column === "D" || column === "H") {
+    if (column === 'D' || column === 'H') {
       return row >= 1 && row <= 9;
     }
-    if (column === "E" || column === "G") {
+    if (column === 'E' || column === 'G') {
       return row >= 1 && row <= 10;
     }
-    if (column === "F") {
+    if (column === 'F') {
       return row >= 1 && row <= 11;
     }
     return false;
@@ -141,22 +141,22 @@ export class Position {
 
   isEndOfColumn(): boolean {
     switch (this.col) {
-      case "A":
-      case "L":
+      case 'A':
+      case 'L':
         return this.row === 6;
-      case "B":
-      case "K":
+      case 'B':
+      case 'K':
         return this.row === 7;
-      case "C":
-      case "I":
+      case 'C':
+      case 'I':
         return this.row === 8;
-      case "D":
-      case "H":
+      case 'D':
+      case 'H':
         return this.row === 9;
-      case "E":
-      case "G":
+      case 'E':
+      case 'G':
         return this.row === 10;
-      case "F":
+      case 'F':
       default:
         return this.row === 11;
     }
@@ -164,16 +164,16 @@ export class Position {
 
   isBeginningOfRow(): boolean {
     switch (this.col) {
-      case "A":
-      case "B":
+      case 'A':
+      case 'B':
         return true;
-      case "C":
+      case 'C':
         return this.row === 1 || this.row === 8;
-      case "D":
+      case 'D':
         return this.row === 1 || this.row === 9;
-      case "E":
+      case 'E':
         return this.row === 1 || this.row === 10;
-      case "F":
+      case 'F':
         return this.row === 1 || this.row === 11;
       default:
         return false;
@@ -182,16 +182,16 @@ export class Position {
 
   isEndOfRow(): boolean {
     switch (this.col) {
-      case "F":
+      case 'F':
         return this.row === 1 || this.row === 11;
-      case "G":
+      case 'G':
         return this.row === 1 || this.row === 10;
-      case "H":
+      case 'H':
         return this.row === 1 || this.row === 9;
-      case "I":
+      case 'I':
         return this.row === 1 || this.row === 8;
-      case "K":
-      case "L":
+      case 'K':
+      case 'L':
         return true;
       default:
         return false;
@@ -218,27 +218,27 @@ export class Position {
 
   getTopRightPosition(): Position | null {
     switch (this.col) {
-      case "A":
-        return new Position("B", this.row + 1);
-      case "B":
-        return new Position("C", this.row + 1);
-      case "C":
-        return new Position("D", this.row + 1);
-      case "D":
-        return new Position("E", this.row + 1);
-      case "E":
-        return new Position("F", this.row + 1);
-      case "F":
-        return this.row === 11 ? null : new Position("G", this.row);
-      case "G":
-        return this.row === 10 ? null : new Position("H", this.row);
-      case "H":
-        return this.row === 9 ? null : new Position("I", this.row);
-      case "I":
-        return this.row === 8 ? null : new Position("K", this.row);
-      case "K":
-        return this.row === 7 ? null : new Position("L", this.row);
-      case "L":
+      case 'A':
+        return new Position('B', this.row + 1);
+      case 'B':
+        return new Position('C', this.row + 1);
+      case 'C':
+        return new Position('D', this.row + 1);
+      case 'D':
+        return new Position('E', this.row + 1);
+      case 'E':
+        return new Position('F', this.row + 1);
+      case 'F':
+        return this.row === 11 ? null : new Position('G', this.row);
+      case 'G':
+        return this.row === 10 ? null : new Position('H', this.row);
+      case 'H':
+        return this.row === 9 ? null : new Position('I', this.row);
+      case 'I':
+        return this.row === 8 ? null : new Position('K', this.row);
+      case 'K':
+        return this.row === 7 ? null : new Position('L', this.row);
+      case 'L':
         return null;
     }
   }
@@ -261,73 +261,73 @@ export class Position {
     }
 
     switch (this.col) {
-      case "A":
-        return new Position("C", this.row + 1);
-      case "B":
-        return new Position("D", this.row + 1);
-      case "C":
-        return new Position("E", this.row + 1);
-      case "D":
-        return new Position("F", this.row + 1);
-      case "E":
-        return new Position("G", this.row);
-      case "F":
-        return new Position("H", this.row - 1);
-      case "G":
-        return new Position("I", this.row - 1);
-      case "H":
-        return new Position("K", this.row - 1);
-      case "I":
-        return new Position("L", this.row - 1);
-      case "K":
-      case "L":
+      case 'A':
+        return new Position('C', this.row + 1);
+      case 'B':
+        return new Position('D', this.row + 1);
+      case 'C':
+        return new Position('E', this.row + 1);
+      case 'D':
+        return new Position('F', this.row + 1);
+      case 'E':
+        return new Position('G', this.row);
+      case 'F':
+        return new Position('H', this.row - 1);
+      case 'G':
+        return new Position('I', this.row - 1);
+      case 'H':
+        return new Position('K', this.row - 1);
+      case 'I':
+        return new Position('L', this.row - 1);
+      case 'K':
+      case 'L':
         return null;
     }
   }
 
   getBottomRightPosition(): Position | null {
     switch (this.col) {
-      case "A":
-        return new Position("B", this.row);
-      case "B":
-        return new Position("C", this.row);
-      case "C":
-        return new Position("D", this.row);
-      case "D":
-        return new Position("E", this.row);
-      case "E":
-        return new Position("F", this.row);
-      case "F": {
+      case 'A':
+        return new Position('B', this.row);
+      case 'B':
+        return new Position('C', this.row);
+      case 'C':
+        return new Position('D', this.row);
+      case 'D':
+        return new Position('E', this.row);
+      case 'E':
+        return new Position('F', this.row);
+      case 'F': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("G", this.row - 1);
+        return new Position('G', this.row - 1);
       }
-      case "G": {
+      case 'G': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("H", this.row - 1);
+        return new Position('H', this.row - 1);
       }
-      case "H": {
+      case 'H': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("I", this.row - 1);
+        return new Position('I', this.row - 1);
       }
-      case "I": {
+      case 'I': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("K", this.row - 1);
+        return new Position('K', this.row - 1);
       }
-      case "K": {
+      case 'K': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("L", this.row - 1);
+        return new Position('L', this.row - 1);
       }
-      case "L":
+      case 'L':
         return null;
     }
   }
@@ -349,52 +349,52 @@ export class Position {
 
   getBottomLeftPosition(): Position | null {
     switch (this.col) {
-      case "A":
+      case 'A':
         return null;
-      case "B": {
+      case 'B': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("A", this.row - 1);
+        return new Position('A', this.row - 1);
       }
-      case "C": {
+      case 'C': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("B", this.row - 1);
+        return new Position('B', this.row - 1);
       }
-      case "D": {
+      case 'D': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("C", this.row - 1);
+        return new Position('C', this.row - 1);
       }
-      case "E": {
+      case 'E': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("D", this.row - 1);
+        return new Position('D', this.row - 1);
       }
-      case "F": {
+      case 'F': {
         if (this.row === 1) {
           return null;
         }
-        return new Position("E", this.row - 1);
+        return new Position('E', this.row - 1);
       }
-      case "G": {
-        return new Position("F", this.row);
+      case 'G': {
+        return new Position('F', this.row);
       }
-      case "H": {
-        return new Position("G", this.row);
+      case 'H': {
+        return new Position('G', this.row);
       }
-      case "I": {
-        return new Position("H", this.row);
+      case 'I': {
+        return new Position('H', this.row);
       }
-      case "K": {
-        return new Position("I", this.row);
+      case 'K': {
+        return new Position('I', this.row);
       }
-      case "L": {
-        return new Position("K", this.row);
+      case 'L': {
+        return new Position('K', this.row);
       }
     }
   }
@@ -412,74 +412,74 @@ export class Position {
       return null;
     }
     switch (this.col) {
-      case "C":
-        return new Position("A", this.row - 1);
-      case "D":
-        return new Position("B", this.row - 1);
-      case "E":
-        return new Position("C", this.row - 1);
-      case "F":
-        return new Position("D", this.row - 1);
-      case "G":
-        return new Position("E", this.row);
-      case "H":
-        return new Position("F", this.row + 1);
-      case "I":
-        return new Position("G", this.row + 1);
-      case "K":
-        return new Position("H", this.row + 1);
-      case "L":
-        return new Position("I", this.row + 1);
-      case "A":
-      case "B":
+      case 'C':
+        return new Position('A', this.row - 1);
+      case 'D':
+        return new Position('B', this.row - 1);
+      case 'E':
+        return new Position('C', this.row - 1);
+      case 'F':
+        return new Position('D', this.row - 1);
+      case 'G':
+        return new Position('E', this.row);
+      case 'H':
+        return new Position('F', this.row + 1);
+      case 'I':
+        return new Position('G', this.row + 1);
+      case 'K':
+        return new Position('H', this.row + 1);
+      case 'L':
+        return new Position('I', this.row + 1);
+      case 'A':
+      case 'B':
         return null;
     }
   }
 
   getTopLeftPosition(): Position | null {
     switch (this.col) {
-      case "A":
+      case 'A':
         return null;
-      case "B": {
+      case 'B': {
         if (this.row === 7) {
           return null;
         }
-        return new Position("A", this.row);
+        return new Position('A', this.row);
       }
-      case "C": {
+      case 'C': {
         if (this.row === 8) {
           return null;
         }
-        return new Position("B", this.row);
+        return new Position('B', this.row);
       }
-      case "D": {
+      case 'D': {
         if (this.row === 9) {
           return null;
         }
-        return new Position("C", this.row);
+        return new Position('C', this.row);
       }
-      case "E": {
+      case 'E': {
         if (this.row === 10) {
           return null;
         }
-        return new Position("D", this.row);
+        return new Position('D', this.row);
       }
-      case "F": {
+      case 'F': {
         if (this.row === 11) {
           return null;
         }
-        return new Position("E", this.row);
+        return new Position('E', this.row);
       }
-      case "G":
-        return new Position("F", this.row + 1);
-      case "H":
-        return new Position("G", this.row + 1);
-      case "I":
-        return new Position("H", this.row + 1);
-      case "K":
-        return new Position("I", this.row + 1);
-      case "L":
-        return new Position("K", this.row + 1);
+      case 'G':
+        return new Position('F', this.row + 1);
+      case 'H':
+        return new Position('G', this.row + 1);
+      case 'I':
+        return new Position('H', this.row + 1);
+      case 'K':
+        return new Position('I', this.row + 1);
+      case 'L':
+        return new Position('K', this.row + 1);
     }
   }
 
