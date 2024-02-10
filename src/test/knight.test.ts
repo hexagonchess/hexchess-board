@@ -35,25 +35,25 @@ describe('Knights', () => {
 
   test('Can get all possible squares for a knight on the starting configuration board', () => {
     const board = Board.new();
-    let knight = board.getPiece('D1')!;
-    expect(knight.allSquareMoves(board).length).toBe(4);
+    let knight = board.getPiece('D1');
+    expect(knight?.allSquareMoves(board).length).toBe(4);
 
-    knight = board.getPiece('D9')!;
-    expect(knight.allSquareMoves(board).length).toBe(4);
+    knight = board.getPiece('D9');
+    expect(knight?.allSquareMoves(board).length).toBe(4);
 
-    knight = board.getPiece('H1')!;
-    expect(knight.allSquareMoves(board).length).toBe(4);
+    knight = board.getPiece('H1');
+    expect(knight?.allSquareMoves(board).length).toBe(4);
 
-    knight = board.getPiece('H9')!;
-    expect(knight.allSquareMoves(board).length).toBe(4);
+    knight = board.getPiece('H9');
+    expect(knight?.allSquareMoves(board).length).toBe(4);
   });
 
   test('Can get all defended squares for a knight', () => {
     const board = Board.new();
-    let knight = board.getPiece('D1')!;
-    expect(knight.defendedSquares(board).length).toBe(6);
+    let knight = board.getPiece('D1');
+    expect(knight?.defendedSquares(board).length).toBe(6);
 
-    knight = board.getPiece('D9')!;
-    expect(knight.defendedSquares(board).length).toBe(6);
+    knight = board.getPiece('D9');
+    expect(knight?.defendedSquares(board).length).toBe(6);
   });
 });

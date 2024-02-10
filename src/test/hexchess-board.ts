@@ -43,8 +43,8 @@ suite('hexchess-board', () => {
     const el = (await fixture(
       html`<hexchess-board></hexchess-board>`,
     )) as HexchessBoard;
-    const button = el.shadowRoot!.querySelector('button')!;
-    button.click();
+    const button = el.shadowRoot?.querySelector('button');
+    button?.click();
     await el.updateComplete;
     assert.shadowDom.equal(
       el,

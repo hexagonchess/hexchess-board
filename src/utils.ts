@@ -231,17 +231,17 @@ export const stringToMoves = (movesStr: string): Move[] => {
     const isEnpassant = chunks[1].includes('$');
     const isPromotion = chunks[1].includes('=');
     let promotionPiece: Piece | null = null;
-    let toSquare;
+    let toSquare: Square;
     if (isPromotion) {
       promotionPiece = chunks[1].split('=')[1] as Piece;
-      toSquare = chunks[1].split('=')[0];
+      toSquare = chunks[1].split('=')[0] as Square;
     } else if (isEnpassant) {
-      toSquare = chunks[1].split('$')[0];
+      toSquare = chunks[1].split('$')[0] as Square;
     } else {
-      toSquare = chunks[1];
+      toSquare = chunks[1] as Square;
     }
     if (isCapture) {
-      toSquare = toSquare.slice(0, -1);
+      toSquare = toSquare.slice(0, -1) as Square;
     }
 
     if (!ALL_SQUARES.includes(toSquare as Square)) {

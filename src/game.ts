@@ -10,10 +10,10 @@ import { Color, HexchessPiece, LegalMoves, Move, Piece } from './types';
 import { Square } from './utils';
 
 export enum GameState {
-  CHECKMATE,
-  STALEMATE,
-  IN_PROGRESS,
-  PROMOTING,
+  CHECKMATE = 0,
+  STALEMATE = 1,
+  IN_PROGRESS = 2,
+  PROMOTING = 3,
 }
 
 export class Game {
@@ -109,14 +109,12 @@ export class Game {
       this.board
         .getPieces(color === 'white' ? 'black' : 'white')
         .filter((piece) => !(piece instanceof Pawn))
-        .map((piece) => piece.allSquareMoves(this.board))
-        .flat()
+        .flatMap((piece) => piece.allSquareMoves(this.board))
         .map((pos) => pos.toSquare()),
     );
     const defendedPositions = this.board
       .getPieces(color === 'white' ? 'black' : 'white')
-      .map((piece) => piece.defendedSquares(this.board))
-      .flat();
+      .flatMap((piece) => piece.defendedSquares(this.board));
     for (const position of defendedPositions) {
       checkPositions.add(position.toSquare());
     }
@@ -253,7 +251,10 @@ export class Game {
           if (!(piecePosition in moves)) {
             moves[piecePosition] = new Set([move.toSquare()]);
           } else {
-            moves[piecePosition]!.add(move.toSquare());
+            if (!moves[piecePosition]) {
+              throw new Error(`No moves for ${piecePosition}`);
+            }
+            moves[piecePosition]?.add(move.toSquare());
           }
         }
       }
@@ -336,20 +337,21 @@ export class Game {
     if (move.capturedPiece) {
       if (move.capturedPiece === 'p') {
         if (move.enPassant) {
-          this.board.addPiece(
-            new Pawn(
-              'black',
-              Position.fromString(move.to).getBottomPosition()!,
-            ),
-          );
+          const newPosition = Position.fromString(move.to).getTopPosition();
+          if (!newPosition) {
+            throw new Error('This is impossible');
+          }
+          this.board.addPiece(new Pawn('black', newPosition));
         } else {
           this.board.addPiece(new Pawn('black', Position.fromString(move.to)));
         }
       } else if (move.capturedPiece === 'P') {
         if (move.enPassant) {
-          this.board.addPiece(
-            new Pawn('white', Position.fromString(move.to).getTopPosition()!),
-          );
+          const newPosition = Position.fromString(move.to).getTopPosition();
+          if (!newPosition) {
+            throw new Error('This is impossible');
+          }
+          this.board.addPiece(new Pawn('white', newPosition));
         } else {
           this.board.addPiece(new Pawn('white', Position.fromString(move.to)));
         }

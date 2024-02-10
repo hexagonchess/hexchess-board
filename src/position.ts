@@ -156,7 +156,6 @@ export class Position {
       case 'E':
       case 'G':
         return this.row === 10;
-      case 'F':
       default:
         return this.row === 11;
     }
@@ -501,13 +500,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getTopPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getTopPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getTopPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -518,13 +520,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getTopRightPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getTopRightPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getTopRightPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -535,13 +540,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getSkipTopRightPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getSkipTopRightPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getSkipTopRightPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -552,13 +560,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getRightPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getRightPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getRightPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -569,13 +580,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getBottomRightPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getBottomRightPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getBottomRightPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -586,13 +600,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getSkipBottomRightPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getSkipBottomRightPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getSkipBottomRightPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -603,13 +620,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getBottomPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getBottomPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getBottomPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -620,13 +640,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getBottomLeftPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getBottomLeftPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getBottomLeftPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -637,13 +660,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getSkipBottomLeftPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getSkipBottomLeftPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getSkipBottomLeftPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -654,13 +680,16 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
     while (
       currentPosition.getLeftPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getLeftPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getLeftPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -671,14 +700,17 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
 
     while (
       currentPosition.getTopLeftPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getTopLeftPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getTopLeftPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;
@@ -689,14 +721,17 @@ export class Position {
   ): Position[] {
     const positions: Position[] = [];
 
-    let currentPosition = new Position(this.col, this.row);
+    const currentPosition = new Position(this.col, this.row);
 
     while (
       currentPosition.getSkipTopLeftPosition() !== null &&
       keepGoing(currentPosition)
     ) {
-      currentPosition = currentPosition.getSkipTopLeftPosition()!;
-      positions.push(currentPosition);
+      const newPos = currentPosition.getSkipTopLeftPosition();
+      if (newPos === null) {
+        throw new Error('This should not happen');
+      }
+      positions.push(newPos);
     }
 
     return positions;

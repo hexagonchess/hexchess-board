@@ -208,8 +208,11 @@ const _capturePieceOrMakeMove = (
     const capturedPieceAsString = capturedPiece.toString();
     newCapturedPieces = JSON.parse(JSON.stringify(state.capturedPieces));
     if (capturedPiece.toString() in newCapturedPieces) {
-      newCapturedPieces[capturedPieceAsString] =
-        newCapturedPieces[capturedPieceAsString]! + 1;
+      const capturedPieces = newCapturedPieces[capturedPieceAsString];
+      if (capturedPieces == null) {
+        throw new Error('This is impossible');
+      }
+      newCapturedPieces[capturedPieceAsString] = capturedPieces + 1;
     } else {
       newCapturedPieces[capturedPieceAsString] = 1;
     }
@@ -235,7 +238,8 @@ const _capturePieceOrMakeMove = (
       },
       didChange: true,
     };
-  } else if (
+  }
+  if (
     fromPiece instanceof Pawn &&
     (Position.fromString(to).isBeginningOfColumn() ||
       Position.fromString(to).isEndOfColumn())
@@ -283,10 +287,6 @@ const _promotingStateTransition = (
         case 'r':
           scoreBump = 4;
           break;
-        case 'B':
-        case 'b':
-        case 'N':
-        case 'n':
         default:
           scoreBump = 2;
           break;
@@ -296,10 +296,10 @@ const _promotingStateTransition = (
         JSON.stringify(state.capturedPieces),
       );
       if (isWhite) {
-        if (!newCapturedPieces['P']) {
-          newCapturedPieces['P'] = 1;
+        if (!newCapturedPieces.P) {
+          newCapturedPieces.P = 1;
         } else {
-          newCapturedPieces['P'] += 1;
+          newCapturedPieces.P += 1;
         }
         if (!newCapturedPieces[transition.piece.toLowerCase()]) {
           newCapturedPieces[transition.piece.toLowerCase()] = 1;
@@ -307,10 +307,10 @@ const _promotingStateTransition = (
           newCapturedPieces[transition.piece.toLowerCase()] += 1;
         }
       } else {
-        if (!newCapturedPieces['p']) {
-          newCapturedPieces['p'] = 1;
+        if (!newCapturedPieces.p) {
+          newCapturedPieces.p = 1;
         } else {
-          newCapturedPieces['p'] += 1;
+          newCapturedPieces.p += 1;
         }
         if (!newCapturedPieces[transition.piece.toUpperCase()]) {
           newCapturedPieces[transition.piece.toUpperCase()] = 1;
@@ -514,7 +514,7 @@ const _mouseUpPieceSelectedStateTransition = (
       }
 
       // 3. If it's an occupied piece, select the piece
-      const piece = state.game.board.getPiece(transition.square)!;
+      const piece = state.game.board.getPiece(transition.square);
       if (piece) {
         return {
           state: {

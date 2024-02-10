@@ -243,7 +243,7 @@ describe('Position', () => {
 
   test('Detects isBeginningOfRow correctly', () => {
     const positions = Position.allPositions();
-    positions.forEach((position) => {
+    for (const position of positions) {
       switch (position.col) {
         case 'A':
         case 'B': {
@@ -279,12 +279,12 @@ describe('Position', () => {
           break;
         }
       }
-    });
+    }
   });
 
   test('Detects isEndOfRow correctly', () => {
     const positions = Position.allPositions();
-    positions.forEach((position) => {
+    for (const position of positions) {
       switch (position.col) {
         case 'L':
         case 'K': {
@@ -320,7 +320,7 @@ describe('Position', () => {
           break;
         }
       }
-    });
+    }
   });
 
   test('Correctly converts to string and square', () => {
@@ -364,7 +364,7 @@ describe('Position', () => {
   });
 
   test('Gets the top position for any position correctly', () => {
-    Position.allPositions().forEach((pos) => {
+    for (const pos of Position.allPositions()) {
       if (pos.isEndOfColumn()) {
         expect(pos.getTopPosition()).toBe(null);
       } else {
@@ -372,7 +372,7 @@ describe('Position', () => {
           new Position(pos.col, pos.row + 1),
         );
       }
-    });
+    }
   });
 
   test('Gets the top right position for any position correctly', () => {
@@ -792,7 +792,7 @@ describe('Position', () => {
   });
 
   test('Gets the bottom position for any position correctly', () => {
-    Position.allPositions().forEach((pos) => {
+    for (const pos of Position.allPositions()) {
       if (pos.row === 1) {
         expect(pos.getBottomPosition()).toBe(null);
       } else {
@@ -800,7 +800,7 @@ describe('Position', () => {
           new Position(pos.col, pos.row - 1),
         );
       }
-    });
+    }
   });
 
   test('Gets the bottom left position for any position correctly', () => {

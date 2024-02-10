@@ -5,17 +5,17 @@ import { describe, expect, test } from '@jest/globals';
 
 describe('Pawns', () => {
   test('Black pawns can only be promoted on the first rank', () => {
-    Position.allPositions().forEach((pos) => {
+    for (const pos of Position.allPositions()) {
       const pawn = new Pawn('black', pos);
       expect(pawn.canBePromoted()).toBe(pos.isBeginningOfColumn());
-    });
+    }
   });
 
   test('White pawns can only be promoted on the last rank', () => {
-    Position.allPositions().forEach((pos) => {
+    for (const pos of Position.allPositions()) {
       const pawn = new Pawn('white', pos);
       expect(pawn.canBePromoted()).toBe(pos.isEndOfColumn());
-    });
+    }
   });
 
   test('Calculates movement square properly', () => {

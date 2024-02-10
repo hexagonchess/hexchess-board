@@ -142,10 +142,10 @@ export class HexchessBoard extends LitElement {
         this._reconcileNewState(newState);
       }
     }
-    moves.forEach(() => {
+    for (let i = 0; i < moves.length; i++) {
       const newState = getNewState(this._state, { name: 'REWIND' });
       this._reconcileNewState(newState);
-    });
+    }
     this.requestUpdate('board');
   }
 
@@ -231,7 +231,7 @@ export class HexchessBoard extends LitElement {
     }
 
     const square = this._getSquareFromClick(event);
-    let newState;
+    let newState: BoardChange;
     if (square === null) {
       newState = getNewState(this._state, { name: 'MOUSE_DOWN_OUTSIDE_BOARD' });
     } else {
@@ -286,7 +286,7 @@ export class HexchessBoard extends LitElement {
     }
 
     const square = this._getSquareFromClick(event);
-    let newState;
+    let newState: BoardChange;
     if (!square) {
       newState = getNewState(this._state, {
         name: 'MOUSE_UP_OUTSIDE_BOARD',
@@ -349,13 +349,20 @@ export class HexchessBoard extends LitElement {
     }
 
     if (this._draggedPiece) {
-      const deltaX = event.clientX - this._originalDragPosition!.x;
-      const deltaY = event.clientY - this._originalDragPosition!.y;
+      if (
+        !this._originalDragPosition ||
+        !this._originalDragPosition.x ||
+        !this._originalDragPosition.y
+      ) {
+        throw new Error('Cannot drag when originalDragPosition is not defined');
+      }
+      const deltaX = event.clientX - this._originalDragPosition.x;
+      const deltaY = event.clientY - this._originalDragPosition.y;
       this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     }
 
     const square = this._getSquareFromClick(event);
-    let newState;
+    let newState: BoardChange;
     if (square) {
       newState = getNewState(this._state, {
         name: 'MOUSE_MOVE_SQUARE',
@@ -704,35 +711,35 @@ export class HexchessBoard extends LitElement {
     const capturedPawns = pawn
       ? this._renderCapturedPieceGroup(
           pawn,
-          pieces[pawn]!,
+          pieces[pawn] as number,
           this._capturedPieceSize,
         )
       : nothing;
     const capturedBishops = bishop
       ? this._renderCapturedPieceGroup(
           bishop,
-          pieces[bishop]!,
+          pieces[bishop] as number,
           this._capturedPieceSize,
         )
       : nothing;
     const capturedKnights = knight
       ? this._renderCapturedPieceGroup(
           knight,
-          pieces[knight]!,
+          pieces[knight] as number,
           this._capturedPieceSize,
         )
       : nothing;
     const capturedRooks = rook
       ? this._renderCapturedPieceGroup(
           rook,
-          pieces[rook]!,
+          pieces[rook] as number,
           this._capturedPieceSize,
         )
       : nothing;
     const capturedQueens = queen
       ? this._renderCapturedPieceGroup(
           queen,
-          pieces[queen]!,
+          pieces[queen] as number,
           this._capturedPieceSize,
         )
       : nothing;
@@ -840,10 +847,18 @@ export class HexchessBoard extends LitElement {
     ) {
       return nothing;
     }
-    const piece = this._state.game.board.getPiece(square)!;
-    const [x, y] = this._squareCenters![square];
+    const piece = this._state.game.board.getPiece(square);
+    if (!piece) {
+      throw new Error('This is impossible');
+    }
+    const pos = this._squareCenters?.[square];
+    if (!pos) {
+      throw new Error('This is impossible');
+    }
     return html`
-      <div style="left: ${x}px; top: ${y}px" class="piece piece-${square}">
+      <div style="left: ${pos[0]}px; top: ${
+        pos[1]
+      }px" class="piece piece-${square}">
         ${renderPiece(piece.toString(), this._pieceSize)}
       </div>
     `;

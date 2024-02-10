@@ -92,11 +92,11 @@ export class Pawn implements HexchessPiece {
     const piecePos =
       this.color === 'white'
         ? direction === 'left'
-          ? this.position.getBottomLeftPosition()!
-          : this.position.getBottomRightPosition()!
+          ? this.position.getBottomLeftPosition()
+          : this.position.getBottomRightPosition()
         : direction === 'left'
-          ? this.position.getTopLeftPosition()!
-          : this.position.getTopRightPosition()!;
+          ? this.position.getTopLeftPosition()
+          : this.position.getTopRightPosition();
     if (piecePos === null) {
       return null;
     }
