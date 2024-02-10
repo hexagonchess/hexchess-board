@@ -24,10 +24,8 @@ jobs:
 
       - run: npm install
 
-      - name: Hello
+      - name: CI Checks
         uses: dagger/dagger-for-github@v5
         with:
           verb: run
-          module: github.com/shykes/daggerverse/hello
           args: node --loader ts-node/esm ./cicd.mts
-
