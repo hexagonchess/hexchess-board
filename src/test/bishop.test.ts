@@ -8,8 +8,8 @@ describe('Bishops', () => {
     const blackBishop = new Bishop('black', new Position('B', 1));
     const whiteBishop = new Bishop('white', new Position('B', 1));
 
-    expect(blackbishop?.toString()).toBe('b');
-    expect(whitebishop?.toString()).toBe('B');
+    expect(blackBishop?.toString()).toBe('b');
+    expect(whiteBishop?.toString()).toBe('B');
   });
 
   test('Calculates all available bishop positions on an empty board', () => {
