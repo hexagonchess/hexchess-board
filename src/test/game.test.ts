@@ -1,13 +1,13 @@
-import {describe, expect, test} from '@jest/globals';
-import {BoardUtils} from './board-utils';
-import {Game, GameState} from '../game';
-import {Board} from '../board';
-import {King} from '../king';
-import {Position} from '../position';
-import {Bishop} from '../bishop';
-import {Pawn} from '../pawn';
-import {Queen} from '../queen';
-import {Rook} from '../rook';
+import { describe, expect, test } from '@jest/globals';
+import { BoardUtils } from './board-utils';
+import { Game, GameState } from '../game';
+import { Board } from '../board';
+import { King } from '../king';
+import { Position } from '../position';
+import { Bishop } from '../bishop';
+import { Pawn } from '../pawn';
+import { Queen } from '../queen';
+import { Rook } from '../rook';
 
 describe('Game', () => {
   test('Calculates all legal moves correctly', () => {
@@ -15,7 +15,7 @@ describe('Game', () => {
     const moves = game.allLegalMoves();
     const numberOfMoves = Object.values(moves).reduce(
       (acc, set) => acc + set.size,
-      0
+      0,
     );
     expect(numberOfMoves).toBe(51);
   });
@@ -97,13 +97,13 @@ describe('Game', () => {
     const game = new Game(BoardUtils.pinnedPiece());
 
     expect(() =>
-      game.movePiece(new Position('F', 10), new Position('D', 9))
+      game.movePiece(new Position('F', 10), new Position('D', 9)),
     ).toThrow();
     expect(() =>
-      game.movePiece(new Position('F', 11), new Position('E', 10))
+      game.movePiece(new Position('F', 11), new Position('E', 10)),
     ).not.toThrow();
     expect(() =>
-      game.movePiece(new Position('F', 10), new Position('F', 9))
+      game.movePiece(new Position('F', 10), new Position('F', 9)),
     ).not.toThrow();
   });
   test('Detects when someone is checkmated', () => {
@@ -112,22 +112,22 @@ describe('Game', () => {
 
     // King and queen checkmate
     expect(
-      new Game(BoardUtils.blackKingAndQueenCheckmate()).isCheckmate()
+      new Game(BoardUtils.blackKingAndQueenCheckmate()).isCheckmate(),
     ).toBe(true);
 
     // King and rook checkmate
     expect(new Game(BoardUtils.blackKingAndRookCheckmate()).isCheckmate()).toBe(
-      true
+      true,
     );
 
     // King and knight checkmate
     expect(
-      new Game(BoardUtils.blackKingAndKnightCheckmate()).isCheckmate()
+      new Game(BoardUtils.blackKingAndKnightCheckmate()).isCheckmate(),
     ).toBe(true);
 
     //  King and bishop checkmate
     expect(
-      new Game(BoardUtils.blackKingAndBishopCheckmate()).isCheckmate()
+      new Game(BoardUtils.blackKingAndBishopCheckmate()).isCheckmate(),
     ).toBe(true);
   });
 
@@ -186,47 +186,47 @@ describe('Game', () => {
     let game = new Game(BoardUtils.blackKingAndQueenCheckmate());
     expect(game.isCheckmate()).toBe(true);
     expect(() =>
-      game.movePiece(new Position('F', 11), new Position('F', 10))
+      game.movePiece(new Position('F', 11), new Position('F', 10)),
     ).toThrow();
 
     // Cannot move if it's not your turn
     game = new Game();
     expect(() =>
-      game.movePiece(new Position('F', 11), new Position('F', 10))
+      game.movePiece(new Position('F', 11), new Position('F', 10)),
     ).toThrow();
 
     // Cannot move an empty square
     expect(() =>
-      game.movePiece(new Position('A', 1), new Position('A', 2))
+      game.movePiece(new Position('A', 1), new Position('A', 2)),
     ).toThrow();
 
     // Cannot make an illegal move
     expect(() =>
-      game.movePiece(new Position('B', 1), new Position('B', 4))
+      game.movePiece(new Position('B', 1), new Position('B', 4)),
     ).toThrow();
 
     // Cannot move on top of another piece
     expect(() =>
-      game.movePiece(new Position('F', 5), new Position('F', 7))
+      game.movePiece(new Position('F', 5), new Position('F', 7)),
     ).toThrow();
 
     // Legal moves are allowed and properly update the board
     expect(() =>
-      game.movePiece(new Position('B', 1), new Position('B', 2))
+      game.movePiece(new Position('B', 1), new Position('B', 2)),
     ).not.toThrow();
     // White cannot move twice in a row
     expect(() =>
-      game.movePiece(new Position('B', 2), new Position('B', 3))
+      game.movePiece(new Position('B', 2), new Position('B', 3)),
     ).toThrow();
 
     // Black is now allowed to move
     expect(() =>
-      game.movePiece(new Position('B', 7), new Position('B', 6))
+      game.movePiece(new Position('B', 7), new Position('B', 6)),
     ).not.toThrow();
 
     // Disallow capturing your own piece
     expect(() =>
-      game.movePiece(new Position('K', 1), new Position('I', 2))
+      game.movePiece(new Position('K', 1), new Position('I', 2)),
     ).toThrow();
   });
 
@@ -234,10 +234,15 @@ describe('Game', () => {
     const game = new Game();
     game.movePiece(new Position('B', 1), new Position('B', 2));
 
-    game.rewind({from: 'B1', to: 'B2', enPassant: false, promotion: null});
+    game.rewind({ from: 'B1', to: 'B2', enPassant: false, promotion: null });
     expect(game.board.getPiece(new Position('B', 2).toSquare())).toBe(null);
 
-    game.fastForward({from: 'B1', to: 'B2', enPassant: false, promotion: null});
+    game.fastForward({
+      from: 'B1',
+      to: 'B2',
+      enPassant: false,
+      promotion: null,
+    });
     expect(game.board.getPiece(new Position('B', 2).toSquare())).not.toBe(null);
 
     game.movePiece(new Position('E', 7), new Position('E', 5));
@@ -254,11 +259,16 @@ describe('Game', () => {
     expect(game.board.getPiece(new Position('F', 5).toSquare())).not.toBe(null);
     expect(game.board.getPiece(new Position('E', 7).toSquare())).toBe(null);
 
-    game.rewind({from: 'E7', to: 'E5', enPassant: false, promotion: null});
+    game.rewind({ from: 'E7', to: 'E5', enPassant: false, promotion: null });
     expect(game.board.getPiece(new Position('E', 5).toSquare())).toBe(null);
     expect(game.board.getPiece(new Position('E', 7).toSquare())).not.toBe(null);
 
-    game.fastForward({from: 'E7', to: 'E5', enPassant: false, promotion: null});
+    game.fastForward({
+      from: 'E7',
+      to: 'E5',
+      enPassant: false,
+      promotion: null,
+    });
     expect(game.board.getPiece(new Position('E', 5).toSquare())).not.toBe(null);
 
     game.fastForward({

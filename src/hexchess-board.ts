@@ -16,14 +16,21 @@ import {
   movesToString,
   stringToMoves,
 } from './utils';
-import {LitElement, html, svg, nothing, PropertyValues} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
-import {Column, ColumnConfig, Square, boardToFen, fenToBoard} from './utils';
-import {styles} from './hexchess-styles';
-import {DEFAULT_PIECE_SIZE, renderPiece} from './piece';
-import {Color, Move, Orientation, Piece, TileColor} from './types';
-import {Board} from './board';
-import {Game, GameState} from './game';
+import {
+  LitElement,
+  html,
+  svg,
+  nothing,
+  PropertyValues,
+  TemplateResult,
+} from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
+import { styles } from './hexchess-styles';
+import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
+import { Color, Move, Orientation, Piece, TileColor } from './types';
+import { Board } from './board';
+import { Game, GameState } from './game';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -75,7 +82,7 @@ export class HexchessBoard extends LitElement {
   private _pieceSize = DEFAULT_PIECE_SIZE;
   private _polygonWidth = 29;
   private _polygonHeight = 22;
-  private _originalDragPosition: {x: number; y: number} | null = null;
+  private _originalDragPosition: { x: number; y: number } | null = null;
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
     capturedPieces: {},
@@ -135,23 +142,23 @@ export class HexchessBoard extends LitElement {
         this._reconcileNewState(newState);
       }
     }
-    for (const _move of moves) {
-      const newState = getNewState(this._state, {name: 'REWIND'});
+    moves.forEach(() => {
+      const newState = getNewState(this._state, { name: 'REWIND' });
       this._reconcileNewState(newState);
-    }
+    });
     this.requestUpdate('board');
   }
 
   /**
    * Black's player name
    */
-  @property({type: String})
+  @property({ type: String })
   blackPlayerName = 'Black';
 
   /**
    * White's player name
    */
-  @property({type: String})
+  @property({ type: String })
   whitePlayerName = 'White';
 
   /**
@@ -166,13 +173,13 @@ export class HexchessBoard extends LitElement {
   /**
    * Show the board coordinates on the bottom and left sides of the board.
    */
-  @property({type: Boolean})
+  @property({ type: Boolean })
   hideCoordinates = false;
 
   /**
    * Do not allow any other moves beyond the predetermined ones set in the `moves` property.
    */
-  @property({type: Boolean})
+  @property({ type: Boolean })
   frozen = false;
 
   constructor() {
@@ -226,7 +233,7 @@ export class HexchessBoard extends LitElement {
     const square = this._getSquareFromClick(event);
     let newState;
     if (square === null) {
-      newState = getNewState(this._state, {name: 'MOUSE_DOWN_OUTSIDE_BOARD'});
+      newState = getNewState(this._state, { name: 'MOUSE_DOWN_OUTSIDE_BOARD' });
     } else {
       newState = getNewState(this._state, {
         name: 'MOUSE_DOWN',
@@ -306,7 +313,7 @@ export class HexchessBoard extends LitElement {
         // 2. The piece moved and needs to go to the center of the new square
         this._draggedPiece.classList.remove(
           `piece-${state.square}`,
-          'drag-piece'
+          'drag-piece',
         );
         this._draggedPiece.classList.add(
           `piece-${
@@ -316,7 +323,7 @@ export class HexchessBoard extends LitElement {
                 | DragPieceState
                 | CancelSelectionSoonState
             ).square
-          }`
+          }`,
         );
       }
     }
@@ -378,7 +385,7 @@ export class HexchessBoard extends LitElement {
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
-          new CustomEvent('promoting', {detail: {location: move.to}})
+          new CustomEvent('promoting', { detail: { location: move.to } }),
         );
       } else if (
         this._state.game.state() === GameState.PROMOTING &&
@@ -389,7 +396,7 @@ export class HexchessBoard extends LitElement {
       } else if (newState.state.moves.length > this._state.moves.length) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
-          new CustomEvent('move', {detail: {from: move.from, to: move.to}})
+          new CustomEvent('move', { detail: { from: move.from, to: move.to } }),
         );
       }
     }
@@ -413,7 +420,7 @@ export class HexchessBoard extends LitElement {
 
   private _calculateHexagonPointsAsString(
     width: number,
-    height: number
+    height: number,
   ): string {
     const quarterWidth = width / 4;
     const threeQuarterWidth = quarterWidth * 3;
@@ -423,7 +430,7 @@ export class HexchessBoard extends LitElement {
 
   private _calculateColumnConfig(
     boardWidth: number,
-    boardHeight: number
+    boardHeight: number,
   ): ColumnConfig {
     const polygonWidth = boardWidth / 8.5;
     const polygonHeight = boardHeight / 11;
@@ -460,37 +467,37 @@ export class HexchessBoard extends LitElement {
 
     if (this.orientation === 'black') {
       return {
-        L: {x: offsetAX, y: offsetAY, colors: blackStart},
-        K: {x: offsetBX, y: offsetBY, colors: greyStart},
-        I: {x: offsetCX, y: offsetCY, colors: whiteStart},
-        H: {x: offsetDX, y: offsetDY, colors: blackStart},
-        G: {x: offsetEX, y: offsetEY, colors: greyStart},
-        F: {x: offsetFX, y: offsetFY, colors: whiteStart},
-        E: {x: offsetGX, y: offsetGY, colors: greyStart},
-        D: {x: offsetHX, y: offsetHY, colors: blackStart},
-        C: {x: offsetIX, y: offsetIY, colors: whiteStart},
-        B: {x: offsetKX, y: offsetKY, colors: greyStart},
-        A: {x: offsetLX, y: offsetLY, colors: blackStart},
+        L: { x: offsetAX, y: offsetAY, colors: blackStart },
+        K: { x: offsetBX, y: offsetBY, colors: greyStart },
+        I: { x: offsetCX, y: offsetCY, colors: whiteStart },
+        H: { x: offsetDX, y: offsetDY, colors: blackStart },
+        G: { x: offsetEX, y: offsetEY, colors: greyStart },
+        F: { x: offsetFX, y: offsetFY, colors: whiteStart },
+        E: { x: offsetGX, y: offsetGY, colors: greyStart },
+        D: { x: offsetHX, y: offsetHY, colors: blackStart },
+        C: { x: offsetIX, y: offsetIY, colors: whiteStart },
+        B: { x: offsetKX, y: offsetKY, colors: greyStart },
+        A: { x: offsetLX, y: offsetLY, colors: blackStart },
       };
     }
 
     return {
-      A: {x: offsetAX, y: offsetAY, colors: blackStart},
-      B: {x: offsetBX, y: offsetBY, colors: greyStart},
-      C: {x: offsetCX, y: offsetCY, colors: whiteStart},
-      D: {x: offsetDX, y: offsetDY, colors: blackStart},
-      E: {x: offsetEX, y: offsetEY, colors: greyStart},
-      F: {x: offsetFX, y: offsetFY, colors: whiteStart},
-      G: {x: offsetGX, y: offsetGY, colors: greyStart},
-      H: {x: offsetHX, y: offsetHY, colors: blackStart},
-      I: {x: offsetIX, y: offsetIY, colors: whiteStart},
-      K: {x: offsetKX, y: offsetKY, colors: greyStart},
-      L: {x: offsetLX, y: offsetLY, colors: blackStart},
+      A: { x: offsetAX, y: offsetAY, colors: blackStart },
+      B: { x: offsetBX, y: offsetBY, colors: greyStart },
+      C: { x: offsetCX, y: offsetCY, colors: whiteStart },
+      D: { x: offsetDX, y: offsetDY, colors: blackStart },
+      E: { x: offsetEX, y: offsetEY, colors: greyStart },
+      F: { x: offsetFX, y: offsetFY, colors: whiteStart },
+      G: { x: offsetGX, y: offsetGY, colors: greyStart },
+      H: { x: offsetHX, y: offsetHY, colors: blackStart },
+      I: { x: offsetIX, y: offsetIY, colors: whiteStart },
+      K: { x: offsetKX, y: offsetKY, colors: greyStart },
+      L: { x: offsetLX, y: offsetLY, colors: blackStart },
     };
   }
 
   private _calculateSquareCenters(
-    columnConfig: ColumnConfig
+    columnConfig: ColumnConfig,
   ): Record<Square, [number, number]> {
     const centers = {} as Record<Square, [number, number]>;
 
@@ -571,7 +578,7 @@ export class HexchessBoard extends LitElement {
     this._polygonHeight = Math.max(this._boardHeight / 11, 10);
     this._columnConfig = this._calculateColumnConfig(
       this._boardWidth,
-      this._boardHeight
+      this._boardHeight,
     );
     this._squareCenters = this._calculateSquareCenters(this._columnConfig);
     this._capturedPieceSize = Math.floor(this._columnConfig.E.x / 10);
@@ -582,12 +589,12 @@ export class HexchessBoard extends LitElement {
         const [xOffset, yOffset] = this._getOffsets(square, this._columnConfig);
         this._hexagonPoints[square] = this._calculateHexagonPoints(
           this._polygonWidth,
-          this._polygonHeight
+          this._polygonHeight,
         ).map((point) => [point[0] + xOffset, point[1] + yOffset]);
         this._hexagonPointsAsString[square] =
           this._calculateHexagonPointsAsString(
             this._polygonWidth,
-            this._polygonHeight
+            this._polygonHeight,
           );
       }
     }
@@ -599,8 +606,8 @@ export class HexchessBoard extends LitElement {
     return number % 3 === 0
       ? colors[0]
       : number % 3 === 1
-      ? colors[1]
-      : colors[2];
+        ? colors[1]
+        : colors[2];
   }
 
   // -----------------
@@ -628,10 +635,10 @@ export class HexchessBoard extends LitElement {
       isWhite && isTop
         ? ['Q', 'R', 'B', 'N']
         : isWhite && !isTop
-        ? ['N', 'B', 'R', 'Q']
-        : !isWhite && isTop
-        ? ['q', 'r', 'b', 'n']
-        : ['n', 'b', 'r', 'q'];
+          ? ['N', 'B', 'R', 'Q']
+          : !isWhite && isTop
+            ? ['q', 'r', 'b', 'n']
+            : ['n', 'b', 'r', 'q'];
 
     return html`
       <div class="promotion" style="top: ${y}px; left: ${x}px;">
@@ -639,8 +646,9 @@ export class HexchessBoard extends LitElement {
           return html`
             <div
               class="hexagon"
-              style="width: ${this._polygonWidth}px; height: ${this
-                ._polygonHeight}px; background-color: var(--hexchess-board-bg, #fcfaf2);"
+              style="width: ${this._polygonWidth}px; height: ${
+                this._polygonHeight
+              }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
               @click=${() => this._handlePromotion(option)}
             >
               ${renderPiece(option, this._pieceSize, false)}
@@ -666,7 +674,7 @@ export class HexchessBoard extends LitElement {
   private _renderCapturedPieceGroup(
     piece: Piece,
     numPieces: number,
-    capturedPieceSize: number
+    capturedPieceSize: number,
   ) {
     return html`
       <div class="captured-piece-group">
@@ -685,7 +693,7 @@ export class HexchessBoard extends LitElement {
 
   private _renderOneSideCapturedPieces(
     pieces: Partial<Record<Piece, number>>,
-    score: number
+    score: number,
   ) {
     const pawn = 'p' in pieces ? 'p' : 'P' in pieces ? 'P' : undefined;
     const bishop = 'b' in pieces ? 'b' : 'B' in pieces ? 'B' : undefined;
@@ -697,43 +705,44 @@ export class HexchessBoard extends LitElement {
       ? this._renderCapturedPieceGroup(
           pawn,
           pieces[pawn]!,
-          this._capturedPieceSize
+          this._capturedPieceSize,
         )
       : nothing;
     const capturedBishops = bishop
       ? this._renderCapturedPieceGroup(
           bishop,
           pieces[bishop]!,
-          this._capturedPieceSize
+          this._capturedPieceSize,
         )
       : nothing;
     const capturedKnights = knight
       ? this._renderCapturedPieceGroup(
           knight,
           pieces[knight]!,
-          this._capturedPieceSize
+          this._capturedPieceSize,
         )
       : nothing;
     const capturedRooks = rook
       ? this._renderCapturedPieceGroup(
           rook,
           pieces[rook]!,
-          this._capturedPieceSize
+          this._capturedPieceSize,
         )
       : nothing;
     const capturedQueens = queen
       ? this._renderCapturedPieceGroup(
           queen,
           pieces[queen]!,
-          this._capturedPieceSize
+          this._capturedPieceSize,
         )
       : nothing;
 
     return html`
       <div
         class="captured-pieces"
-        style="column-gap: ${this._capturedPieceSize *
-        this._capturedPieceGroupPadding}px;"
+        style="column-gap: ${
+          this._capturedPieceSize * this._capturedPieceGroupPadding
+        }px;"
       >
         ${capturedPawns} ${capturedBishops} ${capturedKnights} ${capturedRooks}
         ${capturedQueens} ${this._renderScore(score)}
@@ -767,23 +776,29 @@ export class HexchessBoard extends LitElement {
     const isOrientationWhite = this.orientation === 'white';
 
     const whitePieceKeys = Object.keys(this._state.capturedPieces).filter(
-      (letter) => letter.toUpperCase() === letter
+      (letter) => letter.toUpperCase() === letter,
     );
     const blackPieceKeys = Object.keys(this._state.capturedPieces).filter(
-      (letter) => letter.toLowerCase() === letter
+      (letter) => letter.toLowerCase() === letter,
     );
 
-    const whitePieces = whitePieceKeys.reduce((acc, piece) => {
-      const p = piece as Piece;
-      acc[p] = this._state.capturedPieces[p];
-      return acc;
-    }, {} as Partial<Record<Piece, number>>);
+    const whitePieces = whitePieceKeys.reduce(
+      (acc, piece) => {
+        const p = piece as Piece;
+        acc[p] = this._state.capturedPieces[p];
+        return acc;
+      },
+      {} as Partial<Record<Piece, number>>,
+    );
 
-    const blackPieces = blackPieceKeys.reduce((acc, piece) => {
-      const p = piece as Piece;
-      acc[p] = this._state.capturedPieces[p];
-      return acc;
-    }, {} as Partial<Record<Piece, number>>);
+    const blackPieces = blackPieceKeys.reduce(
+      (acc, piece) => {
+        const p = piece as Piece;
+        acc[p] = this._state.capturedPieces[p];
+        return acc;
+      },
+      {} as Partial<Record<Piece, number>>,
+    );
 
     const whiteScore = this._state.scoreWhite - this._state.scoreBlack;
     const blackScore = this._state.scoreBlack - this._state.scoreWhite;
@@ -795,11 +810,11 @@ export class HexchessBoard extends LitElement {
       >
         ${this._renderPlayer(
           isOrientationWhite ? this.blackPlayerName : this.whitePlayerName,
-          !isOrientationWhite
+          !isOrientationWhite,
         )}
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? whitePieces : blackPieces,
-          isOrientationWhite ? blackScore : whiteScore
+          isOrientationWhite ? blackScore : whiteScore,
         )}
       </div>
       <div
@@ -808,11 +823,11 @@ export class HexchessBoard extends LitElement {
       >
         ${this._renderOneSideCapturedPieces(
           isOrientationWhite ? blackPieces : whitePieces,
-          isOrientationWhite ? whiteScore : blackScore
+          isOrientationWhite ? whiteScore : blackScore,
         )}
         ${this._renderPlayer(
           isOrientationWhite ? this.whitePlayerName : this.blackPlayerName,
-          isOrientationWhite
+          isOrientationWhite,
         )}
       </div>
     `;
@@ -843,7 +858,7 @@ export class HexchessBoard extends LitElement {
     column: Column,
     row: number,
     polygonWidth: number,
-    polygonHeight: number
+    polygonHeight: number,
   ) {
     if (this.hideCoordinates) {
       return nothing;
@@ -945,19 +960,19 @@ export class HexchessBoard extends LitElement {
               ${this._renderHexagon(
                 this._polygonWidth,
                 this._polygonHeight,
-                color
+                color,
               )}
               ${this._renderDot(
                 this._polygonWidth,
                 this._polygonHeight,
                 column,
-                i + 1
+                i + 1,
               )}
               ${this._renderColumnLabel(
                 column,
                 i + 1,
                 this._polygonWidth,
-                this._polygonHeight
+                this._polygonHeight,
               )}
               ${this._renderCoordinate(column, i + 1, this._polygonWidth)}
             </g>
@@ -984,7 +999,7 @@ export class HexchessBoard extends LitElement {
         ${this._renderHexagon(
           this._polygonWidth,
           this._polygonHeight,
-          `possible-move-${this._getColorForSquare(this._state.dragSquare)}`
+          `possible-move-${this._getColorForSquare(this._state.dragSquare)}`,
         )}
       </g>
     `;
@@ -994,7 +1009,7 @@ export class HexchessBoard extends LitElement {
     width: number,
     height: number,
     column: Column,
-    row: number
+    row: number,
   ) {
     if (
       this._state.name === 'WAITING' ||
@@ -1037,7 +1052,7 @@ export class HexchessBoard extends LitElement {
       | TileColor
       | 'possible-move-white'
       | 'possible-move-black'
-      | 'possible-move-grey'
+      | 'possible-move-grey',
   ) {
     return svg`<polygon
       points=${this._calculateHexagonPointsAsString(width, height)}
@@ -1082,7 +1097,7 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  override render() {
+  override render(): TemplateResult {
     return html` ${this._renderBoard()} `;
   }
 
@@ -1107,7 +1122,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Flip the orientation of the board.
    */
-  flip() {
+  flip(): void {
     if (this.orientation === 'white') {
       this.orientation = 'black';
     } else {
@@ -1120,7 +1135,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Resize the board based on the latest dimensions given to the shadow root.
    */
-  resize() {
+  resize(): void {
     this._recalculateBoardCoordinates();
     this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
     this.requestUpdate('board');
@@ -1130,8 +1145,8 @@ export class HexchessBoard extends LitElement {
    * Rewinds one move to a previous position.
    * If there are no previous moves, this does nothing.
    */
-  rewind() {
-    const newState = getNewState(this._state, {name: 'REWIND'});
+  rewind(): void {
+    const newState = getNewState(this._state, { name: 'REWIND' });
     this._reconcileNewState(newState);
   }
 
@@ -1139,8 +1154,8 @@ export class HexchessBoard extends LitElement {
    * Fast forwards one move to the next position.
    * If there are no next moves, this does nothing.
    */
-  fastForward() {
-    const newState = getNewState(this._state, {name: 'FAST_FORWARD'});
+  fastForward(): void {
+    const newState = getNewState(this._state, { name: 'FAST_FORWARD' });
     this._reconcileNewState(newState);
   }
 
@@ -1148,7 +1163,7 @@ export class HexchessBoard extends LitElement {
    * Prevent any more moves to the game.
    * Usually called when the game is over.
    */
-  freeze() {
+  freeze(): void {
     this.frozen = true;
   }
 
@@ -1174,7 +1189,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Resets and unfreezes the board to the default start state.
    */
-  reset() {
+  reset(): void {
     const newGame = new Game();
     this._reconcileNewState({
       didChange: true,

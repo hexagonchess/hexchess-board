@@ -1,12 +1,12 @@
-import {HexchessPiece} from './../types';
-import {Bishop} from '../bishop';
-import {Board} from '../board';
-import {King} from '../king';
-import {Knight} from '../knight';
-import {Pawn} from '../pawn';
-import {Rook} from '../rook';
-import {Queen} from '../queen';
-import {Position} from './../position';
+import { HexchessPiece } from './../types';
+import { Bishop } from '../bishop';
+import { Board } from '../board';
+import { King } from '../king';
+import { Knight } from '../knight';
+import { Pawn } from '../pawn';
+import { Rook } from '../rook';
+import { Queen } from '../queen';
+import { Position } from './../position';
 
 export class BoardUtils {
   static insufficientMaterialStalemate(): Board {
@@ -98,7 +98,7 @@ export class BoardUtils {
   }
 
   static genericCapturePiece(
-    createPiece: (position: Position) => HexchessPiece
+    createPiece: (position: Position) => HexchessPiece,
   ): Board {
     const board = Board.empty();
     board.addPiece(new King('white', new Position('F', 11)));

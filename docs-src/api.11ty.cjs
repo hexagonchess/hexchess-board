@@ -15,9 +15,9 @@ module.exports = class Docs {
     const elements = manifest.modules.reduce(
       (els, module) =>
         els.concat(
-          module.declarations?.filter((dec) => dec.customElement) ?? []
+          module.declarations?.filter((dec) => dec.customElement) ?? [],
         ),
-      []
+      [],
     );
     return `
      <h1>API</h1>
@@ -31,7 +31,7 @@ module.exports = class Docs {
        ${renderTable(
          'Attributes',
          ['name', 'description', 'type.text', 'default'],
-         element.attributes
+         element.attributes,
        )}
        ${renderTable(
          'Methods',
@@ -43,27 +43,27 @@ module.exports = class Docs {
              parameters: renderTable(
                '',
                ['name', 'description', 'type.text'],
-               m.parameters
+               m.parameters,
              ),
-           }))
+           })),
        )}
        ${renderTable('Events', ['name', 'description'], element.events)}    
        ${renderTable(
          'Slots',
          [['name', '(default)'], 'description'],
-         element.slots
+         element.slots,
        )}  
        ${renderTable(
          'CSS Shadow Parts',
          ['name', 'description'],
-         element.cssParts
+         element.cssParts,
        )}
        ${renderTable(
          'CSS Custom Properties',
          ['name', 'description'],
-         element.cssProperties
+         element.cssProperties,
        )}
-       `
+       `,
        )
        .join('')}
    `;
@@ -101,8 +101,8 @@ const renderTable = (name, properties, data) => {
          .map(
            (p) =>
              `<th>${capitalize(
-               (Array.isArray(p) ? p[0] : p).split('.')[0]
-             )}</th>`
+               (Array.isArray(p) ? p[0] : p).split('.')[0],
+             )}</th>`,
          )
          .join('')}
      </tr>
@@ -112,7 +112,7 @@ const renderTable = (name, properties, data) => {
        <tr>
          ${properties.map((p) => `<td>${get(i, p)}</td>`).join('')}
        </tr>
-     `
+     `,
        )
        .join('')}
    </table>

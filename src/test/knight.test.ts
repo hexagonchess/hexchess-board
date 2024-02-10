@@ -1,7 +1,7 @@
-import {describe, expect, test} from '@jest/globals';
-import {Board} from '../board';
-import {Knight} from '../knight';
-import {Position} from '../position';
+import { describe, expect, test } from '@jest/globals';
+import { Board } from '../board';
+import { Knight } from '../knight';
+import { Position } from '../position';
 
 describe('Knights', () => {
   test('Converts knights to strings', () => {

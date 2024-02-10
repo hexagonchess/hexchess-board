@@ -1,5 +1,5 @@
-import {Board} from './board';
-import {Color, Move, Piece} from './types';
+import { Board } from './board';
+import { Color, Move, Piece } from './types';
 
 export const COLUMN_ARRAY = [
   'A',
@@ -19,7 +19,7 @@ export type Column = ColumnArray[number];
 
 export type ColumnConfig = Record<
   Column,
-  {x: number; y: number; colors: Color[]}
+  { x: number; y: number; colors: Color[] }
 >;
 
 export const ALL_SQUARES = [
@@ -336,7 +336,7 @@ export const validatePosition = (position: unknown): Board | null => {
       const square = `${name}${j + 1}` as Square;
       partialBoard.addPieceFromString(
         square,
-        convertedColumn[j] === '1' ? null : (convertedColumn[j] as Piece)
+        convertedColumn[j] === '1' ? null : (convertedColumn[j] as Piece),
       );
     }
   }

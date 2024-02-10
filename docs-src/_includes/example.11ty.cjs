@@ -11,7 +11,7 @@ module.exports = function (data) {
   });
 };
 
-const renderExample = ({name, content, collections, page}) => {
+const renderExample = ({ name, content, collections, page }) => {
   return `
     <h1>Example: ${name}</h1>
     <section class="examples">
@@ -26,10 +26,10 @@ const renderExample = ({name, content, collections, page}) => {
                   <li class=${post.url === page.url ? 'selected' : ''}>
                     <a href="${relative(
                       page.url,
-                      post.url
+                      post.url,
                     )}">${post.data.description.replace(/</g, '&lt;')}</a>
                   </li>
-                `
+                `,
                   )
                   .join('')
           }

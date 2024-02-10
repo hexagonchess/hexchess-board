@@ -1,14 +1,14 @@
-import {describe, expect, test} from '@jest/globals';
-import {Board} from '../board';
-import {Pawn} from '../pawn';
-import {Position} from '../position';
-import {King} from '../king';
-import {Rook} from '../rook';
-import {Knight} from '../knight';
-import {Bishop} from '../bishop';
-import {Queen} from '../queen';
-import {HexchessPiece} from '../types';
-import {Square} from '../utils';
+import { describe, expect, test } from '@jest/globals';
+import { Board } from '../board';
+import { Pawn } from '../pawn';
+import { Position } from '../position';
+import { King } from '../king';
+import { Rook } from '../rook';
+import { Knight } from '../knight';
+import { Bishop } from '../bishop';
+import { Queen } from '../queen';
+import { HexchessPiece } from '../types';
+import { Square } from '../utils';
 
 describe('Board', () => {
   test('Properly initialize the game state', () => {
@@ -29,10 +29,10 @@ describe('Board', () => {
   test('Gets the king properly', () => {
     const board = Board.new();
     expect(board.getKing('white')).toEqual(
-      new King('white', new Position('G', 1))
+      new King('white', new Position('G', 1)),
     );
     expect(board.getKing('black')).toEqual(
-      new King('black', new Position('G', 10))
+      new King('black', new Position('G', 10)),
     );
 
     const empty = Board.empty();
@@ -42,7 +42,7 @@ describe('Board', () => {
     const board2 = Board.empty();
     board2.addPiece(new King('white', new Position('G', 1)));
     expect(board2.getKing('white')).toEqual(
-      new King('white', new Position('G', 1))
+      new King('white', new Position('G', 1)),
     );
     expect(() => board2.getKing('black')).toThrow();
   });
@@ -51,7 +51,7 @@ describe('Board', () => {
     const board = Board.new();
     expect(board.getPiece('A1')).toEqual(null);
     expect(board.getPiece('B1')).toEqual(
-      new Pawn('white', new Position('B', 1))
+      new Pawn('white', new Position('B', 1)),
     );
   });
 
@@ -67,7 +67,7 @@ describe('Board', () => {
     board.addPiece(new Rook('black', new Position('G', 10)));
 
     expect(() =>
-      board.capturePiece(new Position('G', 10), new Position('G', 1))
+      board.capturePiece(new Position('G', 10), new Position('G', 1)),
     ).toThrow();
   });
 
@@ -76,22 +76,22 @@ describe('Board', () => {
 
     // Cannot initiate capture from a square without a piece
     expect(() =>
-      board.capturePiece(new Position('A', 6), new Position('B', 7))
+      board.capturePiece(new Position('A', 6), new Position('B', 7)),
     ).toThrow();
 
     // Cannot initiate capture to a square without a piece
     expect(() =>
-      board.capturePiece(new Position('F', 5), new Position('G', 5))
+      board.capturePiece(new Position('F', 5), new Position('G', 5)),
     ).toThrow();
 
     // Cannot do capture from empty square to another empty square
     expect(() =>
-      board.capturePiece(new Position('A', 6), new Position('A', 7))
+      board.capturePiece(new Position('A', 6), new Position('A', 7)),
     ).toThrow();
 
     // Cannot capture same color piece
     expect(() =>
-      board.capturePiece(new Position('B', 1), new Position('C', 2))
+      board.capturePiece(new Position('B', 1), new Position('C', 2)),
     ).toThrow();
 
     // Can capture opposite color piece
@@ -99,7 +99,7 @@ describe('Board', () => {
     board.capturePiece(new Position('B', 6), new Position('C', 7));
 
     expect(board.getPiece('C7')).toEqual(
-      new Pawn('white', new Position('C', 7))
+      new Pawn('white', new Position('C', 7)),
     );
   });
 
@@ -123,52 +123,52 @@ describe('Board', () => {
     board.addPiece(new Pawn('white', new Position('C', 8)));
     board.promotePawn('C8', 'N');
     expect(board.getPiece('C8')).toEqual(
-      new Knight('white', new Position('C', 8))
+      new Knight('white', new Position('C', 8)),
     );
 
     board.addPiece(new Pawn('black', new Position('C', 1)));
     board.promotePawn('C1', 'n');
     expect(board.getPiece('C1')).toEqual(
-      new Knight('black', new Position('C', 1))
+      new Knight('black', new Position('C', 1)),
     );
 
     // Can promote to a bishop
     board.addPiece(new Pawn('white', new Position('D', 9)));
     board.promotePawn('D9', 'B');
     expect(board.getPiece('D9')).toEqual(
-      new Bishop('white', new Position('D', 9))
+      new Bishop('white', new Position('D', 9)),
     );
 
     board.addPiece(new Pawn('black', new Position('D', 1)));
     board.promotePawn('D1', 'b');
     expect(board.getPiece('D1')).toEqual(
-      new Bishop('black', new Position('D', 1))
+      new Bishop('black', new Position('D', 1)),
     );
 
     // Can promote to a rook
     board.addPiece(new Pawn('white', new Position('E', 10)));
     board.promotePawn('E10', 'R');
     expect(board.getPiece('E10')).toEqual(
-      new Rook('white', new Position('E', 10))
+      new Rook('white', new Position('E', 10)),
     );
 
     board.addPiece(new Pawn('black', new Position('E', 1)));
     board.promotePawn('E1', 'r');
     expect(board.getPiece('E1')).toEqual(
-      new Rook('black', new Position('E', 1))
+      new Rook('black', new Position('E', 1)),
     );
 
     // Can promote to a queen
     board.addPiece(new Pawn('white', new Position('F', 11)));
     board.promotePawn('F11', 'Q');
     expect(board.getPiece('F11')).toEqual(
-      new Bishop('white', new Position('F', 11))
+      new Bishop('white', new Position('F', 11)),
     );
 
     board.addPiece(new Pawn('black', new Position('F', 1)));
     board.promotePawn('F1', 'q');
     expect(board.getPiece('F1')).toEqual(
-      new Bishop('black', new Position('F', 1))
+      new Bishop('black', new Position('F', 1)),
     );
   });
 
@@ -190,52 +190,52 @@ describe('Board', () => {
 
     board.movePiece(new Position('B', 3), new Position('B', 4));
     expect(() =>
-      board.movePiece(new Position('B', 5), new Position('B', 4))
+      board.movePiece(new Position('B', 5), new Position('B', 4)),
     ).toThrow();
 
     // Legal and illegal bishop moves
     board.movePiece(new Position('F', 2), new Position('E', 3));
     expect(board.getPiece('E3')).toEqual(
-      new Bishop('white', new Position('E', 3))
+      new Bishop('white', new Position('E', 3)),
     );
     expect(() =>
-      board.movePiece(new Position('F', 3), new Position('E', 4))
+      board.movePiece(new Position('F', 3), new Position('E', 4)),
     ).toThrow();
 
     // Legal and illegal knight moves
     board.movePiece(new Position('D', 1), new Position('C', 3));
     expect(board.getPiece('C3')).toEqual(
-      new Knight('white', new Position('C', 3))
+      new Knight('white', new Position('C', 3)),
     );
     expect(() =>
-      board.movePiece(new Position('C', 3), new Position('E', 4))
+      board.movePiece(new Position('C', 3), new Position('E', 4)),
     ).toThrow();
 
     // Legal and illegal rook moves
     board.movePiece(new Position('C', 8), new Position('D', 8));
     expect(board.getPiece('D8')).toEqual(
-      new Rook('black', new Position('D', 8))
+      new Rook('black', new Position('D', 8)),
     );
     expect(() =>
-      board.movePiece(new Position('D', 8), new Position('D', 6))
+      board.movePiece(new Position('D', 8), new Position('D', 6)),
     ).toThrow();
 
     // Legal and illegal king moves
     board.movePiece(new Position('G', 1), new Position('G', 2));
     expect(board.getPiece('G2')).toEqual(
-      new King('white', new Position('G', 2))
+      new King('white', new Position('G', 2)),
     );
     expect(() =>
-      board.movePiece(new Position('G', 2), new Position('H', 1))
+      board.movePiece(new Position('G', 2), new Position('H', 1)),
     ).toThrow();
 
     // Legal and illegal queen moves
     board.movePiece(new Position('E', 1), new Position('E', 2));
     expect(board.getPiece('E2')).toEqual(
-      new Queen('white', new Position('E', 2))
+      new Queen('white', new Position('E', 2)),
     );
     expect(() =>
-      board.movePiece(new Position('E', 2), new Position('E', 4))
+      board.movePiece(new Position('E', 2), new Position('E', 4)),
     ).toThrow();
   });
 
@@ -245,39 +245,39 @@ describe('Board', () => {
     // Moving a white pawn two squares forward sets didMoveTwoSquares to true
     board.movePiece(new Position('B', 1), new Position('B', 3));
     expect(board.getPiece('B3')).toEqual(
-      new Pawn('white', new Position('B', 3), true)
+      new Pawn('white', new Position('B', 3), true),
     );
 
     // Moving a white pawn only one square sets didMoveTwoSquares to false
     board.movePiece(new Position('B', 3), new Position('B', 4));
     expect(board.getPiece('B4')).toEqual(
-      new Pawn('white', new Position('B', 4), false)
+      new Pawn('white', new Position('B', 4), false),
     );
 
     // Moving a black pawn two squares forward sets didMoveTwoSquares to true
     board.movePiece(new Position('B', 7), new Position('B', 5));
     expect(board.getPiece('B5')).toEqual(
-      new Pawn('black', new Position('B', 5), true)
+      new Pawn('black', new Position('B', 5), true),
     );
 
     // Moving a black pawn only one square sets didMoveTwoSquares to false
     board.movePiece(new Position('C', 7), new Position('C', 6));
     expect(board.getPiece('C6')).toEqual(
-      new Pawn('black', new Position('C', 6), false)
+      new Pawn('black', new Position('C', 6), false),
     );
 
     // Throws an exception if moving a piece that doesn't exist
     expect(() =>
-      board.movePiece(new Position('A', 1), new Position('A', 2))
+      board.movePiece(new Position('A', 1), new Position('A', 2)),
     ).toThrow();
 
     // Cannot move a piece on top of another piece
     expect(() =>
-      board.movePiece(new Position('F', 5), new Position('F', 7))
+      board.movePiece(new Position('F', 5), new Position('F', 7)),
     ).toThrow();
     board.movePiece(new Position('F', 5), new Position('F', 6));
     expect(() =>
-      board.movePiece(new Position('F', 6), new Position('F', 7))
+      board.movePiece(new Position('F', 6), new Position('F', 7)),
     ).toThrow();
   });
 
@@ -364,7 +364,7 @@ describe('Board', () => {
     expect(board.getPiece('C3')).toBeNull();
     expect(board.getPiece('B1')).toBeNull();
     expect(board.getPiece('B2')).toEqual(
-      new Pawn('black', new Position('B', 2))
+      new Pawn('black', new Position('B', 2)),
     );
   });
 });

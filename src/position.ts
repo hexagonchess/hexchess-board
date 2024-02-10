@@ -1,6 +1,6 @@
-import {Board} from './board';
-import {Color} from './types';
-import {COLUMN_ARRAY, Column, Square} from './utils';
+import { Board } from './board';
+import { Color } from './types';
+import { COLUMN_ARRAY, Column, Square } from './utils';
 
 export class Position {
   readonly col: Column;
@@ -10,7 +10,7 @@ export class Position {
     color: Omit<Color, 'grey'>,
     startingPosition: Position,
     board: Board,
-    getNextPos: () => Position | null
+    getNextPos: () => Position | null,
   ): boolean {
     const potential = getNextPos();
     // Next square doesn't exist or is occupied by another piece
@@ -36,7 +36,7 @@ export class Position {
   static getAllDefendedPositionsInDirection(
     originalPosition: Position,
     board: Board,
-    getNextPos: (pos: Position) => Position | null
+    getNextPos: (pos: Position) => Position | null,
   ): Position[] {
     const positions: Position[] = [];
     const originalPiece = board.getPiece(originalPosition.toSquare());
@@ -497,7 +497,7 @@ export class Position {
   // -------------------------------------------------------------------
 
   getAllTopPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -514,7 +514,7 @@ export class Position {
   }
 
   getAllTopRightPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -531,7 +531,7 @@ export class Position {
   }
 
   getAllSkipTopRightPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -548,7 +548,7 @@ export class Position {
   }
 
   getAllRightPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -565,7 +565,7 @@ export class Position {
   }
 
   getAllBottomRightPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -582,7 +582,7 @@ export class Position {
   }
 
   getAllSkipBottomRightPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -599,7 +599,7 @@ export class Position {
   }
 
   getAllBottomPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -616,7 +616,7 @@ export class Position {
   }
 
   getAllBottomLeftPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -633,7 +633,7 @@ export class Position {
   }
 
   getAllSkipBottomLeftPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -650,7 +650,7 @@ export class Position {
   }
 
   getAllLeftPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -667,7 +667,7 @@ export class Position {
   }
 
   getAllTopLeftPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 
@@ -685,7 +685,7 @@ export class Position {
   }
 
   getAllSkipTopLeftPositions(
-    keepGoing: (pos: Position) => boolean = () => true
+    keepGoing: (pos: Position) => boolean = () => true,
   ): Position[] {
     const positions: Position[] = [];
 

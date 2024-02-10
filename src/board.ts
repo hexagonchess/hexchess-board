@@ -1,25 +1,25 @@
-import {Bishop} from './bishop';
-import {King} from './king';
-import {Knight} from './knight';
-import {Pawn} from './pawn';
-import {Position} from './position';
-import {Queen} from './queen';
-import {Rook} from './rook';
-import {Color, HexchessPiece, Piece} from './types';
-import {Square} from './utils';
+import { Bishop } from './bishop';
+import { King } from './king';
+import { Knight } from './knight';
+import { Pawn } from './pawn';
+import { Position } from './position';
+import { Queen } from './queen';
+import { Rook } from './rook';
+import { Color, HexchessPiece, Piece } from './types';
+import { Square } from './utils';
 
 export class Board {
   readonly pieces: Record<Square, HexchessPiece | null>;
 
   static clone(board: Board): Board {
     const clone = Board.empty();
-    for (const [_square, piece] of Object.entries(board.pieces)) {
+    for (const piece of Object.values(board.pieces)) {
       if (piece === null) {
         continue;
       }
       if (piece instanceof Pawn) {
         clone.addPiece(
-          new Pawn(piece.color, piece.position, piece.didMoveTwoSquares)
+          new Pawn(piece.color, piece.position, piece.didMoveTwoSquares),
         );
       } else if (piece instanceof King) {
         clone.addPiece(new King(piece.color, piece.position));
@@ -40,14 +40,14 @@ export class Board {
 
   static empty(): Board {
     const positions = Object.fromEntries(
-      Position.allPositions().map((pos) => [pos.toSquare(), null])
+      Position.allPositions().map((pos) => [pos.toSquare(), null]),
     ) as Record<Square, HexchessPiece | null>;
     return new Board(positions);
   }
 
   static new(): Board {
     const positions = Object.fromEntries(
-      Position.allPositions().map((pos) => [pos.toSquare(), null])
+      Position.allPositions().map((pos) => [pos.toSquare(), null]),
     ) as Record<Square, HexchessPiece | null>;
     positions['B1'] = new Pawn('white', new Position('B', 1));
     positions['B7'] = new Pawn('black', new Position('B', 7));
@@ -126,13 +126,13 @@ export class Board {
       this.pieces[square as Square] = new Pawn(
         piece.color,
         piece.position,
-        false
+        false,
       );
     });
   }
 
   getKing(color: Omit<Color, 'grey'>): King {
-    for (const [_square, piece] of Object.entries(this.pieces)) {
+    for (const piece of Object.values(this.pieces)) {
       if (piece instanceof King && piece.color === color) {
         return piece;
       }
@@ -147,7 +147,7 @@ export class Board {
 
   getPieces(color: Omit<Color, 'grey'>): HexchessPiece[] {
     return Object.values(this.pieces).filter(
-      (piece) => piece !== null && piece.color === color
+      (piece) => piece !== null && piece.color === color,
     ) as HexchessPiece[];
   }
 
@@ -160,15 +160,15 @@ export class Board {
     return piece !== null && piece.color !== color;
   }
 
-  removePiece(square: Square) {
+  removePiece(square: Square): void {
     this.pieces[square] = null;
   }
 
-  addPiece(piece: HexchessPiece) {
+  addPiece(piece: HexchessPiece): void {
     this.pieces[piece.position.toSquare()] = piece;
   }
 
-  addPieceFromString(square: Square, piece: Piece | null) {
+  addPieceFromString(square: Square, piece: Piece | null): void {
     if (piece === null) {
       this.pieces[square] = null;
       return;
@@ -225,10 +225,10 @@ export class Board {
     }
   }
 
-  movePiece(from: Position, to: Position, override = false) {
+  movePiece(from: Position, to: Position, override = false): void {
     if (!this._canMoveTo(from, to) && !override) {
       throw new Error(
-        `Invalid move from ${from.toSquare()} to ${to.toSquare()}`
+        `Invalid move from ${from.toSquare()} to ${to.toSquare()}`,
       );
     }
 
@@ -254,7 +254,10 @@ export class Board {
     }
   }
 
-  promotePawn(square: Square, newPiece: Omit<Piece, 'k' | 'K' | 'p' | 'P'>) {
+  promotePawn(
+    square: Square,
+    newPiece: Omit<Piece, 'k' | 'K' | 'p' | 'P'>,
+  ): void {
     const possiblePawn = this.getPiece(square);
     if (possiblePawn === null || !(possiblePawn instanceof Pawn)) {
       throw new Error(`No pawn found at ${square}`);
@@ -269,7 +272,7 @@ export class Board {
       case 'Q': {
         this.pieces[square] = new Queen(
           possiblePawn.color,
-          possiblePawn.position
+          possiblePawn.position,
         );
         break;
       }
@@ -277,7 +280,7 @@ export class Board {
       case 'R': {
         this.pieces[square] = new Rook(
           possiblePawn.color,
-          possiblePawn.position
+          possiblePawn.position,
         );
         break;
       }
@@ -285,7 +288,7 @@ export class Board {
       case 'B': {
         this.pieces[square] = new Bishop(
           possiblePawn.color,
-          possiblePawn.position
+          possiblePawn.position,
         );
         break;
       }
@@ -293,7 +296,7 @@ export class Board {
       case 'N': {
         this.pieces[square] = new Knight(
           possiblePawn.color,
-          possiblePawn.position
+          possiblePawn.position,
         );
         break;
       }
@@ -301,12 +304,12 @@ export class Board {
     this._resetPawnsDidMoveTwoSquares();
   }
 
-  capturePiece(from: Position, to: Position) {
+  capturePiece(from: Position, to: Position): void {
     const fromPiece = this.getPiece(from.toSquare());
     const toPiece = this.getPiece(to.toSquare());
     if (fromPiece === null || toPiece === null) {
       throw new Error(
-        `Both pieces must be non-null to capture - did you mean move?`
+        `Both pieces must be non-null to capture - did you mean move?`,
       );
     }
 
@@ -338,7 +341,7 @@ export class Board {
     this._resetPawnsDidMoveTwoSquares();
   }
 
-  enPassant(from: Position, to: Position) {
+  enPassant(from: Position, to: Position): void {
     const fromPiece = this.getPiece(from.toSquare());
     if (fromPiece === null || !(fromPiece instanceof Pawn)) {
       throw new Error(`No pawn found at ${from.toSquare()}`);

@@ -1,7 +1,7 @@
-import {Board} from '../board';
-import {Pawn} from '../pawn';
-import {Position} from '../position';
-import {describe, expect, test} from '@jest/globals';
+import { Board } from '../board';
+import { Pawn } from '../pawn';
+import { Position } from '../position';
+import { describe, expect, test } from '@jest/globals';
 
 describe('Pawns', () => {
   test('Black pawns can only be promoted on the first rank', () => {
@@ -83,13 +83,13 @@ describe('Pawns', () => {
     const possibleSquares2 = whitePawn3.allSquareMoves(board);
 
     expect(
-      possibleSquares2.find((pos) => pos.toString() === 'A6')
+      possibleSquares2.find((pos) => pos.toString() === 'A6'),
     ).toBeTruthy();
     expect(
-      possibleSquares2.find((pos) => pos.toString() === 'C7')
+      possibleSquares2.find((pos) => pos.toString() === 'C7'),
     ).toBeTruthy();
     expect(
-      possibleSquares2.find((pos) => pos.toString() === 'B7')
+      possibleSquares2.find((pos) => pos.toString() === 'B7'),
     ).toBeTruthy();
     expect(possibleSquares2.length).toBe(3);
   });

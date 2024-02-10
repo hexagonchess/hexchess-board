@@ -1,6 +1,6 @@
-import {Board} from './board';
-import {Position} from './position';
-import {Color, HexchessPiece, Piece} from './types';
+import { Board } from './board';
+import { Position } from './position';
+import { Color, HexchessPiece, Piece } from './types';
 
 export class Pawn implements HexchessPiece {
   readonly color: Color;
@@ -87,7 +87,7 @@ export class Pawn implements HexchessPiece {
 
   private _getEnpassantSquare(
     board: Board,
-    direction: 'left' | 'right'
+    direction: 'left' | 'right',
   ): Position | null {
     const piecePos =
       this.color === 'white'
@@ -95,8 +95,8 @@ export class Pawn implements HexchessPiece {
           ? this.position.getBottomLeftPosition()!
           : this.position.getBottomRightPosition()!
         : direction === 'left'
-        ? this.position.getTopLeftPosition()!
-        : this.position.getTopRightPosition()!;
+          ? this.position.getTopLeftPosition()!
+          : this.position.getTopRightPosition()!;
     if (piecePos === null) {
       return null;
     }
@@ -120,13 +120,13 @@ export class Pawn implements HexchessPiece {
         ? this.position.getTopLeftPosition()
         : this.position.getTopRightPosition()
       : direction === 'left'
-      ? this.position.getBottomLeftPosition()
-      : this.position.getBottomRightPosition();
+        ? this.position.getBottomLeftPosition()
+        : this.position.getBottomRightPosition();
   }
 
   private _getCaptureSquare(
     board: Board,
-    direction: 'left' | 'right'
+    direction: 'left' | 'right',
   ): Position | null {
     let pos: Position | null;
     if (this.color === 'white') {

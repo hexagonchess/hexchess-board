@@ -1,6 +1,6 @@
-import {Board} from './board';
-import {Position} from './position';
-import {Color, HexchessPiece, Piece} from './types';
+import { Board } from './board';
+import { Position } from './position';
+import { Color, HexchessPiece, Piece } from './types';
 
 export class Bishop implements HexchessPiece {
   readonly color: Color;
@@ -17,11 +17,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllLeftPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getLeftPosition())
+      getSquare(this.color, pos, board, () => pos.getLeftPosition()),
     );
   }
 
@@ -31,11 +31,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllRightPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getRightPosition())
+      getSquare(this.color, pos, board, () => pos.getRightPosition()),
     );
   }
 
@@ -45,11 +45,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllSkipTopRightPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getSkipTopRightPosition())
+      getSquare(this.color, pos, board, () => pos.getSkipTopRightPosition()),
     );
   }
 
@@ -59,11 +59,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllSkipBottomRightPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getSkipBottomRightPosition())
+      getSquare(this.color, pos, board, () => pos.getSkipBottomRightPosition()),
     );
   }
 
@@ -73,11 +73,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllSkipTopLeftPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getSkipTopLeftPosition())
+      getSquare(this.color, pos, board, () => pos.getSkipTopLeftPosition()),
     );
   }
 
@@ -87,11 +87,11 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
-    ) => boolean
+      getNextPos: () => Position | null,
+    ) => boolean,
   ): Position[] {
     return this.position.getAllSkipBottomLeftPositions((pos) =>
-      getSquare(this.color, pos, board, () => pos.getSkipBottomLeftPosition())
+      getSquare(this.color, pos, board, () => pos.getSkipBottomLeftPosition()),
     );
   }
 
@@ -100,7 +100,7 @@ export class Bishop implements HexchessPiece {
       color: Color,
       position: Position,
       board: Board,
-      getNextPos: () => Position | null
+      getNextPos: () => Position | null,
     ): boolean =>
       Position.canGetNextPosition(color, position, board, getNextPos);
 
@@ -108,19 +108,19 @@ export class Bishop implements HexchessPiece {
     const allRightSquares = this._getAllRightSquare(board, getSquare);
     const allSkipTopRightSquares = this._getAllSkipTopRightSquares(
       board,
-      getSquare
+      getSquare,
     );
     const allSkipBottomRightSquares = this._getAllSkipBottomRightSquares(
       board,
-      getSquare
+      getSquare,
     );
     const allSkipTopLeftSquares = this._getAllSkipTopLeftSquares(
       board,
-      getSquare
+      getSquare,
     );
     const allSkipBottomLeftSquares = this._getAllSkipBottomLeftSquares(
       board,
-      getSquare
+      getSquare,
     );
 
     return [
@@ -137,33 +137,33 @@ export class Bishop implements HexchessPiece {
     const leftPositions = Position.getAllDefendedPositionsInDirection(
       this.position,
       board,
-      (pos: Position): Position | null => pos.getLeftPosition()
+      (pos: Position): Position | null => pos.getLeftPosition(),
     );
     const rightPositions = Position.getAllDefendedPositionsInDirection(
       this.position,
       board,
-      (pos: Position): Position | null => pos.getRightPosition()
+      (pos: Position): Position | null => pos.getRightPosition(),
     );
     const skipTopRightPositions = Position.getAllDefendedPositionsInDirection(
       this.position,
       board,
-      (pos: Position): Position | null => pos.getSkipTopRightPosition()
+      (pos: Position): Position | null => pos.getSkipTopRightPosition(),
     );
     const skipBottomRightPositions =
       Position.getAllDefendedPositionsInDirection(
         this.position,
         board,
-        (pos: Position): Position | null => pos.getSkipBottomRightPosition()
+        (pos: Position): Position | null => pos.getSkipBottomRightPosition(),
       );
     const skipTopLeftPositions = Position.getAllDefendedPositionsInDirection(
       this.position,
       board,
-      (pos: Position): Position | null => pos.getSkipTopLeftPosition()
+      (pos: Position): Position | null => pos.getSkipTopLeftPosition(),
     );
     const skipBottomLeftPositions = Position.getAllDefendedPositionsInDirection(
       this.position,
       board,
-      (pos: Position): Position | null => pos.getSkipBottomLeftPosition()
+      (pos: Position): Position | null => pos.getSkipBottomLeftPosition(),
     );
     return [
       ...leftPositions,

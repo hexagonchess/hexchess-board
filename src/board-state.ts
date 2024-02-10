@@ -1,11 +1,11 @@
-import {Game, GameState} from './game';
-import {Pawn} from './pawn';
-import {PIECE_VALUES} from './piece';
-import {Position} from './position';
-import {HexchessPiece, LegalMoves, Move, Piece} from './types';
-import {Square} from './utils';
+import { Game, GameState } from './game';
+import { Pawn } from './pawn';
+import { PIECE_VALUES } from './piece';
+import { Position } from './position';
+import { HexchessPiece, LegalMoves, Move, Piece } from './types';
+import { Square } from './utils';
 
-export type BoardChange = {state: BoardState; didChange: boolean};
+export type BoardChange = { state: BoardState; didChange: boolean };
 
 export type WaitingState = {
   game: Game;
@@ -144,7 +144,7 @@ export type Transition =
 
 export const getNewState = (
   state: BoardState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (state.name) {
     case 'WAITING':
@@ -162,14 +162,14 @@ export const getNewState = (
     case 'PROMOTING':
       return _promotingStateTransition(state, transition);
     case 'GAMEOVER':
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _capturePieceOrMakeMove = (
   state: WaitingState | MouseUpPieceSelected | DragPieceState,
   from: Square,
-  to: Square
+  to: Square,
 ): BoardChange => {
   const fromPiece = state.game.board.getPiece(from);
   const toPiece = state.game.board.getPiece(to);
@@ -268,7 +268,7 @@ const _capturePieceOrMakeMove = (
 
 const _promotingStateTransition = (
   state: PromotionState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'PROMOTE': {
@@ -293,7 +293,7 @@ const _promotingStateTransition = (
       }
       state.game.promotePawn(transition.piece);
       const newCapturedPieces = JSON.parse(
-        JSON.stringify(state.capturedPieces)
+        JSON.stringify(state.capturedPieces),
       );
       if (isWhite) {
         if (!newCapturedPieces['P']) {
@@ -344,12 +344,12 @@ const _promotingStateTransition = (
 
 const _rewoundStateTransition = (
   state: RewoundState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'FAST_FORWARD': {
       if (state.currentTurn === state.game.turn) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       const move = state.moves[state.currentTurn];
       state.game.fastForward(move);
@@ -371,7 +371,7 @@ const _rewoundStateTransition = (
     }
     case 'REWIND': {
       if (state.currentTurn === 0) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       const move = state.moves[state.currentTurn - 1];
       state.game.rewind(move);
@@ -385,18 +385,18 @@ const _rewoundStateTransition = (
       };
     }
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _waitingStateTransition = (
   state: WaitingState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'REWIND': {
       if (state.game.turn === 0) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       const move = state.moves[state.game.turn - 1];
       state.game.rewind(move);
@@ -411,11 +411,11 @@ const _waitingStateTransition = (
     }
     case 'MOUSE_DOWN': {
       if (!(transition.square in state.game.board.pieces)) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       const piece = state.game.board.getPiece(transition.square);
       if (!piece) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       return {
         state: {
@@ -431,27 +431,27 @@ const _waitingStateTransition = (
       const from = transition.move[0];
       const to = transition.move[1];
       if (!(from in state.game.board.pieces)) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
       const piece = state.game.board.getPiece(from);
       if (!piece) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
 
       if (!state.legalMoves[from]?.has(to)) {
-        return {state, didChange: false};
+        return { state, didChange: false };
       }
 
       return _capturePieceOrMakeMove(state, from, to);
     }
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _mouseDownPieceSelectedStateTransition = (
   state: MouseDownPieceSelected,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'MOUSE_MOVE_OUTSIDE_BOARD':
@@ -481,19 +481,19 @@ const _mouseDownPieceSelectedStateTransition = (
         didChange: true,
       };
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _mouseUpPieceSelectedStateTransition = (
   state: MouseUpPieceSelected,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'MOUSE_DOWN': {
       if (!(transition.square in state.game.board.pieces)) {
         throw new Error(
-          'Square must be in board - did you mean MOUSE_DOWN_OUTSIDE_BOARD transition?'
+          'Square must be in board - did you mean MOUSE_DOWN_OUTSIDE_BOARD transition?',
         );
       }
 
@@ -545,13 +545,13 @@ const _mouseUpPieceSelectedStateTransition = (
         didChange: true,
       };
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _dragPieceStateTransition = (
   state: DragPieceState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'MOUSE_MOVE_OUTSIDE_BOARD':
@@ -588,13 +588,13 @@ const _dragPieceStateTransition = (
       return _capturePieceOrMakeMove(state, state.square, transition.square);
     }
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };
 
 const _cancelSelectionSoonStateTransition = (
   state: CancelSelectionSoonState,
-  transition: Transition
+  transition: Transition,
 ): BoardChange => {
   switch (transition.name) {
     case 'MOUSE_MOVE_OUTSIDE_BOARD':
@@ -624,6 +624,6 @@ const _cancelSelectionSoonStateTransition = (
         didChange: true,
       };
     default:
-      return {state, didChange: false};
+      return { state, didChange: false };
   }
 };

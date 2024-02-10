@@ -1,6 +1,6 @@
-import {Board} from '../board';
-import {Position} from '../position';
-import {describe, expect, test} from '@jest/globals';
+import { Board } from '../board';
+import { Position } from '../position';
+import { describe, expect, test } from '@jest/globals';
 
 describe('Position', () => {
   test('Column A should only have 1 through 6', () => {
@@ -252,25 +252,25 @@ describe('Position', () => {
         }
         case 'C': {
           expect(position.isBeginningOfRow()).toBe(
-            position.row === 1 || position.row === 8
+            position.row === 1 || position.row === 8,
           );
           break;
         }
         case 'D': {
           expect(position.isBeginningOfRow()).toBe(
-            position.row === 1 || position.row === 9
+            position.row === 1 || position.row === 9,
           );
           break;
         }
         case 'E': {
           expect(position.isBeginningOfRow()).toBe(
-            position.row === 1 || position.row === 10
+            position.row === 1 || position.row === 10,
           );
           break;
         }
         case 'F': {
           expect(position.isBeginningOfRow()).toBe(
-            position.row === 1 || position.row === 11
+            position.row === 1 || position.row === 11,
           );
           break;
         }
@@ -293,25 +293,25 @@ describe('Position', () => {
         }
         case 'F': {
           expect(position.isEndOfRow()).toBe(
-            position.row === 1 || position.row === 11
+            position.row === 1 || position.row === 11,
           );
           break;
         }
         case 'G': {
           expect(position.isEndOfRow()).toBe(
-            position.row === 1 || position.row === 10
+            position.row === 1 || position.row === 10,
           );
           break;
         }
         case 'H': {
           expect(position.isEndOfRow()).toBe(
-            position.row === 1 || position.row === 9
+            position.row === 1 || position.row === 9,
           );
           break;
         }
         case 'I': {
           expect(position.isEndOfRow()).toBe(
-            position.row === 1 || position.row === 8
+            position.row === 1 || position.row === 8,
           );
           break;
         }
@@ -339,7 +339,7 @@ describe('Position', () => {
       'white',
       starting,
       Board.new(),
-      getNextPos
+      getNextPos,
     );
     expect(result).toBe(false);
 
@@ -349,7 +349,7 @@ describe('Position', () => {
       'white',
       starting2,
       Board.new(),
-      getNextPos
+      getNextPos,
     );
     expect(result2).toBe(false);
 
@@ -358,7 +358,7 @@ describe('Position', () => {
       'white',
       new Position('B', 7),
       Board.new(),
-      getNextPos
+      getNextPos,
     );
     expect(result3).toBe(false);
   });
@@ -369,7 +369,7 @@ describe('Position', () => {
         expect(pos.getTopPosition()).toBe(null);
       } else {
         expect(pos.getTopPosition()).toEqual(
-          new Position(pos.col, pos.row + 1)
+          new Position(pos.col, pos.row + 1),
         );
       }
     });
@@ -378,31 +378,31 @@ describe('Position', () => {
   test('Gets the top right position for any position correctly', () => {
     for (let row = 1; row <= 6; row++) {
       expect(new Position('A', row).getTopRightPosition()).toEqual(
-        new Position('B', row + 1)
+        new Position('B', row + 1),
       );
     }
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('B', row).getTopRightPosition()).toEqual(
-        new Position('C', row + 1)
+        new Position('C', row + 1),
       );
     }
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('C', row).getTopRightPosition()).toEqual(
-        new Position('D', row + 1)
+        new Position('D', row + 1),
       );
     }
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('D', row).getTopRightPosition()).toEqual(
-        new Position('E', row + 1)
+        new Position('E', row + 1),
       );
     }
 
     for (let row = 1; row <= 10; row++) {
       expect(new Position('E', row).getTopRightPosition()).toEqual(
-        new Position('F', row + 1)
+        new Position('F', row + 1),
       );
     }
 
@@ -411,7 +411,7 @@ describe('Position', () => {
         expect(new Position('F', row).getTopRightPosition()).toBe(null);
       } else {
         expect(new Position('F', row).getTopRightPosition()).toEqual(
-          new Position('G', row)
+          new Position('G', row),
         );
       }
     }
@@ -421,7 +421,7 @@ describe('Position', () => {
         expect(new Position('G', row).getTopRightPosition()).toBe(null);
       } else {
         expect(new Position('G', row).getTopRightPosition()).toEqual(
-          new Position('H', row)
+          new Position('H', row),
         );
       }
     }
@@ -431,7 +431,7 @@ describe('Position', () => {
         expect(new Position('H', row).getTopRightPosition()).toBe(null);
       } else {
         expect(new Position('H', row).getTopRightPosition()).toEqual(
-          new Position('I', row)
+          new Position('I', row),
         );
       }
     }
@@ -441,7 +441,7 @@ describe('Position', () => {
         expect(new Position('I', row).getTopRightPosition()).toBe(null);
       } else {
         expect(new Position('I', row).getTopRightPosition()).toEqual(
-          new Position('K', row)
+          new Position('K', row),
         );
       }
     }
@@ -451,7 +451,7 @@ describe('Position', () => {
         expect(new Position('K', row).getTopRightPosition()).toBe(null);
       } else {
         expect(new Position('K', row).getTopRightPosition()).toEqual(
-          new Position('L', row)
+          new Position('L', row),
         );
       }
     }
@@ -464,42 +464,42 @@ describe('Position', () => {
   test('Gets the skip top right position for any position correctly', () => {
     for (let row = 1; row <= 5; row++) {
       expect(new Position('A', row).getSkipTopRightPosition()).toEqual(
-        new Position('B', row + 2)
+        new Position('B', row + 2),
       );
     }
     expect(new Position('A', 6).getSkipTopRightPosition()).toBe(null);
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('B', row).getSkipTopRightPosition()).toEqual(
-        new Position('C', row + 2)
+        new Position('C', row + 2),
       );
     }
     expect(new Position('B', 7).getSkipTopRightPosition()).toBe(null);
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('C', row).getSkipTopRightPosition()).toEqual(
-        new Position('D', row + 2)
+        new Position('D', row + 2),
       );
     }
     expect(new Position('C', 8).getSkipTopRightPosition()).toBe(null);
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('D', row).getSkipTopRightPosition()).toEqual(
-        new Position('E', row + 2)
+        new Position('E', row + 2),
       );
     }
     expect(new Position('D', 9).getSkipTopRightPosition()).toBe(null);
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('E', row).getSkipTopRightPosition()).toEqual(
-        new Position('F', row + 2)
+        new Position('F', row + 2),
       );
     }
     expect(new Position('E', 10).getSkipTopRightPosition()).toBe(null);
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('F', row).getSkipTopRightPosition()).toEqual(
-        new Position('G', row + 1)
+        new Position('G', row + 1),
       );
     }
     expect(new Position('F', 10).getSkipTopRightPosition()).toBe(null);
@@ -507,7 +507,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('G', row).getSkipTopRightPosition()).toEqual(
-        new Position('H', row + 1)
+        new Position('H', row + 1),
       );
     }
     expect(new Position('G', 9).getSkipTopRightPosition()).toBe(null);
@@ -515,7 +515,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('H', row).getSkipTopRightPosition()).toEqual(
-        new Position('I', row + 1)
+        new Position('I', row + 1),
       );
     }
     expect(new Position('H', 8).getSkipTopRightPosition()).toBe(null);
@@ -523,7 +523,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('I', row).getSkipTopRightPosition()).toEqual(
-        new Position('K', row + 1)
+        new Position('K', row + 1),
       );
     }
     expect(new Position('I', 7).getSkipTopRightPosition()).toBe(null);
@@ -531,7 +531,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 5; row++) {
       expect(new Position('K', row).getSkipTopRightPosition()).toEqual(
-        new Position('L', row + 1)
+        new Position('L', row + 1),
       );
     }
     expect(new Position('K', 6).getSkipTopRightPosition()).toBe(null);
@@ -547,31 +547,31 @@ describe('Position', () => {
   test('Gets the right position of any postion correctly', () => {
     for (let row = 1; row <= 6; row++) {
       expect(new Position('A', row).getRightPosition()).toEqual(
-        new Position('C', row + 1)
+        new Position('C', row + 1),
       );
     }
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('B', row).getRightPosition()).toEqual(
-        new Position('D', row + 1)
+        new Position('D', row + 1),
       );
     }
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('C', row).getRightPosition()).toEqual(
-        new Position('E', row + 1)
+        new Position('E', row + 1),
       );
     }
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('D', row).getRightPosition()).toEqual(
-        new Position('F', row + 1)
+        new Position('F', row + 1),
       );
     }
 
     for (let row = 1; row <= 10; row++) {
       expect(new Position('E', row).getRightPosition()).toEqual(
-        new Position('G', row)
+        new Position('G', row),
       );
     }
 
@@ -580,7 +580,7 @@ describe('Position', () => {
         expect(new Position('F', row).getRightPosition()).toBe(null);
       } else {
         expect(new Position('F', row).getRightPosition()).toEqual(
-          new Position('H', row - 1)
+          new Position('H', row - 1),
         );
       }
     }
@@ -590,7 +590,7 @@ describe('Position', () => {
         expect(new Position('G', row).getRightPosition()).toBe(null);
       } else {
         expect(new Position('G', row).getRightPosition()).toEqual(
-          new Position('I', row - 1)
+          new Position('I', row - 1),
         );
       }
     }
@@ -600,7 +600,7 @@ describe('Position', () => {
         expect(new Position('H', row).getRightPosition()).toBe(null);
       } else {
         expect(new Position('H', row).getRightPosition()).toEqual(
-          new Position('K', row - 1)
+          new Position('K', row - 1),
         );
       }
     }
@@ -610,7 +610,7 @@ describe('Position', () => {
         expect(new Position('I', row).getRightPosition()).toBe(null);
       } else {
         expect(new Position('I', row).getRightPosition()).toEqual(
-          new Position('L', row - 1)
+          new Position('L', row - 1),
         );
       }
     }
@@ -627,31 +627,31 @@ describe('Position', () => {
   test('Get the bottom right position for any position correctly', () => {
     for (let i = 1; i <= 6; i++) {
       expect(new Position('A', i).getBottomRightPosition()).toEqual(
-        new Position('B', i)
+        new Position('B', i),
       );
     }
 
     for (let i = 1; i <= 7; i++) {
       expect(new Position('B', i).getBottomRightPosition()).toEqual(
-        new Position('C', i)
+        new Position('C', i),
       );
     }
 
     for (let i = 1; i <= 8; i++) {
       expect(new Position('C', i).getBottomRightPosition()).toEqual(
-        new Position('D', i)
+        new Position('D', i),
       );
     }
 
     for (let i = 1; i <= 9; i++) {
       expect(new Position('D', i).getBottomRightPosition()).toEqual(
-        new Position('E', i)
+        new Position('E', i),
       );
     }
 
     for (let i = 1; i <= 10; i++) {
       expect(new Position('E', i).getBottomRightPosition()).toEqual(
-        new Position('F', i)
+        new Position('F', i),
       );
     }
 
@@ -660,7 +660,7 @@ describe('Position', () => {
         expect(new Position('F', i).getBottomRightPosition()).toBe(null);
       } else {
         expect(new Position('F', i).getBottomRightPosition()).toEqual(
-          new Position('G', i - 1)
+          new Position('G', i - 1),
         );
       }
     }
@@ -670,7 +670,7 @@ describe('Position', () => {
         expect(new Position('G', i).getBottomRightPosition()).toBe(null);
       } else {
         expect(new Position('G', i).getBottomRightPosition()).toEqual(
-          new Position('H', i - 1)
+          new Position('H', i - 1),
         );
       }
     }
@@ -680,7 +680,7 @@ describe('Position', () => {
         expect(new Position('H', i).getBottomRightPosition()).toBe(null);
       } else {
         expect(new Position('H', i).getBottomRightPosition()).toEqual(
-          new Position('I', i - 1)
+          new Position('I', i - 1),
         );
       }
     }
@@ -690,7 +690,7 @@ describe('Position', () => {
         expect(new Position('I', i).getBottomRightPosition()).toBe(null);
       } else {
         expect(new Position('I', i).getBottomRightPosition()).toEqual(
-          new Position('K', i - 1)
+          new Position('K', i - 1),
         );
       }
     }
@@ -700,7 +700,7 @@ describe('Position', () => {
         expect(new Position('K', i).getBottomRightPosition()).toBe(null);
       } else {
         expect(new Position('K', i).getBottomRightPosition()).toEqual(
-          new Position('L', i - 1)
+          new Position('L', i - 1),
         );
       }
     }
@@ -714,35 +714,35 @@ describe('Position', () => {
     expect(new Position('A', 1).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 2; row <= 6; row++) {
       expect(new Position('A', row).getSkipBottomRightPosition()).toEqual(
-        new Position('B', row - 1)
+        new Position('B', row - 1),
       );
     }
 
     expect(new Position('B', 1).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 2; row <= 7; row++) {
       expect(new Position('B', row).getSkipBottomRightPosition()).toEqual(
-        new Position('C', row - 1)
+        new Position('C', row - 1),
       );
     }
 
     expect(new Position('C', 1).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 2; row <= 8; row++) {
       expect(new Position('C', row).getSkipBottomRightPosition()).toEqual(
-        new Position('D', row - 1)
+        new Position('D', row - 1),
       );
     }
 
     expect(new Position('D', 1).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 2; row <= 9; row++) {
       expect(new Position('D', row).getSkipBottomRightPosition()).toEqual(
-        new Position('E', row - 1)
+        new Position('E', row - 1),
       );
     }
 
     expect(new Position('E', 1).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 2; row <= 10; row++) {
       expect(new Position('E', row).getSkipBottomRightPosition()).toEqual(
-        new Position('F', row - 1)
+        new Position('F', row - 1),
       );
     }
 
@@ -750,7 +750,7 @@ describe('Position', () => {
     expect(new Position('F', 2).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 3; row <= 11; row++) {
       expect(new Position('F', row).getSkipBottomRightPosition()).toEqual(
-        new Position('G', row - 2)
+        new Position('G', row - 2),
       );
     }
 
@@ -758,7 +758,7 @@ describe('Position', () => {
     expect(new Position('G', 2).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 3; row <= 10; row++) {
       expect(new Position('G', row).getSkipBottomRightPosition()).toEqual(
-        new Position('H', row - 2)
+        new Position('H', row - 2),
       );
     }
 
@@ -766,7 +766,7 @@ describe('Position', () => {
     expect(new Position('H', 2).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 3; row <= 9; row++) {
       expect(new Position('H', row).getSkipBottomRightPosition()).toEqual(
-        new Position('I', row - 2)
+        new Position('I', row - 2),
       );
     }
 
@@ -774,7 +774,7 @@ describe('Position', () => {
     expect(new Position('I', 2).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 3; row <= 8; row++) {
       expect(new Position('I', row).getSkipBottomRightPosition()).toEqual(
-        new Position('K', row - 2)
+        new Position('K', row - 2),
       );
     }
 
@@ -782,7 +782,7 @@ describe('Position', () => {
     expect(new Position('K', 2).getSkipBottomRightPosition()).toEqual(null);
     for (let row = 3; row <= 7; row++) {
       expect(new Position('K', row).getSkipBottomRightPosition()).toEqual(
-        new Position('L', row - 2)
+        new Position('L', row - 2),
       );
     }
 
@@ -797,7 +797,7 @@ describe('Position', () => {
         expect(pos.getBottomPosition()).toBe(null);
       } else {
         expect(pos.getBottomPosition()).toEqual(
-          new Position(pos.col, pos.row - 1)
+          new Position(pos.col, pos.row - 1),
         );
       }
     });
@@ -813,7 +813,7 @@ describe('Position', () => {
         expect(new Position('B', row).getBottomLeftPosition()).toEqual(null);
       } else {
         expect(new Position('B', row).getBottomLeftPosition()).toEqual(
-          new Position('A', row - 1)
+          new Position('A', row - 1),
         );
       }
     }
@@ -823,7 +823,7 @@ describe('Position', () => {
         expect(new Position('C', row).getBottomLeftPosition()).toEqual(null);
       } else {
         expect(new Position('C', row).getBottomLeftPosition()).toEqual(
-          new Position('B', row - 1)
+          new Position('B', row - 1),
         );
       }
     }
@@ -833,7 +833,7 @@ describe('Position', () => {
         expect(new Position('D', row).getBottomLeftPosition()).toEqual(null);
       } else {
         expect(new Position('D', row).getBottomLeftPosition()).toEqual(
-          new Position('C', row - 1)
+          new Position('C', row - 1),
         );
       }
     }
@@ -843,7 +843,7 @@ describe('Position', () => {
         expect(new Position('E', row).getBottomLeftPosition()).toEqual(null);
       } else {
         expect(new Position('E', row).getBottomLeftPosition()).toEqual(
-          new Position('D', row - 1)
+          new Position('D', row - 1),
         );
       }
     }
@@ -853,38 +853,38 @@ describe('Position', () => {
         expect(new Position('F', row).getBottomLeftPosition()).toEqual(null);
       } else {
         expect(new Position('F', row).getBottomLeftPosition()).toEqual(
-          new Position('E', row - 1)
+          new Position('E', row - 1),
         );
       }
     }
 
     for (let row = 1; row <= 10; row++) {
       expect(new Position('G', row).getBottomLeftPosition()).toEqual(
-        new Position('F', row)
+        new Position('F', row),
       );
     }
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('H', row).getBottomLeftPosition()).toEqual(
-        new Position('G', row)
+        new Position('G', row),
       );
     }
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('I', row).getBottomLeftPosition()).toEqual(
-        new Position('H', row)
+        new Position('H', row),
       );
     }
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('K', row).getBottomLeftPosition()).toEqual(
-        new Position('I', row)
+        new Position('I', row),
       );
     }
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('L', row).getBottomLeftPosition()).toEqual(
-        new Position('K', row)
+        new Position('K', row),
       );
     }
   });
@@ -898,7 +898,7 @@ describe('Position', () => {
     expect(new Position('B', 2).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 3; row <= 7; row++) {
       expect(new Position('B', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('A', row - 2)
+        new Position('A', row - 2),
       );
     }
 
@@ -906,7 +906,7 @@ describe('Position', () => {
     expect(new Position('C', 2).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 3; row <= 8; row++) {
       expect(new Position('C', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('B', row - 2)
+        new Position('B', row - 2),
       );
     }
 
@@ -914,7 +914,7 @@ describe('Position', () => {
     expect(new Position('D', 2).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 3; row <= 9; row++) {
       expect(new Position('D', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('C', row - 2)
+        new Position('C', row - 2),
       );
     }
 
@@ -922,7 +922,7 @@ describe('Position', () => {
     expect(new Position('E', 2).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 3; row <= 10; row++) {
       expect(new Position('E', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('D', row - 2)
+        new Position('D', row - 2),
       );
     }
 
@@ -930,42 +930,42 @@ describe('Position', () => {
     expect(new Position('F', 2).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 3; row <= 11; row++) {
       expect(new Position('F', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('E', row - 2)
+        new Position('E', row - 2),
       );
     }
 
     expect(new Position('G', 1).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 2; row <= 10; row++) {
       expect(new Position('G', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('F', row - 1)
+        new Position('F', row - 1),
       );
     }
 
     expect(new Position('H', 1).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 2; row <= 9; row++) {
       expect(new Position('H', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('G', row - 1)
+        new Position('G', row - 1),
       );
     }
 
     expect(new Position('I', 1).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 2; row <= 8; row++) {
       expect(new Position('I', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('H', row - 1)
+        new Position('H', row - 1),
       );
     }
 
     expect(new Position('K', 1).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 2; row <= 7; row++) {
       expect(new Position('K', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('I', row - 1)
+        new Position('I', row - 1),
       );
     }
 
     expect(new Position('L', 1).getSkipBottomLeftPosition()).toEqual(null);
     for (let row = 2; row <= 6; row++) {
       expect(new Position('L', row).getSkipBottomLeftPosition()).toEqual(
-        new Position('K', row - 1)
+        new Position('K', row - 1),
       );
     }
   });
@@ -984,7 +984,7 @@ describe('Position', () => {
         expect(new Position('C', row).getLeftPosition()).toBe(null);
       } else {
         expect(new Position('C', row).getLeftPosition()).toEqual(
-          new Position('A', row - 1)
+          new Position('A', row - 1),
         );
       }
     }
@@ -994,7 +994,7 @@ describe('Position', () => {
         expect(new Position('D', row).getLeftPosition()).toBe(null);
       } else {
         expect(new Position('D', row).getLeftPosition()).toEqual(
-          new Position('B', row - 1)
+          new Position('B', row - 1),
         );
       }
     }
@@ -1004,7 +1004,7 @@ describe('Position', () => {
         expect(new Position('E', row).getLeftPosition()).toBe(null);
       } else {
         expect(new Position('E', row).getLeftPosition()).toEqual(
-          new Position('C', row - 1)
+          new Position('C', row - 1),
         );
       }
     }
@@ -1014,38 +1014,38 @@ describe('Position', () => {
         expect(new Position('F', row).getLeftPosition()).toBe(null);
       } else {
         expect(new Position('F', row).getLeftPosition()).toEqual(
-          new Position('D', row - 1)
+          new Position('D', row - 1),
         );
       }
     }
 
     for (let row = 1; row <= 10; row++) {
       expect(new Position('G', row).getLeftPosition()).toEqual(
-        new Position('E', row)
+        new Position('E', row),
       );
     }
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('H', row).getLeftPosition()).toEqual(
-        new Position('F', row + 1)
+        new Position('F', row + 1),
       );
     }
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('I', row).getLeftPosition()).toEqual(
-        new Position('G', row + 1)
+        new Position('G', row + 1),
       );
     }
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('K', row).getLeftPosition()).toEqual(
-        new Position('H', row + 1)
+        new Position('H', row + 1),
       );
     }
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('L', row).getLeftPosition()).toEqual(
-        new Position('I', row + 1)
+        new Position('I', row + 1),
       );
     }
   });
@@ -1060,7 +1060,7 @@ describe('Position', () => {
         expect(new Position('B', row).getTopLeftPosition()).toBe(null);
       } else {
         expect(new Position('B', row).getTopLeftPosition()).toEqual(
-          new Position('A', row)
+          new Position('A', row),
         );
       }
     }
@@ -1070,7 +1070,7 @@ describe('Position', () => {
         expect(new Position('C', row).getTopLeftPosition()).toBe(null);
       } else {
         expect(new Position('C', row).getTopLeftPosition()).toEqual(
-          new Position('B', row)
+          new Position('B', row),
         );
       }
     }
@@ -1080,7 +1080,7 @@ describe('Position', () => {
         expect(new Position('D', row).getTopLeftPosition()).toBe(null);
       } else {
         expect(new Position('D', row).getTopLeftPosition()).toEqual(
-          new Position('C', row)
+          new Position('C', row),
         );
       }
     }
@@ -1090,7 +1090,7 @@ describe('Position', () => {
         expect(new Position('E', row).getTopLeftPosition()).toBe(null);
       } else {
         expect(new Position('E', row).getTopLeftPosition()).toEqual(
-          new Position('D', row)
+          new Position('D', row),
         );
       }
     }
@@ -1100,38 +1100,38 @@ describe('Position', () => {
         expect(new Position('F', row).getTopLeftPosition()).toBe(null);
       } else {
         expect(new Position('F', row).getTopLeftPosition()).toEqual(
-          new Position('E', row)
+          new Position('E', row),
         );
       }
     }
 
     for (let row = 1; row <= 10; row++) {
       expect(new Position('G', row).getTopLeftPosition()).toEqual(
-        new Position('F', row + 1)
+        new Position('F', row + 1),
       );
     }
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('H', row).getTopLeftPosition()).toEqual(
-        new Position('G', row + 1)
+        new Position('G', row + 1),
       );
     }
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('I', row).getTopLeftPosition()).toEqual(
-        new Position('H', row + 1)
+        new Position('H', row + 1),
       );
     }
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('K', row).getTopLeftPosition()).toEqual(
-        new Position('I', row + 1)
+        new Position('I', row + 1),
       );
     }
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('L', row).getTopLeftPosition()).toEqual(
-        new Position('K', row + 1)
+        new Position('K', row + 1),
       );
     }
   });
@@ -1143,7 +1143,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 5; row++) {
       expect(new Position('B', row).getSkipTopLeftPosition()).toEqual(
-        new Position('A', row + 1)
+        new Position('A', row + 1),
       );
     }
     expect(new Position('B', 6).getSkipTopLeftPosition()).toEqual(null);
@@ -1151,7 +1151,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('C', row).getSkipTopLeftPosition()).toEqual(
-        new Position('B', row + 1)
+        new Position('B', row + 1),
       );
     }
     expect(new Position('C', 7).getSkipTopLeftPosition()).toEqual(null);
@@ -1159,7 +1159,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('D', row).getSkipTopLeftPosition()).toEqual(
-        new Position('C', row + 1)
+        new Position('C', row + 1),
       );
     }
     expect(new Position('D', 8).getSkipTopLeftPosition()).toEqual(null);
@@ -1167,7 +1167,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('E', row).getSkipTopLeftPosition()).toEqual(
-        new Position('D', row + 1)
+        new Position('D', row + 1),
       );
     }
     expect(new Position('E', 9).getSkipTopLeftPosition()).toEqual(null);
@@ -1175,7 +1175,7 @@ describe('Position', () => {
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('F', row).getSkipTopLeftPosition()).toEqual(
-        new Position('E', row + 1)
+        new Position('E', row + 1),
       );
     }
     expect(new Position('F', 10).getSkipTopLeftPosition()).toEqual(null);
@@ -1183,35 +1183,35 @@ describe('Position', () => {
 
     for (let row = 1; row <= 9; row++) {
       expect(new Position('G', row).getSkipTopLeftPosition()).toEqual(
-        new Position('F', row + 2)
+        new Position('F', row + 2),
       );
     }
     expect(new Position('G', 10).getSkipTopLeftPosition()).toEqual(null);
 
     for (let row = 1; row <= 8; row++) {
       expect(new Position('H', row).getSkipTopLeftPosition()).toEqual(
-        new Position('G', row + 2)
+        new Position('G', row + 2),
       );
     }
     expect(new Position('H', 9).getSkipTopLeftPosition()).toEqual(null);
 
     for (let row = 1; row <= 7; row++) {
       expect(new Position('I', row).getSkipTopLeftPosition()).toEqual(
-        new Position('H', row + 2)
+        new Position('H', row + 2),
       );
     }
     expect(new Position('I', 8).getSkipTopLeftPosition()).toEqual(null);
 
     for (let row = 1; row <= 6; row++) {
       expect(new Position('K', row).getSkipTopLeftPosition()).toEqual(
-        new Position('I', row + 2)
+        new Position('I', row + 2),
       );
     }
     expect(new Position('K', 7).getSkipTopLeftPosition()).toEqual(null);
 
     for (let row = 1; row <= 5; row++) {
       expect(new Position('L', row).getSkipTopLeftPosition()).toEqual(
-        new Position('K', row + 2)
+        new Position('K', row + 2),
       );
     }
     expect(new Position('L', 6).getSkipTopLeftPosition()).toEqual(null);
@@ -1357,22 +1357,22 @@ describe('Position', () => {
   test('Gets all skip top right positions correctly', () => {
     for (let i = 1; i <= 6; i++) {
       expect(new Position('A', i).getAllSkipTopRightPositions().length).toBe(
-        6 - i
+        6 - i,
       );
     }
 
     for (let i = 1; i <= 7; i++) {
       if (i === 1 || i === 2) {
         expect(new Position('B', i).getAllSkipTopRightPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else if (i === 3) {
         expect(new Position('B', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else {
         expect(new Position('B', i).getAllSkipTopRightPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       }
     }
@@ -1380,19 +1380,19 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i === 1) {
         expect(new Position('C', i).getAllSkipTopRightPositions().length).toBe(
-          5
+          5,
         );
       } else if (i === 2 || i === 3) {
         expect(new Position('C', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else if (i === 4) {
         expect(new Position('C', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else {
         expect(new Position('C', i).getAllSkipTopRightPositions().length).toBe(
-          8 - i
+          8 - i,
         );
       }
     }
@@ -1400,23 +1400,23 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i === 1) {
         expect(new Position('D', i).getAllSkipTopRightPositions().length).toBe(
-          5
+          5,
         );
       } else if (i === 2 || i === 3) {
         expect(new Position('D', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else if (i === 4 || i === 5) {
         expect(new Position('D', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else if (i === 6) {
         expect(new Position('D', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       } else {
         expect(new Position('D', i).getAllSkipTopRightPositions().length).toBe(
-          9 - i
+          9 - i,
         );
       }
     }
@@ -1424,27 +1424,27 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i === 1) {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          5
+          5,
         );
       } else if (i === 2 || i === 3) {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else if (i === 4 || i === 5) {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else if (i === 6 || i === 7) {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       } else if (i === 8) {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('E', i).getAllSkipTopRightPositions().length).toBe(
-          10 - i
+          10 - i,
         );
       }
     }
@@ -1452,27 +1452,27 @@ describe('Position', () => {
     for (let i = 1; i <= 11; i++) {
       if (i === 1) {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          5
+          5,
         );
       } else if (i === 2 || i === 3) {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else if (i === 4 || i === 5) {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else if (i === 6 || i === 7) {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       } else if (i === 8 || i === 9) {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('F', i).getAllSkipTopRightPositions().length).toBe(
-          0
+          0,
         );
       }
     }
@@ -1480,68 +1480,68 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i === 1 || i === 2) {
         expect(new Position('G', i).getAllSkipTopRightPositions().length).toBe(
-          4
+          4,
         );
       } else if (i === 3 || i === 4) {
         expect(new Position('G', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else if (i === 5 || i === 6) {
         expect(new Position('G', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       } else if (i === 7 || i === 8) {
         expect(new Position('G', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('G', i).getAllSkipTopRightPositions().length).toBe(
-          0
+          0,
         );
       }
     }
     for (let i = 1; i <= 9; i++) {
       if (i >= 1 && i <= 3) {
         expect(new Position('H', i).getAllSkipTopRightPositions().length).toBe(
-          3
+          3,
         );
       } else if (i === 4 || i === 5) {
         expect(new Position('H', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       } else if (i === 6 || i === 7) {
         expect(new Position('H', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('H', i).getAllSkipTopRightPositions().length).toBe(
-          0
+          0,
         );
       }
     }
     for (let i = 0; i <= 8; i++) {
       if (i === 5 || i === 6) {
         expect(new Position('I', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       } else if (i === 7 || i === 8) {
         expect(new Position('I', i).getAllSkipTopRightPositions().length).toBe(
-          0
+          0,
         );
       } else {
         expect(new Position('I', i).getAllSkipTopRightPositions().length).toBe(
-          2
+          2,
         );
       }
     }
     for (let i = 1; i <= 7; i++) {
       if (i === 6 || i === 7) {
         expect(new Position('K', i).getAllSkipTopRightPositions().length).toBe(
-          0
+          0,
         );
       } else {
         expect(new Position('K', i).getAllSkipTopRightPositions().length).toBe(
-          1
+          1,
         );
       }
     }
@@ -1633,18 +1633,18 @@ describe('Position', () => {
   test('Gets all skip bottom right positions correctly', () => {
     for (let i = 1; i <= 6; i++) {
       expect(new Position('A', i).getAllSkipBottomRightPositions().length).toBe(
-        i - 1
+        i - 1,
       );
     }
 
     for (let i = 1; i <= 7; i++) {
       if (i === 6 || i === 7) {
         expect(
-          new Position('B', i).getAllSkipBottomRightPositions().length
+          new Position('B', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 2);
       } else {
         expect(
-          new Position('B', i).getAllSkipBottomRightPositions().length
+          new Position('B', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 1);
       }
     }
@@ -1652,15 +1652,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i <= 4) {
         expect(
-          new Position('C', i).getAllSkipBottomRightPositions().length
+          new Position('C', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 1);
       } else if (i >= 7) {
         expect(
-          new Position('C', i).getAllSkipBottomRightPositions().length
+          new Position('C', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 3);
       } else {
         expect(
-          new Position('C', i).getAllSkipBottomRightPositions().length
+          new Position('C', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 2);
       }
     }
@@ -1668,19 +1668,19 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i < 4) {
         expect(
-          new Position('D', i).getAllSkipBottomRightPositions().length
+          new Position('D', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 1);
       } else if (i < 6) {
         expect(
-          new Position('D', i).getAllSkipBottomRightPositions().length
+          new Position('D', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 2);
       } else if (i < 8) {
         expect(
-          new Position('D', i).getAllSkipBottomRightPositions().length
+          new Position('D', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 3);
       } else {
         expect(
-          new Position('D', i).getAllSkipBottomRightPositions().length
+          new Position('D', i).getAllSkipBottomRightPositions().length,
         ).toBe(i - 4);
       }
     }
@@ -1688,27 +1688,27 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i === 1) {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else if (i < 4) {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       } else if (i < 6) {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(2);
       } else if (i < 8) {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(3);
       } else if (i < 10) {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(4);
       } else {
         expect(
-          new Position('E', i).getAllSkipBottomRightPositions().length
+          new Position('E', i).getAllSkipBottomRightPositions().length,
         ).toBe(5);
       }
     }
@@ -1716,27 +1716,27 @@ describe('Position', () => {
     for (let i = 1; i <= 11; i++) {
       if (i < 3) {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       } else if (i < 7) {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(2);
       } else if (i < 9) {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(3);
       } else if (i < 11) {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(4);
       } else {
         expect(
-          new Position('F', i).getAllSkipBottomRightPositions().length
+          new Position('F', i).getAllSkipBottomRightPositions().length,
         ).toBe(5);
       }
     }
@@ -1744,23 +1744,23 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i < 3) {
         expect(
-          new Position('G', i).getAllSkipBottomRightPositions().length
+          new Position('G', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('G', i).getAllSkipBottomRightPositions().length
+          new Position('G', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       } else if (i < 7) {
         expect(
-          new Position('G', i).getAllSkipBottomRightPositions().length
+          new Position('G', i).getAllSkipBottomRightPositions().length,
         ).toBe(2);
       } else if (i < 9) {
         expect(
-          new Position('G', i).getAllSkipBottomRightPositions().length
+          new Position('G', i).getAllSkipBottomRightPositions().length,
         ).toBe(3);
       } else {
         expect(
-          new Position('G', i).getAllSkipBottomRightPositions().length
+          new Position('G', i).getAllSkipBottomRightPositions().length,
         ).toBe(4);
       }
     }
@@ -1768,19 +1768,19 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i < 3) {
         expect(
-          new Position('H', i).getAllSkipBottomRightPositions().length
+          new Position('H', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('H', i).getAllSkipBottomRightPositions().length
+          new Position('H', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       } else if (i < 7) {
         expect(
-          new Position('H', i).getAllSkipBottomRightPositions().length
+          new Position('H', i).getAllSkipBottomRightPositions().length,
         ).toBe(2);
       } else {
         expect(
-          new Position('H', i).getAllSkipBottomRightPositions().length
+          new Position('H', i).getAllSkipBottomRightPositions().length,
         ).toBe(3);
       }
     }
@@ -1788,15 +1788,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i < 3) {
         expect(
-          new Position('I', i).getAllSkipBottomRightPositions().length
+          new Position('I', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('I', i).getAllSkipBottomRightPositions().length
+          new Position('I', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       } else {
         expect(
-          new Position('I', i).getAllSkipBottomRightPositions().length
+          new Position('I', i).getAllSkipBottomRightPositions().length,
         ).toBe(2);
       }
     }
@@ -1804,18 +1804,18 @@ describe('Position', () => {
     for (let i = 1; i <= 7; i++) {
       if (i < 3) {
         expect(
-          new Position('K', i).getAllSkipBottomRightPositions().length
+          new Position('K', i).getAllSkipBottomRightPositions().length,
         ).toBe(0);
       } else {
         expect(
-          new Position('K', i).getAllSkipBottomRightPositions().length
+          new Position('K', i).getAllSkipBottomRightPositions().length,
         ).toBe(1);
       }
     }
 
     for (let i = 1; i <= 6; i++) {
       expect(new Position('L', i).getAllSkipBottomRightPositions().length).toBe(
-        0
+        0,
       );
     }
   });
@@ -1823,18 +1823,18 @@ describe('Position', () => {
   test('Gets all skip bottom left positions correctly', () => {
     for (let i = 1; i <= 6; i++) {
       expect(new Position('A', i).getAllSkipBottomLeftPositions().length).toBe(
-        0
+        0,
       );
     }
 
     for (let i = 1; i <= 7; i++) {
       if (i < 3) {
         expect(
-          new Position('B', i).getAllSkipBottomLeftPositions().length
+          new Position('B', i).getAllSkipBottomLeftPositions().length,
         ).toBe(0);
       } else {
         expect(
-          new Position('B', i).getAllSkipBottomLeftPositions().length
+          new Position('B', i).getAllSkipBottomLeftPositions().length,
         ).toBe(1);
       }
     }
@@ -1842,15 +1842,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i < 3) {
         expect(
-          new Position('C', i).getAllSkipBottomLeftPositions().length
+          new Position('C', i).getAllSkipBottomLeftPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('C', i).getAllSkipBottomLeftPositions().length
+          new Position('C', i).getAllSkipBottomLeftPositions().length,
         ).toBe(1);
       } else {
         expect(
-          new Position('C', i).getAllSkipBottomLeftPositions().length
+          new Position('C', i).getAllSkipBottomLeftPositions().length,
         ).toBe(2);
       }
     }
@@ -1858,15 +1858,15 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i < 5) {
         expect(
-          new Position('D', i).getAllSkipBottomLeftPositions().length
+          new Position('D', i).getAllSkipBottomLeftPositions().length,
         ).toBe(Math.floor(i / 3));
       } else if (i < 7) {
         expect(
-          new Position('D', i).getAllSkipBottomLeftPositions().length
+          new Position('D', i).getAllSkipBottomLeftPositions().length,
         ).toBe(2);
       } else {
         expect(
-          new Position('D', i).getAllSkipBottomLeftPositions().length
+          new Position('D', i).getAllSkipBottomLeftPositions().length,
         ).toBe(3);
       }
     }
@@ -1874,23 +1874,23 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i < 3) {
         expect(
-          new Position('E', i).getAllSkipBottomLeftPositions().length
+          new Position('E', i).getAllSkipBottomLeftPositions().length,
         ).toBe(0);
       } else if (i < 5) {
         expect(
-          new Position('E', i).getAllSkipBottomLeftPositions().length
+          new Position('E', i).getAllSkipBottomLeftPositions().length,
         ).toBe(1);
       } else if (i < 7) {
         expect(
-          new Position('E', i).getAllSkipBottomLeftPositions().length
+          new Position('E', i).getAllSkipBottomLeftPositions().length,
         ).toBe(2);
       } else if (i < 9) {
         expect(
-          new Position('E', i).getAllSkipBottomLeftPositions().length
+          new Position('E', i).getAllSkipBottomLeftPositions().length,
         ).toBe(3);
       } else {
         expect(
-          new Position('E', i).getAllSkipBottomLeftPositions().length
+          new Position('E', i).getAllSkipBottomLeftPositions().length,
         ).toBe(4);
       }
     }
@@ -1927,26 +1927,26 @@ describe('Position', () => {
 
     for (let i = 1; i <= 10; i++) {
       expect(new Position('G', i).getAllSkipBottomLeftPositions().length).toBe(
-        Math.floor(i / 2)
+        Math.floor(i / 2),
       );
     }
 
     for (let i = 1; i <= 9; i++) {
       if (i < 4) {
         expect(
-          new Position('H', i).getAllSkipBottomLeftPositions().length
+          new Position('H', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 1);
       } else if (i < 6) {
         expect(
-          new Position('H', i).getAllSkipBottomLeftPositions().length
+          new Position('H', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 2);
       } else if (i < 8) {
         expect(
-          new Position('H', i).getAllSkipBottomLeftPositions().length
+          new Position('H', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 3);
       } else {
         expect(
-          new Position('H', i).getAllSkipBottomLeftPositions().length
+          new Position('H', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 4);
       }
     }
@@ -1954,15 +1954,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i < 5) {
         expect(
-          new Position('I', i).getAllSkipBottomLeftPositions().length
+          new Position('I', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 1);
       } else if (i < 7) {
         expect(
-          new Position('I', i).getAllSkipBottomLeftPositions().length
+          new Position('I', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 2);
       } else {
         expect(
-          new Position('I', i).getAllSkipBottomLeftPositions().length
+          new Position('I', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 3);
       }
     }
@@ -1970,18 +1970,18 @@ describe('Position', () => {
     for (let i = 1; i <= 7; i++) {
       if (i < 6) {
         expect(
-          new Position('K', i).getAllSkipBottomLeftPositions().length
+          new Position('K', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 1);
       } else {
         expect(
-          new Position('K', i).getAllSkipBottomLeftPositions().length
+          new Position('K', i).getAllSkipBottomLeftPositions().length,
         ).toBe(i - 2);
       }
     }
 
     for (let i = 1; i <= 6; i++) {
       expect(new Position('L', i).getAllSkipBottomLeftPositions().length).toBe(
-        i - 1
+        i - 1,
       );
     }
   });
@@ -2074,11 +2074,11 @@ describe('Position', () => {
     for (let i = 1; i <= 7; i++) {
       if (i === 6 || i === 7) {
         expect(new Position('B', i).getAllSkipTopLeftPositions().length).toBe(
-          0
+          0,
         );
       } else {
         expect(new Position('B', i).getAllSkipTopLeftPositions().length).toBe(
-          1
+          1,
         );
       }
     }
@@ -2086,15 +2086,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i < 5) {
         expect(new Position('C', i).getAllSkipTopLeftPositions().length).toBe(
-          2
+          2,
         );
       } else if (i < 7) {
         expect(new Position('C', i).getAllSkipTopLeftPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('C', i).getAllSkipTopLeftPositions().length).toBe(
-          0
+          0,
         );
       }
     }
@@ -2102,19 +2102,19 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i < 4) {
         expect(new Position('D', i).getAllSkipTopLeftPositions().length).toBe(
-          3
+          3,
         );
       } else if (i < 6) {
         expect(new Position('D', i).getAllSkipTopLeftPositions().length).toBe(
-          2
+          2,
         );
       } else if (i < 8) {
         expect(new Position('D', i).getAllSkipTopLeftPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('D', i).getAllSkipTopLeftPositions().length).toBe(
-          0
+          0,
         );
       }
     }
@@ -2122,23 +2122,23 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i < 3) {
         expect(new Position('E', i).getAllSkipTopLeftPositions().length).toBe(
-          4
+          4,
         );
       } else if (i < 5) {
         expect(new Position('E', i).getAllSkipTopLeftPositions().length).toBe(
-          3
+          3,
         );
       } else if (i < 7) {
         expect(new Position('E', i).getAllSkipTopLeftPositions().length).toBe(
-          2
+          2,
         );
       } else if (i < 9) {
         expect(new Position('E', i).getAllSkipTopLeftPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('E', i).getAllSkipTopLeftPositions().length).toBe(
-          0
+          0,
         );
       }
     }
@@ -2146,27 +2146,27 @@ describe('Position', () => {
     for (let i = 1; i <= 11; i++) {
       if (i < 3) {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else if (i < 5) {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       } else if (i < 7) {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          8 - i
+          8 - i,
         );
       } else if (i < 9) {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          9 - i
+          9 - i,
         );
       } else if (i === 9) {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          1
+          1,
         );
       } else {
         expect(new Position('F', i).getAllSkipTopLeftPositions().length).toBe(
-          0
+          0,
         );
       }
     }
@@ -2174,23 +2174,23 @@ describe('Position', () => {
     for (let i = 1; i <= 10; i++) {
       if (i < 3) {
         expect(new Position('G', i).getAllSkipTopLeftPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else if (i < 5) {
         expect(new Position('G', i).getAllSkipTopLeftPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       } else if (i < 7) {
         expect(new Position('G', i).getAllSkipTopLeftPositions().length).toBe(
-          8 - i
+          8 - i,
         );
       } else if (i < 9) {
         expect(new Position('G', i).getAllSkipTopLeftPositions().length).toBe(
-          9 - i
+          9 - i,
         );
       } else {
         expect(new Position('G', i).getAllSkipTopLeftPositions().length).toBe(
-          10 - i
+          10 - i,
         );
       }
     }
@@ -2198,19 +2198,19 @@ describe('Position', () => {
     for (let i = 1; i <= 9; i++) {
       if (i < 3) {
         expect(new Position('H', i).getAllSkipTopLeftPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else if (i < 5) {
         expect(new Position('H', i).getAllSkipTopLeftPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       } else if (i < 7) {
         expect(new Position('H', i).getAllSkipTopLeftPositions().length).toBe(
-          8 - i
+          8 - i,
         );
       } else {
         expect(new Position('H', i).getAllSkipTopLeftPositions().length).toBe(
-          9 - i
+          9 - i,
         );
       }
     }
@@ -2218,15 +2218,15 @@ describe('Position', () => {
     for (let i = 1; i <= 8; i++) {
       if (i < 3) {
         expect(new Position('I', i).getAllSkipTopLeftPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else if (i < 5) {
         expect(new Position('I', i).getAllSkipTopLeftPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       } else {
         expect(new Position('I', i).getAllSkipTopLeftPositions().length).toBe(
-          8 - i
+          8 - i,
         );
       }
     }
@@ -2234,18 +2234,18 @@ describe('Position', () => {
     for (let i = 1; i <= 7; i++) {
       if (i < 3) {
         expect(new Position('K', i).getAllSkipTopLeftPositions().length).toBe(
-          6 - i
+          6 - i,
         );
       } else {
         expect(new Position('K', i).getAllSkipTopLeftPositions().length).toBe(
-          7 - i
+          7 - i,
         );
       }
     }
 
     for (let i = 1; i <= 6; i++) {
       expect(new Position('L', i).getAllSkipTopLeftPositions().length).toBe(
-        6 - i
+        6 - i,
       );
     }
   });
@@ -2255,7 +2255,7 @@ describe('Position', () => {
     for (let i = 1; i <= 6; i++) {
       const areTwoApart = Position.areTwoSquaresApartVertically(
         initial,
-        new Position('A', i)
+        new Position('A', i),
       );
       expect(areTwoApart).toBe(i === 3);
     }
@@ -2263,7 +2263,7 @@ describe('Position', () => {
     for (let i = 1; i <= 7; i++) {
       const areTwoApart = Position.areTwoSquaresApartVertically(
         initial,
-        new Position('B', i)
+        new Position('B', i),
       );
       expect(areTwoApart).toBe(false);
     }
