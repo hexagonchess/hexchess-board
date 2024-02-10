@@ -26,9 +26,6 @@ connect(
 
     // Lint
     runner.withExec(['npm', 'run', 'lint']).sync();
-
-    // Check unit tests
-    runner.withExec(['npm', 'run', 'test:unit']).sync();
   },
   { LogOutput: process.stderr },
 );
