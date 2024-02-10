@@ -1,6 +1,6 @@
-import {Board} from './board';
-import {Position} from './position';
-import {Color, HexchessPiece, Piece} from './types';
+import { Board } from "./board";
+import { Position } from "./position";
+import { Color, HexchessPiece, Piece } from "./types";
 
 export class Pawn implements HexchessPiece {
   readonly color: Color;
@@ -15,44 +15,44 @@ export class Pawn implements HexchessPiece {
 
   private _canMoveTwoSquares(): boolean {
     switch (this.position.col) {
-      case 'F':
+      case "F":
         return (
-          (this.color === 'white' && this.position.row === 5) ||
-          (this.color === 'black' && this.position.row === 7)
+          (this.color === "white" && this.position.row === 5) ||
+          (this.color === "black" && this.position.row === 7)
         );
-      case 'E':
-      case 'G':
+      case "E":
+      case "G":
         return (
-          (this.color === 'white' && this.position.row === 4) ||
-          (this.color === 'black' && this.position.row === 7)
+          (this.color === "white" && this.position.row === 4) ||
+          (this.color === "black" && this.position.row === 7)
         );
-      case 'D':
-      case 'H':
+      case "D":
+      case "H":
         return (
-          (this.color === 'white' && this.position.row === 3) ||
-          (this.color === 'black' && this.position.row === 7)
+          (this.color === "white" && this.position.row === 3) ||
+          (this.color === "black" && this.position.row === 7)
         );
-      case 'C':
-      case 'I':
+      case "C":
+      case "I":
         return (
-          (this.color === 'white' && this.position.row === 2) ||
-          (this.color === 'black' && this.position.row === 7)
+          (this.color === "white" && this.position.row === 2) ||
+          (this.color === "black" && this.position.row === 7)
         );
-      case 'B':
-      case 'K':
+      case "B":
+      case "K":
         return (
-          (this.color === 'white' && this.position.row === 1) ||
-          (this.color === 'black' && this.position.row === 7)
+          (this.color === "white" && this.position.row === 1) ||
+          (this.color === "black" && this.position.row === 7)
         );
-      case 'A':
-      case 'L':
+      case "A":
+      case "L":
         return false;
     }
   }
 
   private _getForwardSquare(board: Board): Position | null {
     const pos =
-      this.color === 'white'
+      this.color === "white"
         ? this.position.getTopPosition()
         : this.position.getBottomPosition();
     if (pos === null) {
@@ -74,7 +74,7 @@ export class Pawn implements HexchessPiece {
     }
 
     const secondPos =
-      this.color === 'white'
+      this.color === "white"
         ? firstPos.getTopPosition()
         : firstPos.getBottomPosition();
     if (secondPos === null) {
@@ -87,16 +87,16 @@ export class Pawn implements HexchessPiece {
 
   private _getEnpassantSquare(
     board: Board,
-    direction: 'left' | 'right'
+    direction: "left" | "right",
   ): Position | null {
     const piecePos =
-      this.color === 'white'
-        ? direction === 'left'
+      this.color === "white"
+        ? direction === "left"
           ? this.position.getBottomLeftPosition()!
           : this.position.getBottomRightPosition()!
-        : direction === 'left'
-        ? this.position.getTopLeftPosition()!
-        : this.position.getTopRightPosition()!;
+        : direction === "left"
+          ? this.position.getTopLeftPosition()!
+          : this.position.getTopRightPosition()!;
     if (piecePos === null) {
       return null;
     }
@@ -115,28 +115,28 @@ export class Pawn implements HexchessPiece {
       return null;
     }
 
-    return this.color === 'white'
-      ? direction === 'left'
+    return this.color === "white"
+      ? direction === "left"
         ? this.position.getTopLeftPosition()
         : this.position.getTopRightPosition()
-      : direction === 'left'
-      ? this.position.getBottomLeftPosition()
-      : this.position.getBottomRightPosition();
+      : direction === "left"
+        ? this.position.getBottomLeftPosition()
+        : this.position.getBottomRightPosition();
   }
 
   private _getCaptureSquare(
     board: Board,
-    direction: 'left' | 'right'
+    direction: "left" | "right",
   ): Position | null {
     let pos: Position | null;
-    if (this.color === 'white') {
+    if (this.color === "white") {
       pos =
-        direction === 'left'
+        direction === "left"
           ? this.position.getTopLeftPosition()
           : this.position.getTopRightPosition();
     } else {
       pos =
-        direction === 'left'
+        direction === "left"
           ? this.position.getBottomLeftPosition()
           : this.position.getBottomRightPosition();
     }
@@ -155,15 +155,15 @@ export class Pawn implements HexchessPiece {
     return [
       this._getForwardSquare(board),
       this._getTwoSquareForward(board),
-      this._getCaptureSquare(board, 'left'),
-      this._getCaptureSquare(board, 'right'),
-      this._getEnpassantSquare(board, 'left'),
-      this._getEnpassantSquare(board, 'right'),
+      this._getCaptureSquare(board, "left"),
+      this._getCaptureSquare(board, "right"),
+      this._getEnpassantSquare(board, "left"),
+      this._getEnpassantSquare(board, "right"),
     ].filter((pos) => pos !== null) as Position[];
   }
 
   canBePromoted(): boolean {
-    if (this.color === 'black') {
+    if (this.color === "black") {
       return this.position.isBeginningOfColumn();
     }
 
@@ -171,7 +171,7 @@ export class Pawn implements HexchessPiece {
   }
 
   defendedSquares(_board: Board): Position[] {
-    if (this.color === 'white') {
+    if (this.color === "white") {
       return [
         this.position.getTopLeftPosition(),
         this.position.getTopRightPosition(),
@@ -185,6 +185,6 @@ export class Pawn implements HexchessPiece {
   }
 
   toString(): Piece {
-    return this.color === 'white' ? 'P' : 'p';
+    return this.color === "white" ? "P" : "p";
   }
 }

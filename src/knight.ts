@@ -1,7 +1,7 @@
-import {Board} from './board';
-import {King} from './king';
-import {Position} from './position';
-import {Color, HexchessPiece, Piece} from './types';
+import { Board } from "./board";
+import { King } from "./king";
+import { Position } from "./position";
+import { Color, HexchessPiece, Piece } from "./types";
 
 export class Knight implements HexchessPiece {
   readonly color: Color;
@@ -47,7 +47,7 @@ export class Knight implements HexchessPiece {
   }
 
   private _topRightTwoSquares(
-    board: Board
+    board: Board,
   ): [Position | null, Position | null] {
     const oneSquareTopRight = this.position.getTopRightPosition();
     if (oneSquareTopRight === null) {
@@ -70,7 +70,7 @@ export class Knight implements HexchessPiece {
   }
 
   private _bottomRightTwoSquares(
-    board: Board
+    board: Board,
   ): [Position | null, Position | null] {
     const oneSquareBottomRight = this.position.getBottomRightPosition();
     if (oneSquareBottomRight === null) {
@@ -118,7 +118,7 @@ export class Knight implements HexchessPiece {
   }
 
   private _bottomLeftTwoSquares(
-    board: Board
+    board: Board,
   ): [Position | null, Position | null] {
     const oneSquareBottomLeft = this.position.getBottomLeftPosition();
     if (oneSquareBottomLeft === null) {
@@ -205,6 +205,6 @@ export class Knight implements HexchessPiece {
   }
 
   toString(): Piece {
-    return this.color === 'white' ? 'N' : 'n';
+    return this.color === "white" ? "N" : "n";
   }
 }

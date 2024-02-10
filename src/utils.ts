@@ -1,183 +1,183 @@
-import {Board} from './board';
-import {Color, Move, Piece} from './types';
+import { Board } from "./board";
+import { Color, Move, Piece } from "./types";
 
 export const COLUMN_ARRAY = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'K',
-  'L',
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "K",
+  "L",
 ] as const;
 export type ColumnArray = typeof COLUMN_ARRAY;
 export type Column = ColumnArray[number];
 
 export type ColumnConfig = Record<
   Column,
-  {x: number; y: number; colors: Color[]}
+  { x: number; y: number; colors: Color[] }
 >;
 
 export const ALL_SQUARES = [
-  'A1',
-  'A2',
-  'A3',
-  'A4',
-  'A5',
-  'A6',
-  'B1',
-  'B2',
-  'B3',
-  'B4',
-  'B5',
-  'B6',
-  'B7',
-  'C1',
-  'C2',
-  'C3',
-  'C4',
-  'C5',
-  'C6',
-  'C7',
-  'C8',
-  'D1',
-  'D2',
-  'D3',
-  'D4',
-  'D5',
-  'D6',
-  'D7',
-  'D8',
-  'D9',
-  'E1',
-  'E2',
-  'E3',
-  'E4',
-  'E5',
-  'E6',
-  'E7',
-  'E8',
-  'E9',
-  'E10',
-  'F1',
-  'F2',
-  'F3',
-  'F4',
-  'F5',
-  'F6',
-  'F7',
-  'F8',
-  'F9',
-  'F10',
-  'F11',
-  'G1',
-  'G2',
-  'G3',
-  'G4',
-  'G5',
-  'G6',
-  'G7',
-  'G8',
-  'G9',
-  'G10',
-  'H1',
-  'H2',
-  'H3',
-  'H4',
-  'H5',
-  'H6',
-  'H7',
-  'H8',
-  'H9',
-  'I1',
-  'I2',
-  'I3',
-  'I4',
-  'I5',
-  'I6',
-  'I7',
-  'I8',
-  'K1',
-  'K2',
-  'K3',
-  'K4',
-  'K5',
-  'K6',
-  'K7',
-  'L1',
-  'L2',
-  'L3',
-  'L4',
-  'L5',
-  'L6',
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "A5",
+  "A6",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "B5",
+  "B6",
+  "B7",
+  "C1",
+  "C2",
+  "C3",
+  "C4",
+  "C5",
+  "C6",
+  "C7",
+  "C8",
+  "D1",
+  "D2",
+  "D3",
+  "D4",
+  "D5",
+  "D6",
+  "D7",
+  "D8",
+  "D9",
+  "E1",
+  "E2",
+  "E3",
+  "E4",
+  "E5",
+  "E6",
+  "E7",
+  "E8",
+  "E9",
+  "E10",
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5",
+  "F6",
+  "F7",
+  "F8",
+  "F9",
+  "F10",
+  "F11",
+  "G1",
+  "G2",
+  "G3",
+  "G4",
+  "G5",
+  "G6",
+  "G7",
+  "G8",
+  "G9",
+  "G10",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "H7",
+  "H8",
+  "H9",
+  "I1",
+  "I2",
+  "I3",
+  "I4",
+  "I5",
+  "I6",
+  "I7",
+  "I8",
+  "K1",
+  "K2",
+  "K3",
+  "K4",
+  "K5",
+  "K6",
+  "K7",
+  "L1",
+  "L2",
+  "L3",
+  "L4",
+  "L5",
+  "L6",
 ] as const;
 export type AllSquares = typeof ALL_SQUARES;
 export type Square = AllSquares[number];
 export const WHITE_COLUMN_LABEL_SQUARES: Square[] = [
-  'A1',
-  'B1',
-  'C1',
-  'D1',
-  'E1',
-  'F1',
-  'G1',
-  'H1',
-  'I1',
-  'K1',
-  'L1',
+  "A1",
+  "B1",
+  "C1",
+  "D1",
+  "E1",
+  "F1",
+  "G1",
+  "H1",
+  "I1",
+  "K1",
+  "L1",
 ];
 export const BLACK_COLUMN_LABEL_SQUARES: Square[] = [
-  'A6',
-  'B7',
-  'C8',
-  'D9',
-  'E10',
-  'F11',
-  'G10',
-  'H9',
-  'I8',
-  'K7',
-  'L6',
+  "A6",
+  "B7",
+  "C8",
+  "D9",
+  "E10",
+  "F11",
+  "G10",
+  "H9",
+  "I8",
+  "K7",
+  "L6",
 ];
 export const ANNOTATED_WHITE_SQUARES: Square[] = [
-  'A1',
-  'A2',
-  'A3',
-  'A4',
-  'A5',
-  'A6',
-  'B7',
-  'C8',
-  'D9',
-  'E10',
-  'F11',
-  'G10',
-  'H9',
-  'I8',
-  'K7',
-  'L6',
+  "A1",
+  "A2",
+  "A3",
+  "A4",
+  "A5",
+  "A6",
+  "B7",
+  "C8",
+  "D9",
+  "E10",
+  "F11",
+  "G10",
+  "H9",
+  "I8",
+  "K7",
+  "L6",
 ];
 export const ANNOTATED_BLACK_SQUARES: Square[] = [
-  'A6',
-  'B7',
-  'C8',
-  'D9',
-  'E10',
-  'F11',
-  'G10',
-  'H9',
-  'I8',
-  'K7',
-  'L6',
-  'L5',
-  'L4',
-  'L3',
-  'L2',
-  'L1',
+  "A6",
+  "B7",
+  "C8",
+  "D9",
+  "E10",
+  "F11",
+  "G10",
+  "H9",
+  "I8",
+  "K7",
+  "L6",
+  "L5",
+  "L4",
+  "L3",
+  "L2",
+  "L1",
 ];
 
 export const fenToBoard = (position: string | null): Board => {
@@ -198,21 +198,21 @@ export const movesToString = (moves: Move[]): string => {
       newString += `=${move.promotion.toString()}`;
     }
     if (move.enPassant) {
-      newString += '$';
+      newString += "$";
     }
     result.push(newString);
   }
-  return result.join(',');
+  return result.join(",");
 };
 
 const moveRegex =
   /^[A-L^J](10|11|[1-9])(-|x)[A-L^J](10|11|[1-9])([pPnNqQrRbB])?\$?(=[QqRrBbNn])?$/;
 export const stringToMoves = (movesStr: string): Move[] => {
-  if (movesStr === '') {
+  if (movesStr === "") {
     return [];
   }
 
-  const moves = movesStr.split(',');
+  const moves = movesStr.split(",");
   const result: Move[] = [];
   for (const move of moves) {
     if (!moveRegex.test(move)) {
@@ -220,23 +220,23 @@ export const stringToMoves = (movesStr: string): Move[] => {
     }
 
     const newMove: Partial<Move> = {};
-    const isCapture = move.includes('x');
-    const chunks = isCapture ? move.split('x') : move.split('-');
+    const isCapture = move.includes("x");
+    const chunks = isCapture ? move.split("x") : move.split("-");
     const from = chunks[0];
     if (!ALL_SQUARES.includes(from as Square)) {
       throw new Error(`Invalid move: ${move}`);
     }
     newMove.from = from as Square;
 
-    const isEnpassant = chunks[1].includes('$');
-    const isPromotion = chunks[1].includes('=');
+    const isEnpassant = chunks[1].includes("$");
+    const isPromotion = chunks[1].includes("=");
     let promotionPiece: Piece | null = null;
     let toSquare;
     if (isPromotion) {
-      promotionPiece = chunks[1].split('=')[1] as Piece;
-      toSquare = chunks[1].split('=')[0];
+      promotionPiece = chunks[1].split("=")[1] as Piece;
+      toSquare = chunks[1].split("=")[0];
     } else if (isEnpassant) {
-      toSquare = chunks[1].split('$')[0];
+      toSquare = chunks[1].split("$")[0];
     } else {
       toSquare = chunks[1];
     }
@@ -249,7 +249,7 @@ export const stringToMoves = (movesStr: string): Move[] => {
     }
 
     if (isCapture) {
-      const capturedPiece = chunks[1].split('$')[0].split('=')[0].slice(-1);
+      const capturedPiece = chunks[1].split("$")[0].split("=")[0].slice(-1);
       newMove.capturedPiece = capturedPiece as Piece;
     }
 
@@ -265,7 +265,7 @@ export const stringToMoves = (movesStr: string): Move[] => {
 
 export const boardToFen = (board: Board): string => {
   if (Object.keys(board).length === 0) {
-    return '6/7/8/9/10/11/10/9/8/7/6';
+    return "6/7/8/9/10/11/10/9/8/7/6";
   }
 
   const fenParts: string[] = [];
@@ -275,30 +275,30 @@ export const boardToFen = (board: Board): string => {
       const square = `${column}${row + 1}` as Square;
       const piece = board.getPiece(square);
       if (piece === null) {
-        fenParts.push('1');
+        fenParts.push("1");
       } else {
         fenParts.push(piece.toString());
       }
     }
-    fenParts.push('/');
+    fenParts.push("/");
   }
 
-  return fenParts.join('');
+  return fenParts.join("");
 };
 
 export const validatePosition = (position: unknown): Board | null => {
-  if (typeof position !== 'string') {
+  if (typeof position !== "string") {
     return null;
   }
-  if (position === '') {
+  if (position === "") {
     return Board.empty();
   }
-  if (position === 'start') {
+  if (position === "start") {
     return Board.new();
   }
 
   // Hexches has 11 columns
-  const columns = position.split('/');
+  const columns = position.split("/");
   if (columns.length !== 11) {
     return null;
   }
@@ -314,29 +314,29 @@ export const validatePosition = (position: unknown): Board | null => {
     }
 
     const name = columnNameFromIndex(i);
-    if ((name === 'A' || name === 'L') && convertedColumn.length !== 6) {
+    if ((name === "A" || name === "L") && convertedColumn.length !== 6) {
       return null;
     }
-    if ((name === 'B' || name === 'K') && convertedColumn.length !== 7) {
+    if ((name === "B" || name === "K") && convertedColumn.length !== 7) {
       return null;
     }
-    if ((name === 'C' || name === 'I') && convertedColumn.length !== 8) {
+    if ((name === "C" || name === "I") && convertedColumn.length !== 8) {
       return null;
     }
-    if ((name === 'D' || name === 'H') && convertedColumn.length !== 9) {
+    if ((name === "D" || name === "H") && convertedColumn.length !== 9) {
       return null;
     }
-    if ((name === 'E' || name === 'G') && convertedColumn.length !== 10) {
+    if ((name === "E" || name === "G") && convertedColumn.length !== 10) {
       return null;
     }
-    if (name === 'F' && convertedColumn.length !== 11) {
+    if (name === "F" && convertedColumn.length !== 11) {
       return null;
     }
     for (let j = 0; j < convertedColumn.length; j++) {
       const square = `${name}${j + 1}` as Square;
       partialBoard.addPieceFromString(
         square,
-        convertedColumn[j] === '1' ? null : (convertedColumn[j] as Piece)
+        convertedColumn[j] === "1" ? null : (convertedColumn[j] as Piece),
       );
     }
   }
@@ -347,62 +347,62 @@ export const validatePosition = (position: unknown): Board | null => {
 const columnNameFromIndex = (index: number): string => {
   switch (index) {
     case 0:
-      return 'A';
+      return "A";
     case 1:
-      return 'B';
+      return "B";
     case 2:
-      return 'C';
+      return "C";
     case 3:
-      return 'D';
+      return "D";
     case 4:
-      return 'E';
+      return "E";
     case 5:
-      return 'F';
+      return "F";
     case 6:
-      return 'G';
+      return "G";
     case 7:
-      return 'H';
+      return "H";
     case 8:
-      return 'I';
+      return "I";
     case 9:
-      return 'K';
+      return "K";
     default:
-      return 'L';
+      return "L";
   }
 };
 
 const replaceNumbers = (string: string): string => {
   return string
-    .replaceAll('11', '11111111111')
-    .replaceAll('10', '1111111111')
-    .replaceAll('9', '111111111')
-    .replaceAll('8', '11111111')
-    .replaceAll('7', '1111111')
-    .replaceAll('6', '111111')
-    .replaceAll('5', '11111')
-    .replaceAll('4', '1111')
-    .replaceAll('3', '111')
-    .replaceAll('2', '11');
+    .replaceAll("11", "11111111111")
+    .replaceAll("10", "1111111111")
+    .replaceAll("9", "111111111")
+    .replaceAll("8", "11111111")
+    .replaceAll("7", "1111111")
+    .replaceAll("6", "111111")
+    .replaceAll("5", "11111")
+    .replaceAll("4", "1111")
+    .replaceAll("3", "111")
+    .replaceAll("2", "11");
 };
 
 const numberOfRows = (column: Column): number => {
   switch (column) {
-    case 'A':
-    case 'L':
+    case "A":
+    case "L":
       return 6;
-    case 'B':
-    case 'K':
+    case "B":
+    case "K":
       return 7;
-    case 'C':
-    case 'I':
+    case "C":
+    case "I":
       return 8;
-    case 'D':
-    case 'H':
+    case "D":
+    case "H":
       return 9;
-    case 'E':
-    case 'G':
+    case "E":
+    case "G":
       return 10;
-    case 'F':
+    case "F":
       return 11;
   }
 };
