@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-import summary from 'rollup-plugin-summary';
-import { terser } from 'rollup-plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
+import summary from 'rollup-plugin-summary';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: 'hexchess-board.js',

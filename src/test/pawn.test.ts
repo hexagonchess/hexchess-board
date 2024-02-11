@@ -1,7 +1,7 @@
+import { describe, expect, test } from '@jest/globals';
 import { Board } from '../board';
 import { Pawn } from '../pawn';
 import { Position } from '../position';
-import { describe, expect, test } from '@jest/globals';
 
 describe('Pawns', () => {
   test('Black pawns can only be promoted on the first rank', () => {

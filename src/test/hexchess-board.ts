@@ -6,7 +6,7 @@
 
 import { HexchessBoard } from '../hexchess-board.js';
 
-import { fixture, assert } from '@open-wc/testing';
+import { assert, fixture } from '@open-wc/testing';
 import { html } from 'lit/static-html.js';
 
 suite('hexchess-board', () => {

@@ -27,6 +27,7 @@
     "build:watch": "tsc --watch",
     "clean": "rimraf hexchess-board.{d.ts,d.ts.map,js,js.map} test/*.{d.ts,d.ts.map,js,js.map} src/test/*.{d.ts,d.ts.map,js,js.map} *.{d.ts,js.map,d.ts.map} bishop.js board-state.js board.js game.js hexchess-styles.js king.js knight.js pawn.js piece.js position.js queen.js rook.js types.js utils.js",
     "lint": "npx @biomejs/biome lint src/*.ts src/**/**.ts",
+    "lint-fix": "npx @biomejs/biome lint src/*.ts src/**/**.ts --apply",
     "lint:lit-analyzer": "lit-analyzer",
     "format": "npx @biomejs/biome format docs-src/**/**.cjs docs-src/**/**.js src/*.ts src/**/**.ts ./*.cjs ./*.mts ./*.js ./*.json --write",
     "format-check": "npx @biomejs/biome format docs-src/**/**.cjs docs-src/**/**.js src/*.ts src/**/**.ts ./*.cjs ./*.mts ./*.js ./*.json",

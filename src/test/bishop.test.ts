@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
-import { Board } from '../board';
 import { Bishop } from '../bishop';
+import { Board } from '../board';
 import { Position } from '../position';
 
 describe('Bishops', () => {

@@ -1,12 +1,12 @@
-import { HexchessPiece } from './../types';
 import { Bishop } from '../bishop';
 import { Board } from '../board';
 import { King } from '../king';
 import { Knight } from '../knight';
 import { Pawn } from '../pawn';
-import { Rook } from '../rook';
 import { Queen } from '../queen';
+import { Rook } from '../rook';
 import { Position } from './../position';
+import { HexchessPiece } from './../types';
 
 export function insufficientMaterialStalemate(): Board {
   const board = Board.empty();
