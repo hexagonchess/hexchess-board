@@ -1,4 +1,14 @@
 import {
+  LitElement,
+  PropertyValues,
+  TemplateResult,
+  html,
+  nothing,
+  svg,
+} from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { Board } from './board';
+import {
   BoardChange,
   BoardState,
   CancelSelectionSoonState,
@@ -6,6 +16,10 @@ import {
   MouseDownPieceSelected,
   getNewState,
 } from './board-state';
+import { Game, GameState } from './game';
+import { styles } from './hexchess-styles';
+import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
+import { Color, Move, Orientation, Piece, TileColor } from './types';
 import {
   ALL_SQUARES,
   ANNOTATED_BLACK_SQUARES,
@@ -16,21 +30,7 @@ import {
   movesToString,
   stringToMoves,
 } from './utils';
-import {
-  LitElement,
-  html,
-  svg,
-  nothing,
-  PropertyValues,
-  TemplateResult,
-} from 'lit';
-import { customElement, property } from 'lit/decorators.js';
 import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
-import { styles } from './hexchess-styles';
-import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
-import { Color, Move, Orientation, Piece, TileColor } from './types';
-import { Board } from './board';
-import { Game, GameState } from './game';
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.

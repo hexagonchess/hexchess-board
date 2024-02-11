@@ -1,13 +1,13 @@
 import { describe, expect, test } from '@jest/globals';
-import * as BoardUtils from './board-utils';
-import { Game, GameState } from '../game';
-import { Board } from '../board';
-import { King } from '../king';
-import { Position } from '../position';
 import { Bishop } from '../bishop';
+import { Board } from '../board';
+import { Game, GameState } from '../game';
+import { King } from '../king';
 import { Pawn } from '../pawn';
+import { Position } from '../position';
 import { Queen } from '../queen';
 import { Rook } from '../rook';
+import * as BoardUtils from './board-utils';
 
 describe('Game', () => {
   test('Calculates all legal moves correctly', () => {

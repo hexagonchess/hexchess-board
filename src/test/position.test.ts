@@ -1,6 +1,6 @@
+import { describe, expect, test } from '@jest/globals';
 import { Board } from '../board';
 import { Position } from '../position';
-import { describe, expect, test } from '@jest/globals';
 
 describe('Position', () => {
   test('Column A should only have 1 through 6', () => {
