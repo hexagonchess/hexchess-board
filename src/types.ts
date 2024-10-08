@@ -35,3 +35,5 @@ export interface HexchessPiece {
   defendedSquares(board: Board): Position[];
   toString(): Piece;
 }
+
+export type Role = 'white' | 'black' | 'spectator' | 'analyzer';

@@ -18,7 +18,7 @@ Read the full documentation on [the website](https://mganjoo.github.io/gchessboa
 
 ## Installing
 
-`gchessboard` is packaged as a [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components) and should be usable directly in most modern browsers. It bundles its own (configurable) styles, inline assets (for chess pieces), and code.
+`hexchess-board` is packaged as a [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components) and should be usable directly in most modern browsers. It bundles its own (configurable) styles, inline assets (for chess pieces), and code.
 
 #### In HTML (using unpkg)
 
