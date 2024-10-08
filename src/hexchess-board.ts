@@ -155,13 +155,13 @@ export class HexchessBoard extends LitElement {
   /**
    * Black's player name
    */
-  @property({ type: String })
+  @property({ attribute: 'black-player-name', type: String })
   blackPlayerName = 'Black';
 
   /**
    * White's player name
    */
-  @property({ type: String })
+  @property({ attribute: 'white-player-name', type: String })
   whitePlayerName = 'White';
 
   /**
@@ -195,7 +195,7 @@ export class HexchessBoard extends LitElement {
   /**
    * Show the board coordinates on the bottom and left sides of the board.
    */
-  @property({ type: Boolean })
+  @property({ attribute: 'hide-coordinates', type: Boolean })
   hideCoordinates = false;
 
   /**
