@@ -19,7 +19,7 @@ import {
 import { Game, GameState } from './game';
 import { styles } from './hexchess-styles';
 import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
-import { Color, Move, Orientation, Piece, TileColor } from './types';
+import { Color, Move, Orientation, Piece, Role, TileColor } from './types';
 import {
   ALL_SQUARES,
   ANNOTATED_BLACK_SQUARES,
@@ -56,6 +56,7 @@ import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
  * @cssprop [--hexchess-attempted-move-black-stroke=#e4c7b7] - The outline color of a hexagon when the user drags over a black square, trying to move there.
  *
  * Custom events
+ * @fires gameover  - Fired when the game is over.
  * @fires move      - Fired when a move is made on the board.
  * @fires promoting - Fired when a pawn is ready to promote.
  * @fires promoted  - Fired when a pawn has been promoted to a piece.
@@ -103,7 +104,8 @@ export class HexchessBoard extends LitElement {
    * If the string is empty, no pieces will be rendered.
    */
   @property({
-    converter: (value: string | null | undefined) => fenToBoard(value ?? ''),
+    converter: (value: string | null | undefined): Board =>
+      fenToBoard(value ?? ''),
     type: Object,
   })
   get board(): Board {
@@ -120,7 +122,8 @@ export class HexchessBoard extends LitElement {
    * This is useful for analyzing games already played or certain pre-determined openings.
    */
   @property({
-    converter: (value: string | null | undefined) => stringToMoves(value ?? ''),
+    converter: (value: string | null | undefined): Move[] =>
+      stringToMoves(value ?? ''),
     type: Array,
   })
   get moves(): Move[] {
@@ -165,10 +168,29 @@ export class HexchessBoard extends LitElement {
    * The orientation of the board.
    */
   @property({
-    converter: (value: string | null | undefined) =>
+    converter: (value: string | null | undefined): 'black' | 'white' =>
       value === 'black' ? 'black' : 'white',
   })
   orientation: Orientation = 'white';
+
+  /**
+   * The role of the player.
+   * If `white`, you can only make moves when it is white's turn.
+   * If `black`, you can only make moves when it is black's turn.
+   * If `spectator`, then you cannot make moves at all via the UI.
+   * If `analyzer`, then you can make moves for both sides, and it simuluates a local game.
+   */
+  @property({
+    attribute: 'player-role',
+    converter: (value: string | null | undefined): Role => {
+      if (value === 'white' || value === 'black' || value === 'spectator') {
+        return value;
+      }
+
+      return 'analyzer';
+    },
+  })
+  playerRole: Role = 'analyzer';
 
   /**
    * Show the board coordinates on the bottom and left sides of the board.
@@ -217,7 +239,7 @@ export class HexchessBoard extends LitElement {
 
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
     event.preventDefault();
-    if (this.frozen) {
+    if (this.frozen || this.playerRole === 'spectator') {
       return;
     }
 
@@ -227,6 +249,14 @@ export class HexchessBoard extends LitElement {
     }
 
     if (!this._hexagonPoints) {
+      return;
+    }
+
+    if (this.playerRole === 'white' && this._state.game.turn % 2 !== 0) {
+      return;
+    }
+
+    if (this.playerRole === 'black' && this._state.game.turn % 2 !== 1) {
       return;
     }
 
@@ -398,8 +428,9 @@ export class HexchessBoard extends LitElement {
         this._state.game.state() === GameState.PROMOTING &&
         newState.state.game.state() !== GameState.PROMOTING
       ) {
-        // TODO
         this.dispatchEvent(new CustomEvent('promoted'));
+      } else if (newState.state.name === 'GAMEOVER') {
+        this.dispatchEvent(new CustomEvent('gameover'));
       } else if (newState.state.moves.length > this._state.moves.length) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(

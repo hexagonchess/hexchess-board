@@ -28,8 +28,6 @@ description: Analyzing a game that has a specific set of moves played.
   };
 </script>
 
-<h3>HTML</h3>
-
 Here we're building on the keyboard listener example, so you can use your left and right arrow keys to fast forward and rewind.
 
 Because Hexchess is much newer, we've decided to disambiguate the moves as much as possible. So while a king's pawn opening might be notated as `1. E4` followed by `1. E5`, in HexChess we want to show both the starting and the ending squares. So the white pawn moving from `B1` to `B3` would be notated as `B1-B3`.

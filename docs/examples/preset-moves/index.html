@@ -35,10 +35,6 @@
         <ul>
           
                   <li class=>
-                    <a href="../">Common keyboard operations</a>
-                  </li>
-                
-                  <li class=>
                     <a href="../change-look/">Changing the look and feel of the board</a>
                   </li>
                 
@@ -46,8 +42,16 @@
                     <a href="../hexfen/">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
+                  <li class=>
+                    <a href="../">Common keyboard operations</a>
+                  </li>
+                
                   <li class=selected>
                     <a href="">Analyzing a game that has a specific set of moves played.</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../player-roles/">Set player roles</a>
                   </li>
                 
         </ul>
@@ -73,7 +77,6 @@
     document.querySelector('hexchess-board').resize();
   };
 </script>
-<h3>HTML</h3>
 <p>Here we're building on the keyboard listener example, so you can use your left and right arrow keys to fast forward and rewind.</p>
 <p>Because Hexchess is much newer, we've decided to disambiguate the moves as much as possible. So while a king's pawn opening might be notated as <code>1. E4</code> followed by <code>1. E5</code>, in HexChess we want to show both the starting and the ending squares. So the white pawn moving from <code>B1</code> to <code>B3</code> would be notated as <code>B1-B3</code>.</p>
 <p>To indicate a capture, we use the <code>x</code> instead of the <code>-</code> sign. Additionally, we add the piece to the end to specify what was captured. So if a white pawn on B4 captured a piece on C4, we would say <code>B4xC4p</code>.</p>
@@ -89,6 +92,7 @@
     moves="B1-B3,B7-B5,C2-C4,D7-D5,C4xD5p,F11xB3P,C1xC7p"
   ></hexchess-board>
 </div>
+
       </div>
     </section>
   

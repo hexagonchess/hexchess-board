@@ -67,6 +67,14 @@ This is useful for analyzing games already played or certain pre-determined open
        </tr>
      
        <tr>
+         <td>player-role</td><td>The role of the player.
+If `white`, you can only make moves when it is white's turn.
+If `black`, you can only make moves when it is black's turn.
+If `spectator`, then you cannot make moves at all via the UI.
+If `analyzer`, then you can make moves for both sides, and it simuluates a local game.</td><td>Role</td><td>'analyzer'</td>
+       </tr>
+     
+       <tr>
          <td>hideCoordinates</td><td>Show the board coordinates on the bottom and left sides of the board.</td><td>boolean</td><td>false</td>
        </tr>
      
@@ -153,6 +161,10 @@ Usually called when the game is over.</td><td>void</td>
      
        <tr>
          <td>promoted</td><td>Fired when a pawn has been promoted to a piece.</td>
+       </tr>
+     
+       <tr>
+         <td>gameover</td><td>Fired when the game is over.</td>
        </tr>
      
        <tr>
