@@ -1231,7 +1231,7 @@ export class HexchessBoard extends LitElement {
     }
     for (
       let i = (this._state as RewoundState).currentTurn;
-      i < this.moves.length - 1;
+      i < this.moves.length;
       i++
     ) {
       this.fastForward();
