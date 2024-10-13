@@ -14,6 +14,7 @@ import {
   CancelSelectionSoonState,
   DragPieceState,
   MouseDownPieceSelected,
+  RewoundState,
   getNewState,
 } from './board-state';
 import { Game, GameState } from './game';
@@ -1201,12 +1202,40 @@ export class HexchessBoard extends LitElement {
   }
 
   /**
+   * Rewinds all moves until the starting position of the board is reached.
+   */
+  rewindAll(): void {
+    if (this._state.name !== 'REWOUND') {
+      this.rewind();
+    }
+    for (let i = (this._state as RewoundState).currentTurn; i > 0; i--) {
+      this.rewind();
+    }
+  }
+
+  /**
    * Fast forwards one move to the next position.
    * If there are no next moves, this does nothing.
    */
   fastForward(): void {
     const newState = getNewState(this._state, { name: 'FAST_FORWARD' });
     this._reconcileNewState(newState);
+  }
+
+  /**
+   * Fast forwards all moves until the current state of the board is reached.
+   */
+  fastForwardAll(): void {
+    if (this._state.name !== 'REWOUND') {
+      return;
+    }
+    for (
+      let i = (this._state as RewoundState).currentTurn;
+      i < this.moves.length - 1;
+      i++
+    ) {
+      this.fastForward();
+    }
   }
 
   /**

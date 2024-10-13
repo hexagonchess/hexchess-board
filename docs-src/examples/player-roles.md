@@ -21,6 +21,10 @@ description: Set player roles
       document.querySelector('hexchess-board').fastForward();
     } else if (event.code === 'ArrowLeft') {
       document.querySelector('hexchess-board').rewind();
+    } else if (event.code === 'ArrowUp') {
+      document.querySelector('hexchess-board').rewindAll();
+    } else if (event.code === 'ArrowDown') {
+      document.querySelector('hexchess-board').fastForwardAll();
     }
   });
   window.onload = () => {
