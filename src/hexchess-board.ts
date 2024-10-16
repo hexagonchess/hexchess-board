@@ -439,7 +439,7 @@ export class HexchessBoard extends LitElement {
       } else if (newState.state.moves.length > this._state.moves.length) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
-          new CustomEvent('move', { detail: { from: move.from, to: move.to } }),
+          new CustomEvent('move', { detail: { move: movesToString([move]) } }),
         );
       }
     }
