@@ -1251,15 +1251,46 @@ export class HexchessBoard extends LitElement {
    *
    * @returns Whether or not the move can be made.
    */
-  move(from: Square, to: Square): boolean {
+  move(from: string): boolean;
+  move(from: Square, to: Square): boolean;
+  move(arg: string | Square, to?: Square): boolean {
     // No moves if board is frozen
     if (this.frozen) {
       return false;
     }
 
+    if (typeof arg !== 'string') {
+      return false;
+    }
+
+    if (!ALL_SQUARES.includes(arg as any)) {
+      return false;
+    }
+
+    if (to === undefined) {
+      try {
+        const newMove = stringToMoves(arg);
+        if (newMove.length !== 1) {
+          return false;
+        }
+        const newState = getNewState(this._state, {
+          name: 'PROGRAMMATIC_MOVE',
+          move: [newMove[0].from, newMove[0].to],
+        });
+        this._reconcileNewState(newState);
+        return newState.didChange;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    if (!ALL_SQUARES.includes(to as any)) {
+      return false;
+    }
+
     const newState = getNewState(this._state, {
       name: 'PROGRAMMATIC_MOVE',
-      move: [from, to],
+      move: [arg as Square, to as Square],
     });
     this._reconcileNewState(newState);
     return newState.didChange;
