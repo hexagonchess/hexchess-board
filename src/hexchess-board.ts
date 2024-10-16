@@ -1256,14 +1256,12 @@ export class HexchessBoard extends LitElement {
   move(arg: string | Square, to?: Square): boolean {
     // No moves if board is frozen
     if (this.frozen) {
+      console.error('board is currently frozen');
       return false;
     }
 
     if (typeof arg !== 'string') {
-      return false;
-    }
-
-    if (!ALL_SQUARES.includes(arg as any)) {
+      console.error('arg must be a string');
       return false;
     }
 
@@ -1271,6 +1269,7 @@ export class HexchessBoard extends LitElement {
       try {
         const newMove = stringToMoves(arg);
         if (newMove.length !== 1) {
+          console.error('please provide only 1 move');
           return false;
         }
         const newState = getNewState(this._state, {
@@ -1280,11 +1279,13 @@ export class HexchessBoard extends LitElement {
         this._reconcileNewState(newState);
         return newState.didChange;
       } catch (error) {
+        console.error('invalid FEN format move');
         return false;
       }
     }
 
     if (!ALL_SQUARES.includes(to as any)) {
+      console.error(`${to} is not a valid square`);
       return false;
     }
 
