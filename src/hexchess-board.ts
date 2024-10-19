@@ -1247,6 +1247,13 @@ export class HexchessBoard extends LitElement {
   }
 
   /**
+   * Unfreeze the board and re-enable moves to be made.
+   */
+  unfreeze(): void {
+    this.frozen = false;
+  }
+
+  /**
    * Make a move on the board.
    *
    * @returns Whether or not the move can be made.
