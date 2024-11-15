@@ -429,7 +429,12 @@ export class HexchessBoard extends LitElement {
         this._state.game.state() === GameState.PROMOTING &&
         newState.state.game.state() !== GameState.PROMOTING
       ) {
-        this.dispatchEvent(new CustomEvent('promoted'));
+        const move = newState.state.moves[newState.state.moves.length - 1];
+        this.dispatchEvent(
+          new CustomEvent('promoted', {
+            detail: { location: move.to, piece: move.promotion },
+          }),
+        );
       } else if (newState.state.name === 'GAMEOVER') {
         this.dispatchEvent(
           new CustomEvent('gameover', {
