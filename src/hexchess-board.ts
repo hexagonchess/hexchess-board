@@ -1034,14 +1034,15 @@ export class HexchessBoard extends LitElement {
             this._state.moves.length > 0 &&
             (this._state.moves[this._state.moves.length - 1].to === square ||
               this._state.moves[this._state.moves.length - 1].from === square);
+          const canHaveOpponentMove =
+            this._state.name !== 'WAITING' &&
+            this._state.name !== 'REWOUND' &&
+            this._state.name !== 'PROMOTING' &&
+            this._state.name !== 'GAMEOVER' &&
+            this._state.opponentPieceMoves;
           const selectedClass =
             isSelected || isRecentFrom || isRecentTo
-              ? this._state.name !== 'WAITING' &&
-                this._state.name !== 'REWOUND' &&
-                this._state.name !== 'PROMOTING' &&
-                this._state.name !== 'GAMEOVER' &&
-                this._state.opponentPieceMoves &&
-                !wasMostRecentMove
+              ? canHaveOpponentMove && !wasMostRecentMove
                 ? 'selected-opponent'
                 : 'selected'
               : '';
