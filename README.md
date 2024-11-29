@@ -2,11 +2,13 @@
 
 `hexchess-board` is a performant, dependency-free web component implementation of Glinsky's [Hexagonal Chess](https://en.wikipedia.org/wiki/Hexagonal_chess).
 
-![](./hexchess.gif)
+![](./gifs/hexchess.gif)
 
 ## Features:
 
-1. Performant - The component has been extensively benchmarked against Chess.com's own board, and clocks in at ~118 FPS when dragging pieces around the board (based on Chrome's developer tools) and ~80 FPS when resizing the window (the most expensive operation).
+1. Performant - The component has been extensively benchmarked against Chess.com's own board, and clocks in at 120 FPS when dragging pieces around the board (based on Chrome's developer tools) and ~80 FPS when resizing the window (the most expensive operation).
+
+![](./gifs/hexchess-perf.gif)
 
 2. Completely customizable - every single color you see can be changed to whatever fits your style and liking! Soon, we will support [slots](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot), which will also allow you to customize the pieces on the board.
 
