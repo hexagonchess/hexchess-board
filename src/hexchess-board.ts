@@ -11,11 +11,11 @@ import { Board } from './board';
 import {
   BoardChange,
   BoardState,
+  BoardStateMachine,
   CancelSelectionSoonState,
   DragPieceState,
   MouseDownPieceSelected,
   RewoundState,
-  getNewState,
 } from './board-state';
 import { Game, GameState } from './game';
 import { styles } from './hexchess-styles';
@@ -59,10 +59,12 @@ import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
  * @cssprop [--hexchess-possible-move-stroke-opponent=#e3e3e3] - The outline of a square when dragging an opponent piece to a possible move.
  *
  * Custom events
- * @fires gameover  - Fired when the game is over.
- * @fires move      - Fired when a move is made on the board.
- * @fires promoting - Fired when a pawn is ready to promote.
- * @fires promoted  - Fired when a pawn has been promoted to a piece.
+ * @fires gameover        - Fired when the game is over.
+ * @fires move            - Fired when a move is made on the board.
+ * @fires promoting       - Fired when a pawn is ready to promote.
+ * @fires promoted        - Fired when a pawn has been promoted to a piece.
+ * @fires furthestback    - Fired when the game is rewound to its starting position.
+ * @fires furthestforward - Fired when a game is fast forwarded back to its current position.
  */
 @customElement('hexchess-board')
 export class HexchessBoard extends LitElement {
@@ -97,6 +99,10 @@ export class HexchessBoard extends LitElement {
     scoreBlack: 42,
     scoreWhite: 42,
   };
+  private _stateMachine = new BoardStateMachine(
+    () => this._emitFurthestBack(),
+    () => this._emitFurthestForward(),
+  );
 
   // -----------------
   // Public properties
@@ -135,13 +141,13 @@ export class HexchessBoard extends LitElement {
 
   set moves(moves: Move[]) {
     for (const move of moves) {
-      const newState = getNewState(this._state, {
+      const newState = this._stateMachine.getNewState(this._state, {
         name: 'PROGRAMMATIC_MOVE',
         move: [move.from, move.to],
       });
       this._reconcileNewState(newState);
       if (move.promotion) {
-        const newState = getNewState(this._state, {
+        const newState = this._stateMachine.getNewState(this._state, {
           name: 'PROMOTE',
           piece: move.promotion,
         });
@@ -149,7 +155,9 @@ export class HexchessBoard extends LitElement {
       }
     }
     for (let i = 0; i < moves.length; i++) {
-      const newState = getNewState(this._state, { name: 'REWIND' });
+      const newState = this._stateMachine.getNewState(this._state, {
+        name: 'REWIND',
+      });
       this._reconcileNewState(newState);
     }
     this.requestUpdate('board');
@@ -251,7 +259,7 @@ export class HexchessBoard extends LitElement {
   }
 
   private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
-    const newState = getNewState(this._state, {
+    const newState = this._stateMachine.getNewState(this._state, {
       name: 'PROMOTE',
       piece,
     });
@@ -284,9 +292,11 @@ export class HexchessBoard extends LitElement {
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (square === null) {
-      newState = getNewState(this._state, { name: 'MOUSE_DOWN_OUTSIDE_BOARD' });
+      newState = this._stateMachine.getNewState(this._state, {
+        name: 'MOUSE_DOWN_OUTSIDE_BOARD',
+      });
     } else {
-      newState = getNewState(this._state, {
+      newState = this._stateMachine.getNewState(this._state, {
         name: 'MOUSE_DOWN',
         square,
       });
@@ -324,7 +334,7 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
-    const newState = getNewState(this._state, {
+    const newState = this._stateMachine.getNewState(this._state, {
       name: 'MOUSE_MOVE_SQUARE',
       square,
     });
@@ -339,11 +349,11 @@ export class HexchessBoard extends LitElement {
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (!square) {
-      newState = getNewState(this._state, {
+      newState = this._stateMachine.getNewState(this._state, {
         name: 'MOUSE_UP_OUTSIDE_BOARD',
       });
     } else {
-      newState = getNewState(this._state, {
+      newState = this._stateMachine.getNewState(this._state, {
         name: 'MOUSE_UP',
         square,
       });
@@ -415,12 +425,12 @@ export class HexchessBoard extends LitElement {
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (square) {
-      newState = getNewState(this._state, {
+      newState = this._stateMachine.getNewState(this._state, {
         name: 'MOUSE_MOVE_SQUARE',
         square,
       });
     } else {
-      newState = getNewState(this._state, {
+      newState = this._stateMachine.getNewState(this._state, {
         name: 'MOUSE_MOVE_OUTSIDE_BOARD',
       });
     }
@@ -1207,6 +1217,14 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
+  private _emitFurthestBack() {
+    this.dispatchEvent(new CustomEvent('furthestback'));
+  }
+
+  private _emitFurthestForward() {
+    this.dispatchEvent(new CustomEvent('furthestforward'));
+  }
+
   override render(): TemplateResult {
     return html` ${this._renderBoard()} `;
   }
@@ -1256,7 +1274,9 @@ export class HexchessBoard extends LitElement {
    * If there are no previous moves, this does nothing.
    */
   rewind(): void {
-    const newState = getNewState(this._state, { name: 'REWIND' });
+    const newState = this._stateMachine.getNewState(this._state, {
+      name: 'REWIND',
+    });
     this._reconcileNewState(newState);
   }
 
@@ -1277,7 +1297,9 @@ export class HexchessBoard extends LitElement {
    * If there are no next moves, this does nothing.
    */
   fastForward(): void {
-    const newState = getNewState(this._state, { name: 'FAST_FORWARD' });
+    const newState = this._stateMachine.getNewState(this._state, {
+      name: 'FAST_FORWARD',
+    });
     this._reconcileNewState(newState);
   }
 
@@ -1338,7 +1360,7 @@ export class HexchessBoard extends LitElement {
           console.error('please provide only 1 move');
           return false;
         }
-        const newState = getNewState(this._state, {
+        const newState = this._stateMachine.getNewState(this._state, {
           name: 'PROGRAMMATIC_MOVE',
           move: [newMove[0].from, newMove[0].to],
         });
@@ -1355,7 +1377,7 @@ export class HexchessBoard extends LitElement {
       return false;
     }
 
-    const newState = getNewState(this._state, {
+    const newState = this._stateMachine.getNewState(this._state, {
       name: 'PROGRAMMATIC_MOVE',
       move: [arg as Square, to as Square],
     });
