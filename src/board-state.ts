@@ -20,6 +20,7 @@ export type MouseDownPieceSelected = {
   game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
+  opponentPieceMoves?: Square[];
   moves: Move[];
   name: 'MOUSE_DOWN_PIECE_SELECTED';
   scoreBlack: number;
@@ -31,6 +32,7 @@ export type MouseUpPieceSelected = {
   game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
+  opponentPieceMoves?: Square[];
   moves: Move[];
   name: 'MOUSE_UP_PIECE_SELECTED';
   scoreBlack: number;
@@ -43,6 +45,7 @@ export type DragPieceState = {
   capturedPieces: Partial<Record<Piece, number>>;
   dragSquare: Square;
   legalMoves: LegalMoves;
+  opponentPieceMoves?: Square[];
   moves: Move[];
   name: 'DRAG_PIECE';
   scoreBlack: number;
@@ -54,6 +57,7 @@ export type CancelSelectionSoonState = {
   game: Game;
   capturedPieces: Partial<Record<Piece, number>>;
   legalMoves: LegalMoves;
+  opponentPieceMoves?: Square[];
   moves: Move[];
   name: 'CANCEL_SELECTION_SOON';
   scoreBlack: number;
@@ -417,12 +421,19 @@ const _waitingStateTransition = (
       if (!piece) {
         return { state, didChange: false };
       }
+      const isOppositeColor =
+        (state.game.turn % 2 === 0 && piece.color === 'black') ||
+        (state.game.turn % 2 === 1 && piece.color === 'white');
+      const opponentPieceMoves = isOppositeColor
+        ? piece.allSquareMoves(state.game.board).map((move) => move.toSquare())
+        : undefined;
       return {
         state: {
           ...state,
           name: 'MOUSE_DOWN_PIECE_SELECTED',
           selectedPiece: piece.toString(),
           square: transition.square,
+          opponentPieceMoves,
         },
         didChange: true,
       };
@@ -516,12 +527,22 @@ const _mouseUpPieceSelectedStateTransition = (
       // 3. If it's an occupied piece, select the piece
       const piece = state.game.board.getPiece(transition.square);
       if (piece) {
+        const isOppositeColor =
+          (state.game.turn % 2 === 0 && piece.color === 'black') ||
+          (state.game.turn % 2 === 1 && piece.color === 'white');
+        const opponentPieceMoves = isOppositeColor
+          ? piece
+              .allSquareMoves(state.game.board)
+              .map((move) => move.toSquare())
+          : undefined;
+
         return {
           state: {
             ...state,
             name: 'MOUSE_DOWN_PIECE_SELECTED',
             selectedPiece: piece.toString(),
             square: transition.square,
+            opponentPieceMoves,
           },
           didChange: true,
         };

@@ -205,6 +205,12 @@ export class HexchessBoard extends LitElement {
   @property({ type: Boolean })
   frozen = false;
 
+  /**
+   * Clicking on an opponent's piece shows all the squares it can move to
+   */
+  @property({ attribute: 'show-hints', type: Boolean })
+  showHints = true;
+
   constructor() {
     super();
     this._recalculateBoardCoordinates();
@@ -1080,7 +1086,11 @@ export class HexchessBoard extends LitElement {
     if (this._state.square === square) {
       return nothing;
     }
-    if (!this._state.legalMoves[this._state.square]?.has(square)) {
+    if (
+      (!this._state.opponentPieceMoves ||
+        !this._state.opponentPieceMoves.includes(square)) &&
+      !this._state.legalMoves[this._state.square]?.has(square)
+    ) {
       return nothing;
     }
 
