@@ -91,6 +91,7 @@ export const styles = css`
 
   .possible-move-grey,
   .possible-move-black,
+  .possible-move-opponent,
   .possible-move-white {
     stroke-width: 5;
     fill: none;
@@ -105,6 +106,9 @@ export const styles = css`
   }
   polygon.possible-move-grey {
     stroke: var(--hexchess-possible-move-stroke-grey, #a96a41);
+  }
+  polygon.possible-move-opponent {
+    stroke: var(--hexchess-possible-move-stroke-opponent, #e3e3e3);
   }
 
   .score {
@@ -122,6 +126,16 @@ export const styles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .selected-opponent .white {
+    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+  }
+  .selected-opponent .black {
+    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+  }
+  .selected-opponent .grey {
+    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
   }
 
   .white {
@@ -147,6 +161,10 @@ export const styles = css`
 
   .possible-move {
     fill: var(--hexchess-possible-move-bg, #a96a41);
+  }
+
+  .opponent-move {
+    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
   }
 
   .drag-piece {
