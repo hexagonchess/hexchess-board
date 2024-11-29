@@ -37,24 +37,26 @@ import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
  * A hexagonal chess board used for playing Glinsky-style hex chess.
  *
  * Player variables
- * @cssprop [--hexchess-playername-size=1.4rem]              - The font size of the player names.
- * @cssprop [--hexchess-playername-color=black]              - The color of the player names.
+ * @cssprop [--hexchess-playername-size=1.4rem]                - The font size of the player names.
+ * @cssprop [--hexchess-playername-color=black]                - The color of the player names.
  *
  * Board variables
- * @cssprop [--hexchess-board-bg=#ffffff]                    - The background color of the whitespace of the board (not tiles).
- * @cssprop [--hexchess-white-bg=#a5c8df]                    - The background color of the white tiles.
- * @cssprop [--hexchess-selected-white-bg=#a96a41]           - The background color of a white tile that's selected to be moved.
- * @cssprop [--hexchess-black-bg=#4180a9]                    - The background color of the black tiles.
- * @cssprop [--hexchess-selected-black-bg=#a96a41]           - The background color of a black tile that's selected to be moved.
- * @cssprop [--hexchess-grey-bg=#80b1d0]                     - The background color of the grey tiles.
- * @cssprop [--hexchess-selected-grey-bg=#a96a41]            - The background color of a grey tile that's selected to be moved.
- * @cssprop [--hexchess-label-bg=#ffffff]                    - The background color of the column and row labels.
- * @cssprop [--hexchess-label-size=12px]                     - The font size of the column and row labels.
- * @cssprop [--hexchess-possible-move-bg=#e4c7b7]            - The fill color of the small dot shown on a hexagon indicating this is a legal move.
- * @cssprop [--hexchess-possible-capture-bg=#e4c7b7]         - The stroke color of the large circle outlining a piece that can be captured.
- * @cssprop [--hexchess-attempted-move-white-stroke=#e4c7b7] - The outline color of a hexagon when the user drags over a white square, trying to move there.
- * @cssprop [--hexchess-attempted-move-grey-stroke=#e4c7b7]  - The outline color of a hexagon when the user drags over a grey square, trying to move there.
- * @cssprop [--hexchess-attempted-move-black-stroke=#e4c7b7] - The outline color of a hexagon when the user drags over a black square, trying to move there.
+ * @cssprop [--hexchess-board-bg=#ffffff]                      - The background color of the whitespace of the board (not tiles).
+ * @cssprop [--hexchess-white-bg=#a5c8df]                      - The background color of the white tiles.
+ * @cssprop [--hexchess-selected-white-bg=#a96a41]             - The background color of a white tile that's selected to be moved.
+ * @cssprop [--hexchess-black-bg=#4180a9]                      - The background color of the black tiles.
+ * @cssprop [--hexchess-selected-black-bg=#a96a41]             - The background color of a black tile that's selected to be moved.
+ * @cssprop [--hexchess-grey-bg=#80b1d0]                       - The background color of the grey tiles.
+ * @cssprop [--hexchess-selected-grey-bg=#a96a41]              - The background color of a grey tile that's selected to be moved.
+ * @cssprop [--hexchess-label-bg=#ffffff]                      - The background color of the column and row labels.
+ * @cssprop [--hexchess-label-size=12px]                       - The font size of the column and row labels.
+ * @cssprop [--hexchess-possible-move-bg=#e4c7b7]              - The fill color of the small dot shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-possible-move-opponent-bg=#e3e3e3]     - The fill color of the small dot shown on a hexagon indicating this is a move an opponent piece can make.
+ * @cssprop [--hexchess-possible-capture-bg=#e4c7b7]           - The stroke color of the large circle outlining a piece that can be captured.
+ * @cssprop [--hexchess-possible-move-stroke-white=#e4c7b7]    - The outline color of a hexagon when the user drags over a white square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-grey=#e4c7b7]     - The outline color of a hexagon when the user drags over a grey square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-black=#e4c7b7]    - The outline color of a hexagon when the user drags over a black square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-opponent=#e3e3e3] - The outline of a square when dragging an opponent piece to a possible move.
  *
  * Custom events
  * @fires gameover  - Fired when the game is over.
@@ -1007,8 +1009,22 @@ export class HexchessBoard extends LitElement {
             this._state.name !== 'PROMOTING' &&
             this._state.name !== 'GAMEOVER' &&
             this._state.square === square;
+          const wasMostRecentMove =
+            this._state.name !== 'REWOUND' &&
+            this._state.moves.length > 0 &&
+            (this._state.moves[this._state.moves.length - 1].to === square ||
+              this._state.moves[this._state.moves.length - 1].from === square);
           const selectedClass =
-            isSelected || isRecentFrom || isRecentTo ? 'selected' : '';
+            isSelected || isRecentFrom || isRecentTo
+              ? this._state.name !== 'WAITING' &&
+                this._state.name !== 'REWOUND' &&
+                this._state.name !== 'PROMOTING' &&
+                this._state.name !== 'GAMEOVER' &&
+                this._state.opponentPieceMoves &&
+                !wasMostRecentMove
+                ? 'selected-opponent'
+                : 'selected'
+              : '';
 
           // Offsets
           const offset = this._getOffsets(square, this._columnConfig);
@@ -1054,15 +1070,18 @@ export class HexchessBoard extends LitElement {
     }
 
     const offset = this._getOffsets(this._state.dragSquare, this._columnConfig);
+    const classBg:
+      | 'possible-move-opponent'
+      | 'possible-move-grey'
+      | 'possible-move-white'
+      | 'possible-move-black' = this._state.opponentPieceMoves
+      ? 'possible-move-opponent'
+      : `possible-move-${this._getColorForSquare(this._state.dragSquare)}`;
     return svg`
       <g
         transform="translate(${offset[0]},${offset[1]})"
       >
-        ${this._renderHexagon(
-          this._polygonWidth,
-          this._polygonHeight,
-          `possible-move-${this._getColorForSquare(this._state.dragSquare)}`,
-        )}
+        ${this._renderHexagon(this._polygonWidth, this._polygonHeight, classBg)}
       </g>
     `;
   }
@@ -1104,11 +1123,14 @@ export class HexchessBoard extends LitElement {
     }
 
     const radius = Math.min(this._polygonHeight, this._polygonWidth) / 6;
+    const classBg = this._state.opponentPieceMoves
+      ? 'opponent-move'
+      : 'possible-move';
     return svg`<circle
       cx=${width / 2}
       cy=${height / 2}
       r=${radius}
-      class="possible-move" />`;
+      class=${classBg} />`;
   }
 
   private _renderHexagon(
@@ -1118,7 +1140,8 @@ export class HexchessBoard extends LitElement {
       | TileColor
       | 'possible-move-white'
       | 'possible-move-black'
-      | 'possible-move-grey',
+      | 'possible-move-grey'
+      | 'possible-move-opponent',
   ) {
     return svg`<polygon
       points=${this._calculateHexagonPointsAsString(width, height)}
