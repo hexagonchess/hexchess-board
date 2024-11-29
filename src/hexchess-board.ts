@@ -213,6 +213,18 @@ export class HexchessBoard extends LitElement {
   @property({ attribute: 'show-hints', type: Boolean })
   showHints = true;
 
+  /**
+   * Hide player names - usually only used for custom websites to render player names separately.
+   */
+  @property({ attribute: 'hide-playernames', type: Boolean })
+  hidePlayerNames = false;
+
+  /**
+   * Hide captured pieces - usually only used for custom websites to render captured pieces separately.
+   */
+  @property({ attribute: 'hide-capturedpieces', type: Boolean })
+  hideCapturedPieces = false;
+
   constructor() {
     super();
     this._recalculateBoardCoordinates();
@@ -751,6 +763,10 @@ export class HexchessBoard extends LitElement {
     pieces: Partial<Record<Piece, number>>,
     score: number,
   ) {
+    if (this.hideCapturedPieces) {
+      return nothing;
+    }
+
     const pawn = 'p' in pieces ? 'p' : 'P' in pieces ? 'P' : undefined;
     const bishop = 'b' in pieces ? 'b' : 'B' in pieces ? 'B' : undefined;
     const knight = 'n' in pieces ? 'n' : 'N' in pieces ? 'N' : undefined;
@@ -807,6 +823,10 @@ export class HexchessBoard extends LitElement {
   }
 
   private _renderPlayer(name: string, isWhite: boolean) {
+    if (this.hidePlayerNames) {
+      return nothing;
+    }
+
     let outcome = '';
     if (this._state.name === 'GAMEOVER') {
       if (this._state.outcome === 'DRAW') {
