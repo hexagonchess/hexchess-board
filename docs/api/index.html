@@ -86,6 +86,14 @@ If `analyzer`, then you can make moves for both sides, and it simuluates a local
          <td>show-hints</td><td>Clicking on an opponent's piece shows all the squares it can move to</td><td>boolean</td><td>true</td>
        </tr>
      
+       <tr>
+         <td>hide-playernames</td><td>Hide player names - usually only used for custom websites to render player names separately.</td><td>boolean</td><td>false</td>
+       </tr>
+     
+       <tr>
+         <td>hide-capturedpieces</td><td>Hide captured pieces - usually only used for custom websites to render captured pieces separately.</td><td>boolean</td><td>false</td>
+       </tr>
+     
    </table>
  
        
@@ -283,19 +291,27 @@ Usually called when the game is over.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-possible-move-opponent-bg</td><td>The fill color of the small dot shown on a hexagon indicating this is a move an opponent piece can make.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-possible-capture-bg</td><td>The stroke color of the large circle outlining a piece that can be captured.</td>
        </tr>
      
        <tr>
-         <td>--hexchess-attempted-move-white-stroke</td><td>The outline color of a hexagon when the user drags over a white square, trying to move there.</td>
+         <td>--hexchess-possible-move-stroke-white</td><td>The outline color of a hexagon when the user drags over a white square, trying to move there.</td>
        </tr>
      
        <tr>
-         <td>--hexchess-attempted-move-grey-stroke</td><td>The outline color of a hexagon when the user drags over a grey square, trying to move there.</td>
+         <td>--hexchess-possible-move-stroke-grey</td><td>The outline color of a hexagon when the user drags over a grey square, trying to move there.</td>
        </tr>
      
        <tr>
-         <td>--hexchess-attempted-move-black-stroke</td><td>The outline color of a hexagon when the user drags over a black square, trying to move there. Custom events</td>
+         <td>--hexchess-possible-move-stroke-black</td><td>The outline color of a hexagon when the user drags over a black square, trying to move there.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-opponent</td><td>The outline of a square when dragging an opponent piece to a possible move. Custom events</td>
        </tr>
      
    </table>
