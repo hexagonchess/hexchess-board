@@ -453,7 +453,13 @@ export class HexchessBoard extends LitElement {
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
-          new CustomEvent('promoting', { detail: { location: move.to } }),
+          new CustomEvent('promoting', {
+            detail: {
+              from: move.from,
+              to: move.to,
+              isCapture: !!move.capturedPiece,
+            },
+          }),
         );
       } else if (
         this._state.game.state() === GameState.PROMOTING &&
@@ -462,7 +468,7 @@ export class HexchessBoard extends LitElement {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
           new CustomEvent('promoted', {
-            detail: { location: move.to, piece: move.promotion },
+            detail: { piece: move.promotion },
           }),
         );
       } else if (newState.state.name === 'GAMEOVER') {
