@@ -1392,6 +1392,56 @@ export class HexchessBoard extends LitElement {
   }
 
   /**
+   * Promote a pawn.
+   * @returns Whether or not the promotion is valid.
+   */
+  promote(piece: Piece): boolean {
+    if (this._state.name !== 'PROMOTING') {
+      console.error('No piece currently eligible for promotion.');
+      return false;
+    }
+
+    switch (piece.toLowerCase()) {
+      case 'R':
+      case 'r':
+      case 'n':
+      case 'N':
+      case 'Q':
+      case 'q':
+      case 'B':
+      case 'b':
+        break;
+      default:
+        console.error(
+          'Target promotion piece must be a queen, rook, bishop or knight.',
+        );
+        return false;
+    }
+
+    const isLowerCase = piece === piece.toLowerCase();
+    if (this._state.game.turn % 2 === 0 && isLowerCase) {
+      console.error("Cannot promote a black piece on white's turn.");
+      return false;
+    }
+    if (this._state.game.turn % 2 === 1 && !isLowerCase) {
+      console.error("Cannot promote a white piece on black's turn.");
+      return false;
+    }
+
+    try {
+      const newState = this._stateMachine.getNewState(this._state, {
+        name: 'PROMOTE',
+        piece,
+      });
+      this._reconcileNewState(newState);
+      return newState.didChange;
+    } catch (error) {
+      console.error(`Unknown promotion error: ${error}.`);
+      return false;
+    }
+  }
+
+  /**
    * Resets and unfreezes the board to the default start state.
    */
   reset(): void {
