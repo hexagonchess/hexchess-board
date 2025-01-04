@@ -17,7 +17,7 @@ import {
   MouseDownPieceSelected,
   RewoundState,
 } from './board-state';
-import { Game, GameState } from './game';
+import { Game } from './game';
 import { styles } from './hexchess-styles';
 import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
 import { Color, Move, Orientation, Piece, Role, TileColor } from './types';
@@ -448,8 +448,8 @@ export class HexchessBoard extends LitElement {
     }
     if (newState.state.name !== 'REWOUND') {
       if (
-        newState.state.game.state() === GameState.PROMOTING &&
-        this._state.game.state() !== GameState.PROMOTING
+        newState.state.name === 'PROMOTING' &&
+        this._state.name !== 'PROMOTING'
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
@@ -462,8 +462,8 @@ export class HexchessBoard extends LitElement {
           }),
         );
       } else if (
-        this._state.game.state() === GameState.PROMOTING &&
-        newState.state.game.state() !== GameState.PROMOTING
+        this._state.name === 'PROMOTING' &&
+        newState.state.name !== 'PROMOTING'
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
         this.dispatchEvent(
