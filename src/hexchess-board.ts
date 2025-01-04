@@ -103,6 +103,7 @@ export class HexchessBoard extends LitElement {
     () => this._emitFurthestBack(),
     () => this._emitFurthestForward(),
   );
+  private _customEventsPaused = false;
 
   // -----------------
   // Public properties
@@ -452,36 +453,46 @@ export class HexchessBoard extends LitElement {
         this._state.name !== 'PROMOTING'
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
-        this.dispatchEvent(
-          new CustomEvent('promoting', {
-            detail: {
-              from: move.from,
-              to: move.to,
-              isCapture: !!move.capturedPiece,
-            },
-          }),
-        );
+        if (!this._customEventsPaused) {
+          this.dispatchEvent(
+            new CustomEvent('promoting', {
+              detail: {
+                from: move.from,
+                to: move.to,
+                isCapture: !!move.capturedPiece,
+              },
+            }),
+          );
+        }
       } else if (
         this._state.name === 'PROMOTING' &&
         newState.state.name !== 'PROMOTING'
       ) {
         const move = newState.state.moves[newState.state.moves.length - 1];
-        this.dispatchEvent(
-          new CustomEvent('promoted', {
-            detail: { piece: move.promotion },
-          }),
-        );
+        if (!this._customEventsPaused) {
+          this.dispatchEvent(
+            new CustomEvent('promoted', {
+              detail: { piece: move.promotion },
+            }),
+          );
+        }
       } else if (newState.state.name === 'GAMEOVER') {
-        this.dispatchEvent(
-          new CustomEvent('gameover', {
-            detail: { outcome: newState.state.outcome },
-          }),
-        );
+        if (!this._customEventsPaused) {
+          this.dispatchEvent(
+            new CustomEvent('gameover', {
+              detail: { outcome: newState.state.outcome },
+            }),
+          );
+        }
       } else if (newState.state.moves.length > this._state.moves.length) {
         const move = newState.state.moves[newState.state.moves.length - 1];
-        this.dispatchEvent(
-          new CustomEvent('move', { detail: { move: movesToString([move]) } }),
-        );
+        if (!this._customEventsPaused) {
+          this.dispatchEvent(
+            new CustomEvent('move', {
+              detail: { move: movesToString([move]) },
+            }),
+          );
+        }
       }
     }
     this._state = newState.state;
@@ -1224,11 +1235,15 @@ export class HexchessBoard extends LitElement {
   }
 
   private _emitFurthestBack() {
-    this.dispatchEvent(new CustomEvent('furthestback'));
+    if (!this._customEventsPaused) {
+      this.dispatchEvent(new CustomEvent('furthestback'));
+    }
   }
 
   private _emitFurthestForward() {
-    this.dispatchEvent(new CustomEvent('furthestforward'));
+    if (!this._customEventsPaused) {
+      this.dispatchEvent(new CustomEvent('furthestforward'));
+    }
   }
 
   override render(): TemplateResult {
@@ -1459,6 +1474,21 @@ export class HexchessBoard extends LitElement {
       },
     });
     this.frozen = false;
+  }
+
+  /**
+   * Pauses all custom events from being emitted.
+   * This is useful when replaying many pre-programmed moves.
+   */
+  stopCustomEvents(): void {
+    this._customEventsPaused = true;
+  }
+
+  /**
+   *
+   */
+  restartCustomEvents(): void {
+    this._customEventsPaused = false;
   }
 }
 
