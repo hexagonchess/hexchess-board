@@ -1,6 +1,6 @@
 {
   "name": "@hexchess/hexchess-board",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "A simple web component",
   "main": "hexchess-board.js",
   "module": "hexchess-board.js",
