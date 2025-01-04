@@ -1401,7 +1401,7 @@ export class HexchessBoard extends LitElement {
       return false;
     }
 
-    switch (piece.toLowerCase()) {
+    switch (piece) {
       case 'R':
       case 'r':
       case 'n':
