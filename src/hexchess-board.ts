@@ -493,7 +493,7 @@ export class HexchessBoard extends LitElement {
               detail: {
                 move: movesToString([move]),
                 isCapture: !!move.capturedPiece,
-                piece,
+                piece: piece?.toString(),
               },
             }),
           );
