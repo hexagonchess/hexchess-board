@@ -1268,9 +1268,12 @@ export class HexchessBoard extends LitElement {
 
   /**
    * Converts to a hex-FEN notation describing the state of the board.
+   * Includes the positions of all the pieces along with whose turn it is.
    */
   fen(): string {
-    return boardToFen(this._state.game.board);
+    const pureFen = boardToFen(this._state.game.board);
+    const isWhiteTurn = this._state.game.turn % 2 === 0;
+    return `${isWhiteTurn ? 'WHITE' : 'BLACK'};${pureFen}`;
   }
 
   /**
