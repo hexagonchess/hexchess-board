@@ -378,13 +378,12 @@ export class HexchessBoard extends LitElement {
           'drag-piece',
         );
         this._draggedPiece.classList.add(
-          `piece-${
-            (
-              newState.state as
-                | MouseDownPieceSelected
-                | DragPieceState
-                | CancelSelectionSoonState
-            ).square
+          `piece-${(
+            newState.state as
+            | MouseDownPieceSelected
+            | DragPieceState
+            | CancelSelectionSoonState
+          ).square
           }`,
         );
       }
@@ -729,7 +728,7 @@ export class HexchessBoard extends LitElement {
     const y = isTop
       ? this._columnConfig[column].y
       : this._columnConfig[column].y +
-        this._polygonHeight * (this._numberOfHexagons(column) - 4);
+      this._polygonHeight * (this._numberOfHexagons(column) - 4);
 
     const options: Piece[] =
       isWhite && isTop
@@ -743,18 +742,17 @@ export class HexchessBoard extends LitElement {
     return html`
       <div class="promotion" style="top: ${y}px; left: ${x}px;">
         ${options.map((option) => {
-          return html`
+      return html`
             <div
               class="hexagon"
-              style="width: ${this._polygonWidth}px; height: ${
-                this._polygonHeight
-              }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
+              style="width: ${this._polygonWidth}px; height: ${this._polygonHeight
+        }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
               @click=${() => this._handlePromotion(option)}
             >
               ${renderPiece(option, this._pieceSize, false)}
             </div>
           `;
-        })}
+    })}
       </div>
     `;
   }
@@ -779,14 +777,14 @@ export class HexchessBoard extends LitElement {
     return html`
       <div class="captured-piece-group">
         ${[...Array(numPieces).keys()].map((numPiece) => {
-          const padding =
-            numPiece * capturedPieceSize * this._capturedPiecePadding;
-          return html`
+      const padding =
+        numPiece * capturedPieceSize * this._capturedPiecePadding;
+      return html`
             <div style="position: relative; left: ${padding}px">
               ${renderPiece(piece, capturedPieceSize)}
             </div>
           `;
-        })}
+    })}
       </div>
     `;
   }
@@ -807,46 +805,45 @@ export class HexchessBoard extends LitElement {
 
     const capturedPawns = pawn
       ? this._renderCapturedPieceGroup(
-          pawn,
-          pieces[pawn] as number,
-          this._capturedPieceSize,
-        )
+        pawn,
+        pieces[pawn] as number,
+        this._capturedPieceSize,
+      )
       : nothing;
     const capturedBishops = bishop
       ? this._renderCapturedPieceGroup(
-          bishop,
-          pieces[bishop] as number,
-          this._capturedPieceSize,
-        )
+        bishop,
+        pieces[bishop] as number,
+        this._capturedPieceSize,
+      )
       : nothing;
     const capturedKnights = knight
       ? this._renderCapturedPieceGroup(
-          knight,
-          pieces[knight] as number,
-          this._capturedPieceSize,
-        )
+        knight,
+        pieces[knight] as number,
+        this._capturedPieceSize,
+      )
       : nothing;
     const capturedRooks = rook
       ? this._renderCapturedPieceGroup(
-          rook,
-          pieces[rook] as number,
-          this._capturedPieceSize,
-        )
+        rook,
+        pieces[rook] as number,
+        this._capturedPieceSize,
+      )
       : nothing;
     const capturedQueens = queen
       ? this._renderCapturedPieceGroup(
-          queen,
-          pieces[queen] as number,
-          this._capturedPieceSize,
-        )
+        queen,
+        pieces[queen] as number,
+        this._capturedPieceSize,
+      )
       : nothing;
 
     return html`
       <div
         class="captured-pieces"
-        style="column-gap: ${
-          this._capturedPieceSize * this._capturedPieceGroupPadding
-        }px;"
+        style="column-gap: ${this._capturedPieceSize * this._capturedPieceGroupPadding
+      }px;"
       >
         ${capturedPawns} ${capturedBishops} ${capturedKnights} ${capturedRooks}
         ${capturedQueens} ${this._renderScore(score)}
@@ -917,26 +914,26 @@ export class HexchessBoard extends LitElement {
         style="row-gap: ${this._capturedPieceSize / 2}px;"
       >
         ${this._renderPlayer(
-          isOrientationWhite ? this.blackPlayerName : this.whitePlayerName,
-          !isOrientationWhite,
-        )}
+      isOrientationWhite ? this.blackPlayerName : this.whitePlayerName,
+      !isOrientationWhite,
+    )}
         ${this._renderOneSideCapturedPieces(
-          isOrientationWhite ? whitePieces : blackPieces,
-          isOrientationWhite ? blackScore : whiteScore,
-        )}
+      isOrientationWhite ? whitePieces : blackPieces,
+      isOrientationWhite ? blackScore : whiteScore,
+    )}
       </div>
       <div
         class="player-info"
         style="row-gap: ${this._capturedPieceSize / 2}px"
       >
         ${this._renderOneSideCapturedPieces(
-          isOrientationWhite ? blackPieces : whitePieces,
-          isOrientationWhite ? whiteScore : blackScore,
-        )}
+      isOrientationWhite ? blackPieces : whitePieces,
+      isOrientationWhite ? whiteScore : blackScore,
+    )}
         ${this._renderPlayer(
-          isOrientationWhite ? this.whitePlayerName : this.blackPlayerName,
-          isOrientationWhite,
-        )}
+      isOrientationWhite ? this.whitePlayerName : this.blackPlayerName,
+      isOrientationWhite,
+    )}
       </div>
     `;
   }
@@ -957,8 +954,7 @@ export class HexchessBoard extends LitElement {
       throw new Error('This is impossible');
     }
     return html`
-      <div style="left: ${pos[0]}px; top: ${
-        pos[1]
+      <div style="left: ${pos[0]}px; top: ${pos[1]
       }px" class="piece piece-${square}">
         ${renderPiece(piece.toString(), this._pieceSize)}
       </div>
@@ -1040,48 +1036,48 @@ export class HexchessBoard extends LitElement {
     return svg`
       <g id="column-${column}">
         ${[...Array(numHexagons).keys()].map((i) => {
-          // Helper methods
-          const square = `${column}${i + 1}` as Square;
+      // Helper methods
+      const square = `${column}${i + 1}` as Square;
 
-          // Base background color, except for classes defined below
-          const color = this._getColorForSquare(square);
+      // Base background color, except for classes defined below
+      const color = this._getColorForSquare(square);
 
-          // Rendering classes
-          const isRecentFrom =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            this._state.moves[this._state.moves.length - 1].from === square;
-          const isRecentTo =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            this._state.moves[this._state.moves.length - 1].to === square;
-          const isSelected =
-            this._state.name !== 'WAITING' &&
-            this._state.name !== 'REWOUND' &&
-            this._state.name !== 'PROMOTING' &&
-            this._state.name !== 'GAMEOVER' &&
-            this._state.square === square;
-          const wasMostRecentMove =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            (this._state.moves[this._state.moves.length - 1].to === square ||
-              this._state.moves[this._state.moves.length - 1].from === square);
-          const canHaveOpponentMove =
-            this._state.name !== 'WAITING' &&
-            this._state.name !== 'REWOUND' &&
-            this._state.name !== 'PROMOTING' &&
-            this._state.name !== 'GAMEOVER' &&
-            this._state.opponentPieceMoves;
-          const selectedClass =
-            isSelected || isRecentFrom || isRecentTo
-              ? canHaveOpponentMove && !wasMostRecentMove
-                ? 'selected-opponent'
-                : 'selected'
-              : '';
+      // Rendering classes
+      const isRecentFrom =
+        this._state.name !== 'REWOUND' &&
+        this._state.moves.length > 0 &&
+        this._state.moves[this._state.moves.length - 1].from === square;
+      const isRecentTo =
+        this._state.name !== 'REWOUND' &&
+        this._state.moves.length > 0 &&
+        this._state.moves[this._state.moves.length - 1].to === square;
+      const isSelected =
+        this._state.name !== 'WAITING' &&
+        this._state.name !== 'REWOUND' &&
+        this._state.name !== 'PROMOTING' &&
+        this._state.name !== 'GAMEOVER' &&
+        this._state.square === square;
+      const wasMostRecentMove =
+        this._state.name !== 'REWOUND' &&
+        this._state.moves.length > 0 &&
+        (this._state.moves[this._state.moves.length - 1].to === square ||
+          this._state.moves[this._state.moves.length - 1].from === square);
+      const canHaveOpponentMove =
+        this._state.name !== 'WAITING' &&
+        this._state.name !== 'REWOUND' &&
+        this._state.name !== 'PROMOTING' &&
+        this._state.name !== 'GAMEOVER' &&
+        this._state.opponentPieceMoves;
+      const selectedClass =
+        isSelected || isRecentFrom || isRecentTo
+          ? canHaveOpponentMove && !wasMostRecentMove
+            ? 'selected-opponent'
+            : 'selected'
+          : '';
 
-          // Offsets
-          const offset = this._getOffsets(square, this._columnConfig);
-          return svg`
+      // Offsets
+      const offset = this._getOffsets(square, this._columnConfig);
+      return svg`
             <g
               @pointerenter=${() => this._handleMouseEnter(square)}
               class=${selectedClass}
@@ -1089,26 +1085,26 @@ export class HexchessBoard extends LitElement {
               transform="translate(${offset[0]},${offset[1]})"
             >
               ${this._renderHexagon(
-                this._polygonWidth,
-                this._polygonHeight,
-                color,
-              )}
+        this._polygonWidth,
+        this._polygonHeight,
+        color,
+      )}
               ${this._renderDot(
-                this._polygonWidth,
-                this._polygonHeight,
-                column,
-                i + 1,
-              )}
+        this._polygonWidth,
+        this._polygonHeight,
+        column,
+        i + 1,
+      )}
               ${this._renderColumnLabel(
-                column,
-                i + 1,
-                this._polygonWidth,
-                this._polygonHeight,
-              )}
+        column,
+        i + 1,
+        this._polygonWidth,
+        this._polygonHeight,
+      )}
               ${this._renderCoordinate(column, i + 1, this._polygonWidth)}
             </g>
           `;
-        })}
+    })}
       </g>
     `;
   }
@@ -1128,8 +1124,8 @@ export class HexchessBoard extends LitElement {
       | 'possible-move-grey'
       | 'possible-move-white'
       | 'possible-move-black' = this._state.opponentPieceMoves
-      ? 'possible-move-opponent'
-      : `possible-move-${this._getColorForSquare(this._state.dragSquare)}`;
+        ? 'possible-move-opponent'
+        : `possible-move-${this._getColorForSquare(this._state.dragSquare)}`;
     return svg`
       <g
         transform="translate(${offset[0]},${offset[1]})"
@@ -1204,8 +1200,8 @@ export class HexchessBoard extends LitElement {
   private _renderBoard() {
     const cursorClass =
       this._state.name === 'DRAG_PIECE' ||
-      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
-      this._state.name === 'CANCEL_SELECTION_SOON'
+        this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+        this._state.name === 'CANCEL_SELECTION_SOON'
         ? 'cursor-grabbing'
         : 'cursor-grab';
 
@@ -1217,16 +1213,16 @@ export class HexchessBoard extends LitElement {
           viewbox="0 0 ${this._boardWidth} ${this._boardHeight}"
           class="board ${cursorClass}"
           @pointerdown=${(event: MouseEvent | PointerEvent) =>
-            this._handleMouseDown(event)}
+        this._handleMouseDown(event)}
           @pointerup=${(event: MouseEvent | PointerEvent) =>
-            this._handleMouseUp(event)}
+        this._handleMouseUp(event)}
           @pointermove=${(event: MouseEvent) =>
-            requestAnimationFrame(() => this._handleMouseMove(event))}
+        requestAnimationFrame(() => this._handleMouseMove(event))}
         >
           <g>
             ${COLUMN_ARRAY.map((column) => {
-              return svg`${this._renderColumn(column)}`;
-            })}
+          return svg`${this._renderColumn(column)}`;
+        })}
           </g>
           ${this._renderPossibleMove()}
         </svg>
@@ -1268,9 +1264,12 @@ export class HexchessBoard extends LitElement {
 
   /**
    * Converts to a hex-FEN notation describing the state of the board.
+   * Includes the positions of all the pieces along with whose turn it is.
    */
   fen(): string {
-    return boardToFen(this._state.game.board);
+    const pureFen = boardToFen(this._state.game.board);
+    const isWhiteTurn = this._state.game.turn % 2 === 0;
+    return `${isWhiteTurn ? 'WHITE' : 'BLACK'};${pureFen}`
   }
 
   /**
