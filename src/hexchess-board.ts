@@ -126,6 +126,7 @@ export class HexchessBoard extends LitElement {
   set board(board: Board) {
     const newGame = new Game(board);
     this._state.game = newGame;
+    this._state.moves = [];
     (this._state as WaitingState).legalMoves = newGame.allLegalMoves();
     this.requestUpdate('board');
   }
