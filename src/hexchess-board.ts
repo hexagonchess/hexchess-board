@@ -16,6 +16,7 @@ import {
   DragPieceState,
   MouseDownPieceSelected,
   RewoundState,
+  WaitingState,
 } from './board-state';
 import { Game } from './game';
 import { styles } from './hexchess-styles';
@@ -123,7 +124,9 @@ export class HexchessBoard extends LitElement {
   }
 
   set board(board: Board) {
-    this._state.game = new Game(board);
+    const newGame = new Game(board);
+    this._state.game = newGame;
+    (this._state as WaitingState).legalMoves = newGame.allLegalMoves();
     this.requestUpdate('board');
   }
 
