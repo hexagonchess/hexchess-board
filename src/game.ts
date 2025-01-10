@@ -53,11 +53,45 @@ export class Game {
   }
 
   pawnAtEnd(): HexchessPiece[] {
-    const pieces = this.board.getPieces(
-      this.turn % 2 === 0 ? 'white' : 'black',
-    );
-    const pawns: Pawn[] = pieces.filter((p) => p instanceof Pawn) as Pawn[];
-    return pawns.filter((pawn: Pawn) => pawn.canBePromoted());
+    const currentColor = this.turn % 2 === 0 ? 'white' : 'black';
+    const pieces = this.board.getPieces(currentColor);
+
+    return pieces.filter((piece) => {
+      if (!(piece instanceof Pawn)) return false;
+
+      // Get position information
+      const square = piece.position.toSquare();
+      const row = parseInt(square.slice(1));
+      const column = square[0];
+
+      // Check if pawn is at the end row for its color
+      if (currentColor === 'white') {
+        switch (column) {
+          case 'A':
+          case 'L':
+            return row === 6;
+          case 'B':
+          case 'K':
+            return row === 7;
+          case 'C':
+          case 'I':
+            return row === 8;
+          case 'D':
+          case 'H':
+            return row === 9;
+          case 'E':
+          case 'G':
+            return row === 10;
+          case 'F':
+            return row === 11;
+        }
+      } else {
+        // Black pawns promote at row 1
+        return row === 1;
+      }
+
+      return false;
+    });
   }
 
   canMoveTo(from: Position, to: Position): boolean {

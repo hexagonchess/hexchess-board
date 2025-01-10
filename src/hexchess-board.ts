@@ -147,7 +147,17 @@ export class HexchessBoard extends LitElement {
 
   set board(board: Board) {
     this._originalBoard = board;
-    const newGame = new Game(board);
+
+    const emptyBoard = Board.empty();
+    for (const square of ALL_SQUARES) {
+      const piece = board.getPiece(square);
+      if (piece) {
+        emptyBoard.addPieceFromString(square, piece.toString() as Piece);
+      }
+    }
+
+    const turn = this._originalTurn === 'white' ? 0 : 1;
+    const newGame = new Game(emptyBoard, turn);
     this._state.game = newGame;
     this._state.moves = [];
     (this._state as WaitingState).legalMoves = newGame.allLegalMoves();
@@ -1495,9 +1505,29 @@ export class HexchessBoard extends LitElement {
    * Resets and unfreezes the board to the default start state.
    */
   reset(): void {
-    const newGame = this._originalBoard
-      ? new Game(this._originalBoard, this._originalTurn === 'white' ? 0 : 1)
-      : new Game();
+    let newGame;
+
+    if (this._originalBoard) {
+      // Create a fresh empty board
+      const emptyBoard = Board.empty();
+
+      // Copy each piece from the original board
+      for (const square of ALL_SQUARES) {
+        const piece = this._originalBoard.getPiece(square);
+        if (piece) {
+          emptyBoard.addPieceFromString(square, piece.toString() as Piece);
+        }
+      }
+
+      // Create new game with original turn and board state
+      const turn = this._originalTurn === 'white' ? 0 : 1;
+      newGame = new Game(emptyBoard, turn);
+    } else {
+      // If no original board was set, create default game
+      newGame = new Game();
+    }
+
+    // Reset state completely
     this._reconcileNewState({
       didChange: true,
       state: {
@@ -1510,6 +1540,7 @@ export class HexchessBoard extends LitElement {
         scoreWhite: 42,
       },
     });
+
     this.frozen = false;
   }
 
