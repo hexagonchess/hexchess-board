@@ -90,6 +90,8 @@ export class HexchessBoard extends LitElement {
   private _polygonWidth = 29;
   private _polygonHeight = 22;
   private _originalDragPosition: { x: number; y: number } | null = null;
+  private _originalTurn: 'white' | 'black' = 'white';
+  private _originalBoard: Board | undefined = undefined;
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
     capturedPieces: {},
@@ -111,6 +113,26 @@ export class HexchessBoard extends LitElement {
   // -----------------
 
   /**
+   * Whose turn it is initially
+   */
+  @property({
+    converter: (value: string | null | undefined): 'white' | 'black' =>
+      value === 'black' ? 'black' : 'white',
+    type: String,
+  })
+  get turn(): string {
+    return this._state.game.turn % 2 === 0 ? 'white' : 'black';
+  }
+
+  set turn(turn: 'white' | 'black') {
+    this._originalTurn = turn;
+    this._state.game = new Game(
+      this._state.game.board,
+      turn === 'white' ? 0 : 1,
+    );
+  }
+
+  /**
    * A hex-FEN notation describing the state of the board.
    * If the string is empty, no pieces will be rendered.
    */
@@ -124,6 +146,7 @@ export class HexchessBoard extends LitElement {
   }
 
   set board(board: Board) {
+    this._originalBoard = board;
     const newGame = new Game(board);
     this._state.game = newGame;
     this._state.moves = [];
@@ -1472,7 +1495,9 @@ export class HexchessBoard extends LitElement {
    * Resets and unfreezes the board to the default start state.
    */
   reset(): void {
-    const newGame = new Game();
+    const newGame = this._originalBoard
+      ? new Game(this._originalBoard, this._originalTurn === 'white' ? 0 : 1)
+      : new Game();
     this._reconcileNewState({
       didChange: true,
       state: {
