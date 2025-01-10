@@ -1505,7 +1505,7 @@ export class HexchessBoard extends LitElement {
    * Resets and unfreezes the board to the default start state.
    */
   reset(): void {
-    let newGame;
+    let newGame: Game;
 
     if (this._originalBoard) {
       // Create a fresh empty board

@@ -85,12 +85,9 @@ export class Game {
           case 'F':
             return row === 11;
         }
-      } else {
-        // Black pawns promote at row 1
-        return row === 1;
       }
-
-      return false;
+      // Black pawns promote at row 1
+      return row === 1;
     });
   }
 
