@@ -90,6 +90,8 @@ export class HexchessBoard extends LitElement {
   private _polygonWidth = 29;
   private _polygonHeight = 22;
   private _originalDragPosition: { x: number; y: number } | null = null;
+  private _originalTurn: 'white' | 'black' = 'white';
+  private _originalBoard: Board | undefined = undefined;
   private _squareCenters: Record<Square, [number, number]> | null = null;
   private _state: BoardState = {
     capturedPieces: {},
@@ -111,6 +113,26 @@ export class HexchessBoard extends LitElement {
   // -----------------
 
   /**
+   * Whose turn it is initially
+   */
+  @property({
+    converter: (value: string | null | undefined): 'white' | 'black' =>
+      value === 'black' ? 'black' : 'white',
+    type: String,
+  })
+  get turn(): string {
+    return this._state.game.turn % 2 === 0 ? 'white' : 'black';
+  }
+
+  set turn(turn: 'white' | 'black') {
+    this._originalTurn = turn;
+    this._state.game = new Game(
+      this._state.game.board,
+      turn === 'white' ? 0 : 1,
+    );
+  }
+
+  /**
    * A hex-FEN notation describing the state of the board.
    * If the string is empty, no pieces will be rendered.
    */
@@ -124,7 +146,18 @@ export class HexchessBoard extends LitElement {
   }
 
   set board(board: Board) {
-    const newGame = new Game(board);
+    this._originalBoard = board;
+
+    const emptyBoard = Board.empty();
+    for (const square of ALL_SQUARES) {
+      const piece = board.getPiece(square);
+      if (piece) {
+        emptyBoard.addPieceFromString(square, piece.toString() as Piece);
+      }
+    }
+
+    const turn = this._originalTurn === 'white' ? 0 : 1;
+    const newGame = new Game(emptyBoard, turn);
     this._state.game = newGame;
     this._state.moves = [];
     (this._state as WaitingState).legalMoves = newGame.allLegalMoves();
@@ -1472,7 +1505,29 @@ export class HexchessBoard extends LitElement {
    * Resets and unfreezes the board to the default start state.
    */
   reset(): void {
-    const newGame = new Game();
+    let newGame: Game;
+
+    if (this._originalBoard) {
+      // Create a fresh empty board
+      const emptyBoard = Board.empty();
+
+      // Copy each piece from the original board
+      for (const square of ALL_SQUARES) {
+        const piece = this._originalBoard.getPiece(square);
+        if (piece) {
+          emptyBoard.addPieceFromString(square, piece.toString() as Piece);
+        }
+      }
+
+      // Create new game with original turn and board state
+      const turn = this._originalTurn === 'white' ? 0 : 1;
+      newGame = new Game(emptyBoard, turn);
+    } else {
+      // If no original board was set, create default game
+      newGame = new Game();
+    }
+
+    // Reset state completely
     this._reconcileNewState({
       didChange: true,
       state: {
@@ -1485,6 +1540,7 @@ export class HexchessBoard extends LitElement {
         scoreWhite: 42,
       },
     });
+
     this.frozen = false;
   }
 
