@@ -22,6 +22,13 @@ export const styles = css`
     background-color: var(--hexchess-board-bg, #ffffff);
   }
 
+  .board-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+
   .captured-pieces {
     display: flex;
     flex-direction: row;

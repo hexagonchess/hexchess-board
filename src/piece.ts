@@ -18,50 +18,30 @@ export const PIECE_VALUES: Record<Piece, number> = {
 
 export const DEFAULT_PIECE_SIZE = 60;
 
+export const PIECE_ASSET_IDS: Record<Piece, keyof typeof PIECE_ASSET_URLS> = {
+  k: 'black-king',
+  q: 'black-queen',
+  b: 'black-bishop',
+  n: 'black-knight',
+  r: 'black-rook',
+  p: 'black-pawn',
+  K: 'white-king',
+  Q: 'white-queen',
+  B: 'white-bishop',
+  N: 'white-knight',
+  R: 'white-rook',
+  P: 'white-pawn',
+};
+
 export const renderPiece = (
   piece: Piece,
   size: number = DEFAULT_PIECE_SIZE,
   translate = true,
 ): TemplateResult | typeof nothing => {
   if (piece === null) return nothing;
-  let id: keyof typeof pieceUrls;
-  switch (piece) {
-    case 'k':
-      id = 'black-king';
-      break;
-    case 'q':
-      id = 'black-queen';
-      break;
-    case 'b':
-      id = 'black-bishop';
-      break;
-    case 'n':
-      id = 'black-knight';
-      break;
-    case 'r':
-      id = 'black-rook';
-      break;
-    case 'p':
-      id = 'black-pawn';
-      break;
-    case 'K':
-      id = 'white-king';
-      break;
-    case 'Q':
-      id = 'white-queen';
-      break;
-    case 'B':
-      id = 'white-bishop';
-      break;
-    case 'N':
-      id = 'white-knight';
-      break;
-    case 'R':
-      id = 'white-rook';
-      break;
-    case 'P':
-      id = 'white-pawn';
-      break;
+  const id = PIECE_ASSET_IDS[piece];
+  if (!id) {
+    return nothing;
   }
   const style = translate
     ? `transform: translate(-${size / 2}px, -${size / 2}px)`
@@ -75,7 +55,7 @@ export const renderPiece = (
   />`;
 };
 
-const pieceUrls = {
+export const PIECE_ASSET_URLS = {
   'black-bishop':
     'https://upload.wikimedia.org/wikipedia/commons/8/81/Chess_bdt60.png?20120721213129',
   'white-bishop':
@@ -101,3 +81,5 @@ const pieceUrls = {
   'white-rook':
     'https://upload.wikimedia.org/wikipedia/commons/5/5c/Chess_rlt60.png?20120721213128',
 };
+
+const pieceUrls = PIECE_ASSET_URLS;

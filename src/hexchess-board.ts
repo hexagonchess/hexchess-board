@@ -1,11 +1,4 @@
-import {
-  LitElement,
-  PropertyValues,
-  TemplateResult,
-  html,
-  nothing,
-  svg,
-} from 'lit';
+import { LitElement, PropertyValues, TemplateResult, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Board } from './board';
 import {
@@ -20,7 +13,12 @@ import {
 } from './board-state';
 import { Game } from './game';
 import { styles } from './hexchess-styles';
-import { DEFAULT_PIECE_SIZE, renderPiece } from './piece';
+import {
+  DEFAULT_PIECE_SIZE,
+  PIECE_ASSET_IDS,
+  PIECE_ASSET_URLS,
+  renderPiece,
+} from './piece';
 import { Color, Move, Orientation, Piece, Role, TileColor } from './types';
 import {
   ALL_SQUARES,
@@ -33,6 +31,17 @@ import {
   stringToMoves,
 } from './utils';
 import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
+
+type CanvasColors = {
+  board: string;
+  tiles: Record<TileColor, string>;
+  selectedTiles: Record<TileColor, string>;
+  label: string;
+  possibleMove: string;
+  opponentMove: string;
+  possibleCapture: string;
+  strokes: Record<TileColor, string> & { opponent: string };
+};
 
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
@@ -77,19 +86,22 @@ export class HexchessBoard extends LitElement {
   private _capturedPiecePadding = 0.2;
   private _capturedPieceGroupPadding = 1;
   private _columnConfig: ColumnConfig = {} as ColumnConfig;
-  private _draggedPiece: SVGElement | null = null;
   private _hexagonPoints: Record<Square, number[][]> = {} as Record<
     Square,
     number[][]
   >;
-  private _hexagonPointsAsString: Record<Square, string> = {} as Record<
-    Square,
-    string
-  >;
+  private _canvas: HTMLCanvasElement | null = null;
+  private _canvasCtx: CanvasRenderingContext2D | null = null;
+  private _needsRedraw = true;
+  private _drawScheduled = false;
+  private _pieceImages: Partial<Record<Piece, HTMLImageElement>> = {};
+  private _draggedSquare: Square | null = null;
+  private _dragPointerDelta: { x: number; y: number } | null = null;
+  private _pointerBoardPosition: { x: number; y: number } | null = null;
   private _pieceSize = DEFAULT_PIECE_SIZE;
   private _polygonWidth = 29;
   private _polygonHeight = 22;
-  private _originalDragPosition: { x: number; y: number } | null = null;
+  private _devicePixelRatio = window.devicePixelRatio || 1;
   private _originalTurn: 'white' | 'black' = 'white';
   private _originalBoard: Board | undefined = undefined;
   private _squareCenters: Record<Square, [number, number]> | null = null;
@@ -107,6 +119,10 @@ export class HexchessBoard extends LitElement {
     () => this._emitFurthestForward(),
   );
   private _customEventsPaused = false;
+  private _boundWindowPointerUp = (event: MouseEvent | PointerEvent) =>
+    this._handleMouseUp(event);
+  private _boundWindowPointerMove = (event: MouseEvent | PointerEvent) =>
+    this._handleMouseMove(event);
 
   // -----------------
   // Public properties
@@ -162,6 +178,7 @@ export class HexchessBoard extends LitElement {
     this._state.moves = [];
     (this._state as WaitingState).legalMoves = newGame.allLegalMoves();
     this.requestUpdate('board');
+    this._scheduleRedraw();
   }
 
   /**
@@ -199,6 +216,7 @@ export class HexchessBoard extends LitElement {
       this._reconcileNewState(newState);
     }
     this.requestUpdate('board');
+    this._scheduleRedraw();
   }
 
   /**
@@ -282,17 +300,18 @@ export class HexchessBoard extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    window.addEventListener('pointerup', this._handleMouseUp.bind(this));
-    window.addEventListener('pointermove', this._handleMouseMove.bind(this));
+    window.addEventListener('pointerup', this._boundWindowPointerUp);
+    window.addEventListener('pointermove', this._boundWindowPointerMove);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener('pointerup', this._handleMouseUp);
-    window.removeEventListener('pointermove', this._handleMouseMove);
+    window.removeEventListener('pointerup', this._boundWindowPointerUp);
+    window.removeEventListener('pointermove', this._boundWindowPointerMove);
   }
 
   protected override firstUpdated(_changedProperties: PropertyValues): void {
+    this._captureCanvas();
     this.resize();
   }
 
@@ -327,6 +346,7 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
+    this._updatePointerPositionFromEvent(event);
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (square === null) {
@@ -341,41 +361,22 @@ export class HexchessBoard extends LitElement {
     }
 
     if (
-      newState.state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
-      newState.state.name === 'CANCEL_SELECTION_SOON'
+      square &&
+      (newState.state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+        newState.state.name === 'CANCEL_SELECTION_SOON')
     ) {
-      this._draggedPiece = this.renderRoot.querySelector(`.piece-${square}`);
-      this._draggedPiece?.classList.add('drag-piece');
-      if (this._draggedPiece) {
-        const boundingRect = this._draggedPiece.getBoundingClientRect();
-        this._originalDragPosition = {
-          x: boundingRect.left,
-          y: boundingRect.top,
-        };
-        const isLeftOf = event.clientX < boundingRect.left;
-        const deltaX = isLeftOf
-          ? event.clientX - boundingRect.left - boundingRect.width / 2
-          : event.clientX - boundingRect.right + boundingRect.width / 2;
-        const isAboveOf = event.clientY < boundingRect.top;
-        const deltaY = isAboveOf
-          ? event.clientY - boundingRect.top - boundingRect.height / 2
-          : event.clientY - boundingRect.bottom + boundingRect.height / 2;
-        this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      this._draggedSquare = square;
+      if (this._squareCenters && this._pointerBoardPosition) {
+        const center = this._squareCenters[square];
+        if (center) {
+          this._dragPointerDelta = {
+            x: this._pointerBoardPosition.x - center[0],
+            y: this._pointerBoardPosition.y - center[1],
+          };
+        }
       }
     }
 
-    this._reconcileNewState(newState);
-  }
-
-  private _handleMouseEnter(square: Square) {
-    if (this._state.name !== 'DRAG_PIECE' || this.frozen) {
-      return;
-    }
-
-    const newState = this._stateMachine.getNewState(this._state, {
-      name: 'MOUSE_MOVE_SQUARE',
-      square,
-    });
     this._reconcileNewState(newState);
   }
 
@@ -384,6 +385,7 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
+    this._updatePointerPositionFromEvent(event);
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (!square) {
@@ -397,40 +399,7 @@ export class HexchessBoard extends LitElement {
       });
     }
 
-    // Set new position of piece
-    const state = this._state as
-      | MouseDownPieceSelected
-      | DragPieceState
-      | CancelSelectionSoonState;
-    const originalPiece = this._state.game.board.getPiece(state.square);
-    const newPiece = newState.state.game.board.getPiece(state.square);
-    if (this._draggedPiece) {
-      if (originalPiece === newPiece) {
-        // 1. The piece didn't move and needs to go back to the square center
-        this._draggedPiece.style.transform = 'none';
-      } else {
-        // 2. The piece moved and needs to go to the center of the new square
-        this._draggedPiece.classList.remove(
-          `piece-${state.square}`,
-          'drag-piece',
-        );
-        this._draggedPiece.classList.add(
-          `piece-${
-            (
-              newState.state as
-                | MouseDownPieceSelected
-                | DragPieceState
-                | CancelSelectionSoonState
-            ).square
-          }`,
-        );
-      }
-    }
-
-    this._draggedPiece?.classList.remove('drag-piece');
-    this._draggedPiece = null;
-    this._originalDragPosition = null;
-
+    this._dragPointerDelta = null;
     this._reconcileNewState(newState);
   }
 
@@ -447,19 +416,8 @@ export class HexchessBoard extends LitElement {
       return;
     }
 
-    if (this._draggedPiece) {
-      if (
-        !this._originalDragPosition ||
-        !this._originalDragPosition.x ||
-        !this._originalDragPosition.y
-      ) {
-        throw new Error('Cannot drag when originalDragPosition is not defined');
-      }
-      const deltaX = event.clientX - this._originalDragPosition.x;
-      const deltaY = event.clientY - this._originalDragPosition.y;
-      this._draggedPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    }
-
+    this._updatePointerPositionFromEvent(event);
+    this._scheduleRedraw();
     const square = this._getSquareFromClick(event);
     let newState: BoardChange;
     if (square) {
@@ -538,7 +496,22 @@ export class HexchessBoard extends LitElement {
       }
     }
     this._state = newState.state;
+    this._updateDragVisualState();
     this.requestUpdate('board');
+    this._scheduleRedraw();
+  }
+
+  private _updateDragVisualState() {
+    if (
+      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+      this._state.name === 'DRAG_PIECE' ||
+      this._state.name === 'CANCEL_SELECTION_SOON'
+    ) {
+      this._draggedSquare = this._state.square;
+    } else {
+      this._draggedSquare = null;
+      this._dragPointerDelta = null;
+    }
   }
 
   private _calculateHexagonPoints(width: number, height: number): number[][] {
@@ -553,16 +526,6 @@ export class HexchessBoard extends LitElement {
       [quarterWidth, height],
       [0, halfHeight],
     ];
-  }
-
-  private _calculateHexagonPointsAsString(
-    width: number,
-    height: number,
-  ): string {
-    const quarterWidth = width / 4;
-    const threeQuarterWidth = quarterWidth * 3;
-    const halfHeight = height / 2;
-    return `${quarterWidth},0 ${threeQuarterWidth},0 ${width},${halfHeight} ${threeQuarterWidth},${height} ${quarterWidth},${height} 0,${halfHeight}`;
   }
 
   private _calculateColumnConfig(
@@ -649,26 +612,71 @@ export class HexchessBoard extends LitElement {
     return centers;
   }
 
+  private _getBoardCoordinatesFromEvent(
+    event: MouseEvent | PointerEvent,
+  ): { x: number; y: number } | null {
+    if (!this._canvas) {
+      return null;
+    }
+
+    const rect = this._canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      return null;
+    }
+    const cssX = event.clientX - rect.left;
+    const cssY = event.clientY - rect.top;
+    const x = (cssX / rect.width) * this._boardWidth;
+    const y = (cssY / rect.height) * this._boardHeight;
+    return { x, y };
+  }
+
+  private _updatePointerPositionFromEvent(
+    event: MouseEvent | PointerEvent,
+  ): void {
+    const coords = this._getBoardCoordinatesFromEvent(event);
+    this._pointerBoardPosition = coords;
+  }
+
   private _getSquareFromClick(event: MouseEvent | PointerEvent): Square | null {
-    if (!event.target) {
+    const coords = this._getBoardCoordinatesFromEvent(event);
+    if (!coords) {
       return null;
     }
 
-    if (!(event.target instanceof SVGElement)) {
-      return null;
+    for (const square of ALL_SQUARES) {
+      const points = this._hexagonPoints[square];
+      if (!points) {
+        continue;
+      }
+
+      if (this._isPointInPolygon(coords.x, coords.y, points)) {
+        return square;
+      }
     }
 
-    const parent = event.target.parentElement;
-    if (!parent) {
-      return null;
-    }
+    return null;
+  }
 
-    const dataset = parent.dataset;
-    if (!dataset || !('square' in dataset)) {
-      return null;
+  private _isPointInPolygon(
+    x: number,
+    y: number,
+    polygon: number[][],
+  ): boolean {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i++) {
+      const xi = polygon[i][0];
+      const yi = polygon[i][1];
+      const xj = polygon[j][0];
+      const yj = polygon[j][1];
+      if (yi > y !== yj > y) {
+        const slope = yj - yi;
+        const intersect = x < ((xj - xi) * (y - yi)) / slope + xi;
+        if (intersect) {
+          inside = !inside;
+        }
+      }
     }
-
-    return dataset.square as Square;
+    return inside;
   }
 
   private _getOffsets(square: Square, config: ColumnConfig): [number, number] {
@@ -728,11 +736,6 @@ export class HexchessBoard extends LitElement {
           this._polygonWidth,
           this._polygonHeight,
         ).map((point) => [point[0] + xOffset, point[1] + yOffset]);
-        this._hexagonPointsAsString[square] =
-          this._calculateHexagonPointsAsString(
-            this._polygonWidth,
-            this._polygonHeight,
-          );
       }
     }
   }
@@ -978,266 +981,6 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  private _renderPiece(square: Square) {
-    if (
-      !(square in this._state.game.board.pieces) ||
-      this._state.game.board.getPiece(square) === null
-    ) {
-      return nothing;
-    }
-    const piece = this._state.game.board.getPiece(square);
-    if (!piece) {
-      throw new Error('This is impossible');
-    }
-    const pos = this._squareCenters?.[square];
-    if (!pos) {
-      throw new Error('This is impossible');
-    }
-    return html`
-      <div style="left: ${pos[0]}px; top: ${
-        pos[1]
-      }px" class="piece piece-${square}">
-        ${renderPiece(piece.toString(), this._pieceSize)}
-      </div>
-    `;
-  }
-
-  private _renderPieces() {
-    const squares = Object.keys(this._state.game.board.pieces) as Square[];
-    return html`${squares.map((square) => this._renderPiece(square))}`;
-  }
-
-  private _renderColumnLabel(
-    column: Column,
-    row: number,
-    polygonWidth: number,
-    polygonHeight: number,
-  ) {
-    if (this.hideCoordinates) {
-      return nothing;
-    }
-
-    const square = `${column}${row}` as Square;
-    if (
-      this.orientation === 'white' &&
-      !WHITE_COLUMN_LABEL_SQUARES.includes(square)
-    ) {
-      return nothing;
-    }
-    if (
-      this.orientation === 'black' &&
-      !BLACK_COLUMN_LABEL_SQUARES.includes(square)
-    ) {
-      return nothing;
-    }
-
-    return svg`
-      <text
-        x=${polygonWidth * 0.75 - 10}
-        y=${polygonHeight - 4}
-        class="label"
-      >
-        ${column}
-      </text>
-    `;
-  }
-
-  private _renderCoordinate(column: Column, row: number, polygonWidth: number) {
-    if (this.hideCoordinates) {
-      return nothing;
-    }
-
-    const square = `${column}${row}` as Square;
-    if (
-      this.orientation === 'white' &&
-      !ANNOTATED_WHITE_SQUARES.includes(square)
-    ) {
-      return nothing;
-    }
-    if (
-      this.orientation === 'black' &&
-      !ANNOTATED_BLACK_SQUARES.includes(square)
-    ) {
-      return nothing;
-    }
-    return svg`
-      <text
-        x=${polygonWidth / 4 + 3}
-        y=${13}
-        class="label"
-      >
-        ${row}
-      </text>
-    `;
-  }
-
-  private _renderColumn(column: Column) {
-    const numHexagons = this._numberOfHexagons(column);
-
-    return svg`
-      <g id="column-${column}">
-        ${[...Array(numHexagons).keys()].map((i) => {
-          // Helper methods
-          const square = `${column}${i + 1}` as Square;
-
-          // Base background color, except for classes defined below
-          const color = this._getColorForSquare(square);
-
-          // Rendering classes
-          const isRecentFrom =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            this._state.moves[this._state.moves.length - 1].from === square;
-          const isRecentTo =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            this._state.moves[this._state.moves.length - 1].to === square;
-          const isSelected =
-            this._state.name !== 'WAITING' &&
-            this._state.name !== 'REWOUND' &&
-            this._state.name !== 'PROMOTING' &&
-            this._state.name !== 'GAMEOVER' &&
-            this._state.square === square;
-          const wasMostRecentMove =
-            this._state.name !== 'REWOUND' &&
-            this._state.moves.length > 0 &&
-            (this._state.moves[this._state.moves.length - 1].to === square ||
-              this._state.moves[this._state.moves.length - 1].from === square);
-          const canHaveOpponentMove =
-            this._state.name !== 'WAITING' &&
-            this._state.name !== 'REWOUND' &&
-            this._state.name !== 'PROMOTING' &&
-            this._state.name !== 'GAMEOVER' &&
-            this._state.opponentPieceMoves;
-          const selectedClass =
-            isSelected || isRecentFrom || isRecentTo
-              ? canHaveOpponentMove && !wasMostRecentMove
-                ? 'selected-opponent'
-                : 'selected'
-              : '';
-
-          // Offsets
-          const offset = this._getOffsets(square, this._columnConfig);
-          return svg`
-            <g
-              @pointerenter=${() => this._handleMouseEnter(square)}
-              class=${selectedClass}
-              data-square=${square}
-              transform="translate(${offset[0]},${offset[1]})"
-            >
-              ${this._renderHexagon(
-                this._polygonWidth,
-                this._polygonHeight,
-                color,
-              )}
-              ${this._renderDot(
-                this._polygonWidth,
-                this._polygonHeight,
-                column,
-                i + 1,
-              )}
-              ${this._renderColumnLabel(
-                column,
-                i + 1,
-                this._polygonWidth,
-                this._polygonHeight,
-              )}
-              ${this._renderCoordinate(column, i + 1, this._polygonWidth)}
-            </g>
-          `;
-        })}
-      </g>
-    `;
-  }
-
-  private _renderPossibleMove() {
-    if (this._state.name !== 'DRAG_PIECE') {
-      return nothing;
-    }
-
-    if (this._state.dragSquare === this._state.square) {
-      return nothing;
-    }
-
-    const offset = this._getOffsets(this._state.dragSquare, this._columnConfig);
-    const classBg:
-      | 'possible-move-opponent'
-      | 'possible-move-grey'
-      | 'possible-move-white'
-      | 'possible-move-black' = this._state.opponentPieceMoves
-      ? 'possible-move-opponent'
-      : `possible-move-${this._getColorForSquare(this._state.dragSquare)}`;
-    return svg`
-      <g
-        transform="translate(${offset[0]},${offset[1]})"
-      >
-        ${this._renderHexagon(this._polygonWidth, this._polygonHeight, classBg)}
-      </g>
-    `;
-  }
-
-  private _renderDot(
-    width: number,
-    height: number,
-    column: Column,
-    row: number,
-  ) {
-    if (
-      this._state.name === 'WAITING' ||
-      this._state.name === 'REWOUND' ||
-      this._state.name === 'PROMOTING' ||
-      this._state.name === 'GAMEOVER'
-    ) {
-      return nothing;
-    }
-
-    const square = `${column}${row}` as Square;
-    if (this._state.square === square) {
-      return nothing;
-    }
-    if (
-      (!this._state.opponentPieceMoves ||
-        !this._state.opponentPieceMoves.includes(square)) &&
-      !this._state.legalMoves[this._state.square]?.has(square)
-    ) {
-      return nothing;
-    }
-
-    if (this._state.game.board.getPiece(square) !== null) {
-      return svg`<circle
-        class="possible-capture"
-        cx=${width / 2}
-        cy=${height / 2}
-        r=${Math.min(this._polygonHeight, this._polygonWidth) / 2.2} />
-      `;
-    }
-
-    const radius = Math.min(this._polygonHeight, this._polygonWidth) / 6;
-    const classBg = this._state.opponentPieceMoves
-      ? 'opponent-move'
-      : 'possible-move';
-    return svg`<circle
-      cx=${width / 2}
-      cy=${height / 2}
-      r=${radius}
-      class=${classBg} />`;
-  }
-
-  private _renderHexagon(
-    width: number,
-    height: number,
-    className:
-      | TileColor
-      | 'possible-move-white'
-      | 'possible-move-black'
-      | 'possible-move-grey'
-      | 'possible-move-opponent',
-  ) {
-    return svg`<polygon
-      points=${this._calculateHexagonPointsAsString(width, height)}
-      class="${className}" />`;
-  }
-
   private _renderBoard() {
     const cursorClass =
       this._state.name === 'DRAG_PIECE' ||
@@ -1248,32 +991,451 @@ export class HexchessBoard extends LitElement {
 
     return html`
       <div id="root" style="width: 100%; height: 100%; position: relative;">
-        <svg
-          width="100%"
-          height="100%"
-          viewbox="0 0 ${this._boardWidth} ${this._boardHeight}"
-          class="board ${cursorClass}"
+        <canvas
+          class="board-canvas ${cursorClass}"
+          width=${this._boardWidth}
+          height=${this._boardHeight}
+          style="width: 100%; height: 100%;"
           @pointerdown=${(event: MouseEvent | PointerEvent) =>
             this._handleMouseDown(event)}
-          @pointerup=${(event: MouseEvent | PointerEvent) =>
-            this._handleMouseUp(event)}
-          @pointermove=${(event: MouseEvent) =>
-            requestAnimationFrame(() => this._handleMouseMove(event))}
-        >
-          <g>
-            ${COLUMN_ARRAY.map((column) => {
-              return svg`${this._renderColumn(column)}`;
-            })}
-          </g>
-          ${this._renderPossibleMove()}
-        </svg>
-        <div>${this._renderPieces()}</div>
+        ></canvas>
         <div class="game-info" style="padding-left: 17px">
           ${this._renderGameInfo()}
         </div>
         ${this._renderPromotionOptions()}
       </div>
     `;
+  }
+
+  private _captureCanvas() {
+    this._canvas = this.renderRoot.querySelector(
+      '.board-canvas',
+    ) as HTMLCanvasElement | null;
+    this._canvasCtx = this._canvas?.getContext('2d') ?? null;
+    this._configureCanvasSize();
+  }
+
+  private _configureCanvasSize() {
+    if (!this._canvas) {
+      return;
+    }
+    this._devicePixelRatio = window.devicePixelRatio || 1;
+    this._canvas.width = this._boardWidth * this._devicePixelRatio;
+    this._canvas.height = this._boardHeight * this._devicePixelRatio;
+    this._canvas.style.width = `${this._boardWidth}px`;
+    this._canvas.style.height = `${this._boardHeight}px`;
+    if (!this._canvasCtx) {
+      this._canvasCtx = this._canvas.getContext('2d');
+    }
+    this._scheduleRedraw();
+  }
+
+  private _scheduleRedraw() {
+    this._needsRedraw = true;
+    if (this._drawScheduled) {
+      return;
+    }
+    this._drawScheduled = true;
+    requestAnimationFrame(() => {
+      this._drawScheduled = false;
+      if (!this._needsRedraw) {
+        return;
+      }
+      this._needsRedraw = false;
+      this._drawBoardCanvas();
+    });
+  }
+
+  private _drawBoardCanvas() {
+    if (!this._canvas) {
+      return;
+    }
+    if (!this._canvasCtx) {
+      this._canvasCtx = this._canvas.getContext('2d');
+    }
+    const ctx = this._canvasCtx;
+    if (!ctx) {
+      return;
+    }
+    const dpr = window.devicePixelRatio || 1;
+    const targetWidth = this._boardWidth * dpr;
+    const targetHeight = this._boardHeight * dpr;
+    if (
+      this._canvas.width !== targetWidth ||
+      this._canvas.height !== targetHeight
+    ) {
+      this._configureCanvasSize();
+    }
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, this._boardWidth, this._boardHeight);
+    const styles = getComputedStyle(this);
+    const colors = this._getCssColors(styles);
+    ctx.fillStyle = colors.board;
+    ctx.fillRect(0, 0, this._boardWidth, this._boardHeight);
+    this._drawSquares(ctx, colors, styles);
+    this._drawMoveIndicators(ctx, colors);
+    this._drawDragTarget(ctx, colors);
+    this._drawPieces(ctx);
+    ctx.restore();
+  }
+
+  private _getCssColors(styles: CSSStyleDeclaration): CanvasColors {
+    const readVar = (name: string, fallback: string) => {
+      const value = styles.getPropertyValue(name).trim();
+      return value.length > 0 ? value : fallback;
+    };
+    return {
+      board: readVar('--hexchess-board-bg', '#ffffff'),
+      tiles: {
+        white: readVar('--hexchess-white-bg', '#a5c8df'),
+        black: readVar('--hexchess-black-bg', '#4180a9'),
+        grey: readVar('--hexchess-grey-bg', '#80b1d0'),
+      },
+      selectedTiles: {
+        white: readVar('--hexchess-selected-white-bg', '#e4c7b7'),
+        black: readVar('--hexchess-selected-black-bg', '#e4c7b7'),
+        grey: readVar('--hexchess-selected-grey-bg', '#e4c7b7'),
+      },
+      label: readVar('--hexchess-label-bg', '#ffffff'),
+      possibleMove: readVar('--hexchess-possible-move-bg', '#a96a41'),
+      opponentMove: readVar('--hexchess-possible-move-opponent-bg', '#e3e3e3'),
+      possibleCapture: readVar('--hexchess-possible-capture-bg', '#a96a41'),
+      strokes: {
+        white: readVar('--hexchess-possible-move-stroke-white', '#a96a41'),
+        black: readVar('--hexchess-possible-move-stroke-black', '#a96a41'),
+        grey: readVar('--hexchess-possible-move-stroke-grey', '#a96a41'),
+        opponent: readVar(
+          '--hexchess-possible-move-stroke-opponent',
+          '#e3e3e3',
+        ),
+      },
+    };
+  }
+
+  private _drawSquares(
+    ctx: CanvasRenderingContext2D,
+    colors: CanvasColors,
+    styles: CSSStyleDeclaration,
+  ) {
+    const fontSizeRaw = styles.getPropertyValue('--hexchess-label-size').trim();
+    const fontSize = Number.parseInt(fontSizeRaw, 10) || 12;
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+
+    const highlightLastMove = this._state.name !== 'REWOUND';
+    const recentMove =
+      highlightLastMove && this._state.moves.length > 0
+        ? this._state.moves[this._state.moves.length - 1]
+        : null;
+    const interactiveState =
+      this._state.name !== 'WAITING' &&
+      this._state.name !== 'REWOUND' &&
+      this._state.name !== 'PROMOTING' &&
+      this._state.name !== 'GAMEOVER';
+    const selectedSquare = this._getSelectedSquare();
+
+    for (const column of COLUMN_ARRAY) {
+      const numHexagons = this._numberOfHexagons(column);
+      for (let row = 1; row <= numHexagons; row++) {
+        const square = `${column}${row}` as Square;
+        const polygon = this._hexagonPoints[square];
+        if (!polygon) {
+          continue;
+        }
+        const tileColor = this._getColorForSquare(square);
+        const isRecentFrom = highlightLastMove && recentMove?.from === square;
+        const isRecentTo = highlightLastMove && recentMove?.to === square;
+        const isSelected = interactiveState && selectedSquare === square;
+        const wasMostRecentMove =
+          highlightLastMove &&
+          !!recentMove &&
+          (recentMove.to === square || recentMove.from === square);
+        const canHaveOpponentMove =
+          interactiveState && !!this._state.opponentPieceMoves;
+
+        let fillColor = colors.tiles[tileColor];
+        if (isSelected || isRecentFrom || isRecentTo) {
+          fillColor =
+            canHaveOpponentMove && !wasMostRecentMove
+              ? colors.opponentMove
+              : colors.selectedTiles[tileColor];
+        }
+
+        this._tracePolygon(ctx, polygon);
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+
+        if (!this.hideCoordinates) {
+          const offsets = this._getOffsets(square, this._columnConfig);
+          if (this._shouldRenderColumnLabel(square)) {
+            this._drawColumnLabel(ctx, column, offsets, colors.label, fontSize);
+          }
+          if (this._shouldRenderCoordinateLabel(square)) {
+            this._drawCoordinateLabel(
+              ctx,
+              row,
+              offsets,
+              colors.label,
+              fontSize,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  private _shouldRenderColumnLabel(square: Square): boolean {
+    if (this.hideCoordinates) {
+      return false;
+    }
+    return this.orientation === 'white'
+      ? WHITE_COLUMN_LABEL_SQUARES.includes(square)
+      : BLACK_COLUMN_LABEL_SQUARES.includes(square);
+  }
+
+  private _shouldRenderCoordinateLabel(square: Square): boolean {
+    if (this.hideCoordinates) {
+      return false;
+    }
+    return this.orientation === 'white'
+      ? ANNOTATED_WHITE_SQUARES.includes(square)
+      : ANNOTATED_BLACK_SQUARES.includes(square);
+  }
+
+  private _drawColumnLabel(
+    ctx: CanvasRenderingContext2D,
+    column: Column,
+    offsets: [number, number],
+    color: string,
+    fontSize: number,
+  ) {
+    ctx.fillStyle = color;
+    ctx.fillText(
+      column,
+      offsets[0] + this._polygonWidth * 0.75 - 10,
+      offsets[1] + this._polygonHeight - fontSize / 4,
+    );
+  }
+
+  private _drawCoordinateLabel(
+    ctx: CanvasRenderingContext2D,
+    row: number,
+    offsets: [number, number],
+    color: string,
+    _fontSize: number,
+  ) {
+    ctx.fillStyle = color;
+    ctx.fillText(
+      row.toString(),
+      offsets[0] + this._polygonWidth / 4 + 3,
+      offsets[1] + 13,
+    );
+  }
+
+  private _tracePolygon(ctx: CanvasRenderingContext2D, points: number[][]) {
+    if (points.length === 0) {
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i][0], points[i][1]);
+    }
+    ctx.closePath();
+  }
+
+  private _drawMoveIndicators(
+    ctx: CanvasRenderingContext2D,
+    colors: CanvasColors,
+  ) {
+    if (
+      this._state.name === 'WAITING' ||
+      this._state.name === 'REWOUND' ||
+      this._state.name === 'PROMOTING' ||
+      this._state.name === 'GAMEOVER'
+    ) {
+      return;
+    }
+    const selectedSquare = this._getSelectedSquare();
+    if (!selectedSquare) {
+      return;
+    }
+    const opponentMoves = this._state.opponentPieceMoves ?? [];
+    const legalMoves = this._state.legalMoves[selectedSquare];
+
+    for (const square of ALL_SQUARES) {
+      if (square === selectedSquare) {
+        continue;
+      }
+      const isOpponentMove = opponentMoves?.includes(square) ?? false;
+      const isLegalMove = legalMoves?.has(square) ?? false;
+      if (!isOpponentMove && !isLegalMove) {
+        continue;
+      }
+      const center = this._squareCenters?.[square];
+      if (!center) {
+        continue;
+      }
+      const hasPiece = this._state.game.board.getPiece(square) !== null;
+      if (hasPiece) {
+        ctx.beginPath();
+        ctx.strokeStyle = colors.possibleCapture;
+        ctx.lineWidth = 5;
+        ctx.arc(
+          center[0],
+          center[1],
+          Math.min(this._polygonWidth, this._polygonHeight) / 2.2,
+          0,
+          Math.PI * 2,
+        );
+        ctx.stroke();
+        continue;
+      }
+      ctx.beginPath();
+      ctx.fillStyle = isOpponentMove
+        ? colors.opponentMove
+        : colors.possibleMove;
+      ctx.arc(
+        center[0],
+        center[1],
+        Math.min(this._polygonWidth, this._polygonHeight) / 6,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+  }
+
+  private _drawDragTarget(ctx: CanvasRenderingContext2D, colors: CanvasColors) {
+    if (this._state.name !== 'DRAG_PIECE') {
+      return;
+    }
+    if (this._state.dragSquare === this._state.square) {
+      return;
+    }
+    const dragSquare = this._state.dragSquare;
+    const polygon = this._hexagonPoints[dragSquare];
+    if (!polygon) {
+      return;
+    }
+    const tileColor = this._getColorForSquare(dragSquare);
+    const strokeColor = this._state.opponentPieceMoves
+      ? colors.strokes.opponent
+      : colors.strokes[tileColor];
+    this._tracePolygon(ctx, polygon);
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 5;
+    ctx.stroke();
+  }
+
+  private _drawPieces(ctx: CanvasRenderingContext2D) {
+    const squares = Object.keys(this._state.game.board.pieces) as Square[];
+    const draggingSquare = this._draggedSquare;
+    let draggedPiece: Piece | null = null;
+
+    for (const square of squares) {
+      const piece = this._state.game.board.getPiece(square);
+      if (!piece) {
+        continue;
+      }
+      const pieceChar = piece.toString() as Piece;
+      if (
+        draggingSquare &&
+        square === draggingSquare &&
+        (this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+          this._state.name === 'CANCEL_SELECTION_SOON' ||
+          this._state.name === 'DRAG_PIECE')
+      ) {
+        draggedPiece = pieceChar;
+        continue;
+      }
+      this._drawPieceAtSquare(ctx, pieceChar, square);
+    }
+
+    if (draggedPiece) {
+      this._drawDraggedPiece(ctx, draggedPiece);
+    }
+  }
+
+  private _drawPieceAtSquare(
+    ctx: CanvasRenderingContext2D,
+    piece: Piece,
+    square: Square,
+  ) {
+    if (!this._squareCenters) {
+      return;
+    }
+    const center = this._squareCenters[square];
+    if (!center) {
+      return;
+    }
+    this._drawPiece(ctx, piece, center[0], center[1]);
+  }
+
+  private _drawDraggedPiece(ctx: CanvasRenderingContext2D, piece: Piece) {
+    const center = this._getDraggedPieceCenter();
+    if (!center) {
+      return;
+    }
+    this._drawPiece(ctx, piece, center[0], center[1]);
+  }
+
+  private _drawPiece(
+    ctx: CanvasRenderingContext2D,
+    piece: Piece,
+    centerX: number,
+    centerY: number,
+  ) {
+    const image = this._loadPieceImage(piece);
+    if (!image) {
+      return;
+    }
+    const size = this._pieceSize;
+    ctx.drawImage(image, centerX - size / 2, centerY - size / 2, size, size);
+  }
+
+  private _loadPieceImage(piece: Piece): HTMLImageElement | null {
+    const assetId = PIECE_ASSET_IDS[piece];
+    if (!assetId) {
+      return null;
+    }
+    const cached = this._pieceImages[piece];
+    if (cached) {
+      return cached.complete ? cached : null;
+    }
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.src = PIECE_ASSET_URLS[assetId];
+    image.onload = () => this._scheduleRedraw();
+    this._pieceImages[piece] = image;
+    return image.complete ? image : null;
+  }
+
+  private _getSelectedSquare(): Square | null {
+    switch (this._state.name) {
+      case 'MOUSE_DOWN_PIECE_SELECTED':
+      case 'MOUSE_UP_PIECE_SELECTED':
+      case 'DRAG_PIECE':
+      case 'CANCEL_SELECTION_SOON':
+        return this._state.square;
+      default:
+        return null;
+    }
+  }
+
+  private _getDraggedPieceCenter(): [number, number] | null {
+    if (!this._pointerBoardPosition) {
+      return null;
+    }
+    if (this._dragPointerDelta) {
+      return [
+        this._pointerBoardPosition.x - this._dragPointerDelta.x,
+        this._pointerBoardPosition.y - this._dragPointerDelta.y,
+      ];
+    }
+    return [this._pointerBoardPosition.x, this._pointerBoardPosition.y];
   }
 
   private _emitFurthestBack() {
@@ -1323,7 +1485,9 @@ export class HexchessBoard extends LitElement {
       this.orientation = 'white';
     }
     this._recalculateBoardCoordinates();
+    this._configureCanvasSize();
     this.requestUpdate('board');
+    this._scheduleRedraw();
   }
 
   /**
@@ -1332,7 +1496,9 @@ export class HexchessBoard extends LitElement {
   resize(): void {
     this._recalculateBoardCoordinates();
     this._pieceSize = Math.min(this._polygonWidth, this._polygonHeight) * 0.8;
+    this._configureCanvasSize();
     this.requestUpdate('board');
+    this._scheduleRedraw();
   }
 
   /**
