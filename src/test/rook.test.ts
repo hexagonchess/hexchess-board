@@ -1,5 +1,4 @@
 import { describe, expect, test } from '@jest/globals';
-import { assert } from '@open-wc/testing';
 import { Board } from '../board';
 import { Position } from '../position';
 import { Rook } from '../rook';
@@ -25,27 +24,35 @@ describe('Rooks', () => {
 
     // Left white rook
     let piece = board.getPiece('C1');
-    assert(piece !== null);
+    if (piece === null) {
+      throw new Error('Expected rook at C1');
+    }
     board.addPiece(piece);
-    expect(piece?.allSquareMoves(board).length).toBe(3);
+    expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Right white rook
     piece = board.getPiece('I1');
-    assert(piece !== null);
+    if (piece === null) {
+      throw new Error('Expected rook at I1');
+    }
     board.addPiece(piece);
-    expect(piece?.allSquareMoves(board).length).toBe(3);
+    expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Left black rook
     piece = board.getPiece('C8');
-    assert(piece !== null);
+    if (piece === null) {
+      throw new Error('Expected rook at C8');
+    }
     board.addPiece(piece);
-    expect(piece?.allSquareMoves(board).length).toBe(3);
+    expect(piece.allSquareMoves(board).length).toBe(3);
 
     // Right black rook
     piece = board.getPiece('I8');
-    assert(piece !== null);
+    if (piece === null) {
+      throw new Error('Expected rook at I8');
+    }
     board.addPiece(piece);
-    expect(piece?.allSquareMoves(board).length).toBe(3);
+    expect(piece.allSquareMoves(board).length).toBe(3);
   });
 
   test('Can get the defended squares of a rook correctly', () => {

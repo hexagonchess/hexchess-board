@@ -90,7 +90,7 @@ export function blackKingAndBishopCheckmate(): Board {
 export function pinnedPiece(): Board {
   const board = Board.empty();
   board.addPiece(new King('white', new Position('F', 11)));
-  board.addPiece(new Bishop('white', new Position('F', 10)));
+  board.addPiece(new Queen('white', new Position('F', 10)));
   board.addPiece(new Rook('black', new Position('F', 1)));
   board.addPiece(new King('black', new Position('A', 1)));
   return board;

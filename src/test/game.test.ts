@@ -3,11 +3,20 @@ import { Bishop } from '../bishop';
 import { Board } from '../board';
 import { Game, GameState } from '../game';
 import { King } from '../king';
+import { Knight } from '../knight';
 import { Pawn } from '../pawn';
 import { Position } from '../position';
 import { Queen } from '../queen';
 import { Rook } from '../rook';
+import { HexchessPiece, Move, Piece } from '../types';
 import * as BoardUtils from './board-utils';
+
+const createMinimalBoard = (): Board => {
+  const board = Board.empty();
+  board.addPiece(new King('white', new Position('F', 11)));
+  board.addPiece(new King('black', new Position('F', 1)));
+  return board;
+};
 
 describe('Game', () => {
   test('Calculates all legal moves correctly', () => {
@@ -94,16 +103,19 @@ describe('Game', () => {
   });
 
   test('Prevents moving pinned pieces', () => {
-    const game = new Game(BoardUtils.pinnedPiece());
-
+    const cannotMoveGame = new Game(BoardUtils.pinnedPiece());
     expect(() =>
-      game.movePiece(new Position('F', 10), new Position('D', 9)),
+      cannotMoveGame.movePiece(new Position('F', 10), new Position('D', 9)),
     ).toThrow();
+
+    const kingCanMoveGame = new Game(BoardUtils.pinnedPiece());
     expect(() =>
-      game.movePiece(new Position('F', 11), new Position('E', 10)),
+      kingCanMoveGame.movePiece(new Position('F', 11), new Position('E', 10)),
     ).not.toThrow();
+
+    const moveAlongPinGame = new Game(BoardUtils.pinnedPiece());
     expect(() =>
-      game.movePiece(new Position('F', 10), new Position('F', 9)),
+      moveAlongPinGame.movePiece(new Position('F', 10), new Position('F', 9)),
     ).not.toThrow();
   });
   test('Detects when someone is checkmated', () => {
@@ -279,6 +291,209 @@ describe('Game', () => {
       promotion: null,
     });
     expect(game.board.getPiece(new Position('F', 5).toSquare())).toBe(null);
+  });
+
+  test('fastForward adds promoted pieces for every promotion type', () => {
+    const promotions: Array<{
+      promotion: NonNullable<Move['promotion']>;
+      ctor: new (...args: never[]) => HexchessPiece;
+      color: 'white' | 'black';
+    }> = [
+      { promotion: 'Q', ctor: Queen, color: 'white' },
+      { promotion: 'q', ctor: Queen, color: 'black' },
+      { promotion: 'R', ctor: Rook, color: 'white' },
+      { promotion: 'r', ctor: Rook, color: 'black' },
+      { promotion: 'B', ctor: Bishop, color: 'white' },
+      { promotion: 'b', ctor: Bishop, color: 'black' },
+      { promotion: 'N', ctor: Knight, color: 'white' },
+      { promotion: 'n', ctor: Knight, color: 'black' },
+    ];
+
+    for (const { promotion, ctor, color } of promotions) {
+      const board = createMinimalBoard();
+      const fromPosition =
+        color === 'white' ? new Position('C', 3) : new Position('C', 6);
+      const toPosition =
+        color === 'white' ? new Position('C', 4) : new Position('C', 5);
+      board.addPiece(new Queen(color, fromPosition));
+      const game = new Game(board);
+
+      const move: Move = {
+        from: fromPosition.toSquare(),
+        to: toPosition.toSquare(),
+        enPassant: false,
+        promotion,
+      };
+
+      game.fastForward(move);
+      const promotedPiece = game.board.getPiece(toPosition.toSquare());
+      expect(promotedPiece).toBeInstanceOf(ctor);
+      expect(promotedPiece?.color).toBe(color);
+    }
+  });
+
+  test('rewind reinstates promoted pawns for both colors', () => {
+    const promotions: Array<{
+      promotion: NonNullable<Move['promotion']>;
+      expectedColor: 'white' | 'black';
+    }> = [
+      { promotion: 'Q', expectedColor: 'white' },
+      { promotion: 'q', expectedColor: 'black' },
+    ];
+
+    for (const { promotion, expectedColor } of promotions) {
+      const board = createMinimalBoard();
+      const fromPosition = new Position('C', 3);
+      const toPosition = new Position('C', 4);
+      board.addPiece(new Queen(expectedColor, toPosition));
+      const game = new Game(board);
+
+      const move: Move = {
+        from: fromPosition.toSquare(),
+        to: toPosition.toSquare(),
+        enPassant: false,
+        promotion,
+      };
+
+      game.rewind(move);
+      const pawn = game.board.getPiece(fromPosition.toSquare());
+      expect(pawn).toBeInstanceOf(Pawn);
+      expect(pawn?.color).toBe(expectedColor);
+      expect(game.board.getPiece(toPosition.toSquare())).toBe(null);
+    }
+  });
+
+  test('rewind restores every captured piece type', () => {
+    const capturedCases: Array<{
+      capturedPiece: Piece;
+      enPassant: boolean;
+      expectedSquare: string;
+      expectedColor: 'white' | 'black';
+      ctor: new (...args: never[]) => HexchessPiece;
+    }> = [
+      {
+        capturedPiece: 'p',
+        enPassant: true,
+        expectedSquare: 'C5',
+        expectedColor: 'black',
+        ctor: Pawn,
+      },
+      {
+        capturedPiece: 'p',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: Pawn,
+      },
+      {
+        capturedPiece: 'P',
+        enPassant: true,
+        expectedSquare: 'C5',
+        expectedColor: 'white',
+        ctor: Pawn,
+      },
+      {
+        capturedPiece: 'P',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: Pawn,
+      },
+      {
+        capturedPiece: 'k',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: King,
+      },
+      {
+        capturedPiece: 'K',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: King,
+      },
+      {
+        capturedPiece: 'q',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: Queen,
+      },
+      {
+        capturedPiece: 'Q',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: Queen,
+      },
+      {
+        capturedPiece: 'r',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: Rook,
+      },
+      {
+        capturedPiece: 'R',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: Rook,
+      },
+      {
+        capturedPiece: 'b',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: Bishop,
+      },
+      {
+        capturedPiece: 'B',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: Bishop,
+      },
+      {
+        capturedPiece: 'n',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'black',
+        ctor: Knight,
+      },
+      {
+        capturedPiece: 'N',
+        enPassant: false,
+        expectedSquare: 'C4',
+        expectedColor: 'white',
+        ctor: Knight,
+      },
+    ];
+
+    for (const scenario of capturedCases) {
+      const board = createMinimalBoard();
+      const fromPosition = new Position('C', 3);
+      const toPosition = new Position('C', 4);
+      board.addPiece(new Queen('white', toPosition));
+      const game = new Game(board);
+
+      const move: Move = {
+        from: fromPosition.toSquare(),
+        to: toPosition.toSquare(),
+        enPassant: scenario.enPassant,
+        promotion: null,
+        capturedPiece: scenario.capturedPiece,
+      };
+
+      game.rewind(move);
+      const restoredSquare = Position.fromString(
+        scenario.expectedSquare,
+      ).toSquare();
+      const restoredPiece = game.board.getPiece(restoredSquare);
+      expect(restoredPiece).toBeInstanceOf(scenario.ctor);
+      expect(restoredPiece?.color).toBe(scenario.expectedColor);
+    }
   });
 
   test('Can only en passant for one turn after the pawn moves', () => {

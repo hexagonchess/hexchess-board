@@ -1,6 +1,15 @@
 import { describe, expect, test } from '@jest/globals';
+import { Board } from '../board';
+import { King } from '../king';
+import { Position } from '../position';
 import { Move } from '../types';
-import { movesToString, stringToMoves } from '../utils';
+import {
+  boardToFen,
+  fenToBoard,
+  movesToString,
+  stringToMoves,
+  validatePosition,
+} from '../utils';
 
 describe('Utils', () => {
   test('Converts moves to a CSV string properly', () => {
@@ -68,5 +77,44 @@ describe('Utils', () => {
       { from: 'B2', to: 'B1', enPassant: false, promotion: 'q' },
     ];
     expect(stringToMoves(moveStr)).toEqual(moves);
+  });
+
+  test('fenToBoard falls back to an empty board for invalid input', () => {
+    expect(fenToBoard('invalid').numPieces()).toBe(0);
+    expect(fenToBoard(null).numPieces()).toBe(0);
+
+    const startingBoard = fenToBoard('start');
+    expect(startingBoard.getPiece('G1')).toBeInstanceOf(King);
+  });
+
+  test('boardToFen serializes boards and handles fallback values', () => {
+    expect(boardToFen({} as unknown as Board)).toBe('6/7/8/9/10/11/10/9/8/7/6');
+
+    const board = Board.empty();
+    board.addPiece(new King('white', new Position('F', 2)));
+    const fen = boardToFen(board);
+    expect(fen).toContain('K');
+  });
+
+  test('stringToMoves rejects invalid formats', () => {
+    expect(() => stringToMoves('bad-move')).toThrow('Invalid move: bad-move');
+    expect(() => stringToMoves('J1-A2')).toThrow('Invalid move: J1-A2');
+    expect(() => stringToMoves('A1-J2')).toThrow('Invalid move: A1-J2');
+  });
+
+  test('validatePosition handles special tokens and malformed data', () => {
+    expect(validatePosition(42 as unknown)).toBeNull();
+
+    const emptyBoard = validatePosition('');
+    expect(emptyBoard?.numPieces()).toBe(0);
+
+    const startBoard = validatePosition('start');
+    expect(startBoard?.getPiece('G1')).toBeInstanceOf(King);
+
+    expect(validatePosition('6/7')).toBeNull();
+    expect(validatePosition('5/7/8/9/10/11/10/9/8/7/6')).toBeNull();
+
+    const validBoard = validatePosition('6/7/8/9/10/11/10/9/8/7/6');
+    expect(validBoard?.numPieces()).toBe(0);
   });
 });
