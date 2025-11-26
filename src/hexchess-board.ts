@@ -5,9 +5,6 @@ import {
   BoardChange,
   BoardState,
   BoardStateMachine,
-  CancelSelectionSoonState,
-  DragPieceState,
-  MouseDownPieceSelected,
   RewoundState,
   WaitingState,
 } from './board-state';
@@ -1153,7 +1150,9 @@ export class HexchessBoard extends LitElement {
           !!recentMove &&
           (recentMove.to === square || recentMove.from === square);
         const canHaveOpponentMove =
-          interactiveState && !!this._state.opponentPieceMoves;
+          interactiveState &&
+          'opponentPieceMoves' in this._state &&
+          !!this._state.opponentPieceMoves;
 
         let fillColor = colors.tiles[tileColor];
         if (isSelected || isRecentFrom || isRecentTo) {

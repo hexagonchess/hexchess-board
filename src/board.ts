@@ -120,7 +120,7 @@ export class Board {
   private _resetPawnsDidMoveTwoSquares() {
     for (const [square, piece] of Object.entries(this.pieces)) {
       if (piece === null || !(piece instanceof Pawn)) {
-        return;
+        continue;
       }
 
       this.pieces[square as Square] = new Pawn(
