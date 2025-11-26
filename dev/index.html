@@ -6,37 +6,47 @@
     <title>Hexchess Board Demo</title>
     <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../node_modules/lit/polyfill-support.js"></script>
-    <script type="module" src="../hexchess-board.js"></script>
+    <script type="module">
+      import '../src/hexchess-board.ts';
+    </script>
   </head>
   <body style="padding: 0px; margin: 0px; overflow: hidden">
     <script>
+      const boardPromise = customElements
+        .whenDefined('hexchess-board')
+        .then(() => document.querySelector('hexchess-board'));
+
       document.addEventListener('keydown', (event) => {
         event.preventDefault();
       });
       document.addEventListener('keyup', (event) => {
         event.preventDefault();
         if (event.code === 'KeyF') {
-          document.querySelector('hexchess-board').flip();
+          boardPromise.then((board) => board?.flip());
         } else if (event.code === 'ArrowRight') {
-          document.querySelector('hexchess-board').fastForward();
+          boardPromise.then((board) => board?.fastForward());
         } else if (event.code === 'ArrowLeft') {
-          document.querySelector('hexchess-board').rewind();
+          boardPromise.then((board) => board?.rewind());
+        } else if (event.code === 'ArrowDown') {
+          boardPromise.then((board) => board?.rewindAll());
+        } else if (event.code === 'ArrowUp') {
+          boardPromise.then((board) => board?.fastForwardAll());
         }
       });
       window.addEventListener('resize', () => {
-        document.querySelector('hexchess-board').resize();
+        boardPromise.then((board) => board?.resize());
       });
       window.onload = () => {
-        document.querySelector('hexchess-board').resize();
+        boardPromise.then((board) => board?.resize());
       };
     </script>
     <div style="width: 100vw; height: 100vh">
       <hexchess-board
         id="hexchess-board"
-        board="6/P5p/1P4p1/2P3p2/3P2p3/4P1p4/K2P2p2k/2P3p2/1P4p1/P5p/6"
         turn="white"
         orientation="white"
-      ></hexchess-board>
+      >
+      </hexchess-board>
     </div>
   </body>
 </html>
