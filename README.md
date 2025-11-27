@@ -16,7 +16,7 @@
 
 3. Can be standalone without a server! `hexchess-board` ships with a complete game engine that can detect illegal moves, checkmate, stalemate, and more! You can play with two players on the same laptop without any other dependencies, should you choose.
 
-4. Minimal dependencies - the web component has a single dependency that, when shipped in production mode, can mostly be tree shaken away. We use [Lit](https://lit.dev) for developer convenience when creating the web component, but the footprint is extremely small.
+4. Zero dependencies - built entirely using web standards, this board requires absolutely no external dependencies, so the footprint stays extremely small.
 
 Read the full documentation on [the website](https://mganjoo.github.io/gchessboard/).
 
