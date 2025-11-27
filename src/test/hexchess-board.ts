@@ -10,9 +10,10 @@ import { assert } from '@open-wc/testing';
 
 suite('hexchess-board', () => {
   teardown(() => {
-    document
-      .querySelectorAll('hexchess-board')
-      .forEach((element) => element.remove());
+    const instances = document.querySelectorAll('hexchess-board');
+    for (const element of instances) {
+      element.remove();
+    }
   });
 
   test('is defined', () => {
