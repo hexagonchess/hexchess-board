@@ -1,5 +1,6 @@
 import { Board } from './board';
 import {
+  BoardAnimation,
   BoardChange,
   BoardState,
   BoardStateMachine,
@@ -36,6 +37,12 @@ type CanvasColors = {
   opponentMove: string;
   possibleCapture: string;
   strokes: Record<TileColor, string> & { opponent: string };
+};
+
+type ActiveHistoryAnimation = BoardAnimation & {
+  duration: number;
+  progress: number;
+  startTime: number;
 };
 
 /**
@@ -125,6 +132,9 @@ export class HexchessBoard extends HTMLElement {
     () => this._emitFurthestBack(),
     () => this._emitFurthestForward(),
   );
+  private _activeHistoryAnimation: ActiveHistoryAnimation | null = null;
+  private _historyAnimationQueue: BoardAnimation[] = [];
+  private _historyAnimationDuration = 100;
   private _customEventsPaused = false;
   private _boundWindowPointerUp = (event: MouseEvent | PointerEvent) =>
     this._handleMouseUp(event);
@@ -144,6 +154,7 @@ export class HexchessBoard extends HTMLElement {
 
   set turn(turn: 'white' | 'black') {
     this._originalTurn = turn;
+    this._resetHistoryAnimations();
     this._state.game = new Game(
       this._state.game.board,
       turn === 'white' ? 0 : 1,
@@ -162,6 +173,7 @@ export class HexchessBoard extends HTMLElement {
 
   set board(board: Board) {
     this._originalBoard = board;
+    this._resetHistoryAnimations();
 
     const emptyBoard = Board.empty();
     for (const square of ALL_SQUARES) {
@@ -181,6 +193,24 @@ export class HexchessBoard extends HTMLElement {
   }
 
   /**
+   * Duration in milliseconds for rewind/fast-forward animations.
+   * Set to 0 to disable animations entirely.
+   */
+  get historyAnimationDuration(): number {
+    return this._historyAnimationDuration;
+  }
+
+  set historyAnimationDuration(duration: number) {
+    const parsed = Number(duration);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      this._historyAnimationDuration = 0;
+      this._resetHistoryAnimations();
+      return;
+    }
+    this._historyAnimationDuration = parsed;
+  }
+
+  /**
    * A list of moves made on the board.
    * This is useful for analyzing games already played or certain pre-determined openings.
    */
@@ -189,6 +219,7 @@ export class HexchessBoard extends HTMLElement {
   }
 
   set moves(moves: Move[]) {
+    this._resetHistoryAnimations();
     for (const move of moves) {
       const newState = this._stateMachine.getNewState(this._state, {
         name: 'PROGRAMMATIC_MOVE',
@@ -376,6 +407,7 @@ export class HexchessBoard extends HTMLElement {
       'show-hints',
       'hide-playernames',
       'hide-capturedpieces',
+      'history-animation-duration',
     ];
   }
 
@@ -434,6 +466,11 @@ export class HexchessBoard extends HTMLElement {
       }
       case 'hide-capturedpieces': {
         this.hideCapturedPieces = newValue !== null;
+        break;
+      }
+      case 'history-animation-duration': {
+        this.historyAnimationDuration =
+          newValue === null ? 0 : Number(newValue);
         break;
       }
       default:
@@ -733,6 +770,9 @@ export class HexchessBoard extends HTMLElement {
   private _reconcileNewState(newState: BoardChange) {
     if (!newState.didChange) {
       return;
+    }
+    if (newState.animation) {
+      this._queueHistoryAnimation(newState.animation);
     }
     if (newState.state.name !== 'REWOUND') {
       if (
@@ -1325,6 +1365,7 @@ export class HexchessBoard extends HTMLElement {
     if (!ctx) {
       return;
     }
+    this._updateHistoryAnimations(this._now());
     const dpr = window.devicePixelRatio || 1;
     const targetWidth = this._boardWidth * dpr;
     const targetHeight = this._boardHeight * dpr;
@@ -1345,7 +1386,12 @@ export class HexchessBoard extends HTMLElement {
     this._drawMoveIndicators(ctx, colors);
     this._drawDragTarget(ctx, colors);
     this._drawPieces(ctx);
+    this._drawPendingHistoryAnimations(ctx);
+    this._drawActiveHistoryAnimation(ctx);
     ctx.restore();
+    if (this._activeHistoryAnimation) {
+      this._scheduleRedraw();
+    }
   }
 
   private _getCssColors(styles: CSSStyleDeclaration): CanvasColors {
@@ -1603,9 +1649,19 @@ export class HexchessBoard extends HTMLElement {
   private _drawPieces(ctx: CanvasRenderingContext2D) {
     const squares = Object.keys(this._state.game.board.pieces) as Square[];
     const draggingSquare = this._draggedSquare;
+    const hiddenSquares = new Set<Square>();
+    if (this._activeHistoryAnimation) {
+      hiddenSquares.add(this._activeHistoryAnimation.to);
+    }
+    for (const animation of this._historyAnimationQueue) {
+      hiddenSquares.add(animation.to);
+    }
     let draggedPiece: Piece | null = null;
 
     for (const square of squares) {
+      if (hiddenSquares.has(square)) {
+        continue;
+      }
       const piece = this._state.game.board.getPiece(square);
       if (!piece) {
         continue;
@@ -1652,6 +1708,37 @@ export class HexchessBoard extends HTMLElement {
     this._drawPiece(ctx, piece, center[0], center[1]);
   }
 
+  private _drawPendingHistoryAnimations(ctx: CanvasRenderingContext2D) {
+    if (!this._squareCenters || this._historyAnimationQueue.length === 0) {
+      return;
+    }
+    for (const animation of this._historyAnimationQueue) {
+      const center = this._squareCenters[animation.from];
+      if (!center) {
+        continue;
+      }
+      this._drawPiece(ctx, animation.piece, center[0], center[1]);
+    }
+  }
+
+  private _drawActiveHistoryAnimation(ctx: CanvasRenderingContext2D) {
+    if (!this._activeHistoryAnimation || !this._squareCenters) {
+      return;
+    }
+    const fromCenter = this._squareCenters[this._activeHistoryAnimation.from];
+    const toCenter = this._squareCenters[this._activeHistoryAnimation.to];
+    if (!fromCenter || !toCenter) {
+      return;
+    }
+    const progress = Math.min(
+      Math.max(this._activeHistoryAnimation.progress ?? 0, 0),
+      1,
+    );
+    const centerX = fromCenter[0] + (toCenter[0] - fromCenter[0]) * progress;
+    const centerY = fromCenter[1] + (toCenter[1] - fromCenter[1]) * progress;
+    this._drawPiece(ctx, this._activeHistoryAnimation.piece, centerX, centerY);
+  }
+
   private _drawPiece(
     ctx: CanvasRenderingContext2D,
     piece: Piece,
@@ -1664,6 +1751,73 @@ export class HexchessBoard extends HTMLElement {
     }
     const size = this._pieceSize;
     ctx.drawImage(image, centerX - size / 2, centerY - size / 2, size, size);
+  }
+
+  private _queueHistoryAnimation(animation: BoardAnimation) {
+    if (this._historyAnimationDuration <= 0) {
+      return;
+    }
+    const activeDirection =
+      this._activeHistoryAnimation?.direction ??
+      this._historyAnimationQueue[0]?.direction;
+    if (activeDirection && activeDirection !== animation.direction) {
+      this._resetHistoryAnimations();
+    }
+    this._historyAnimationQueue.push({ ...animation });
+    this._scheduleRedraw();
+  }
+
+  private _updateHistoryAnimations(now: number) {
+    if (this._historyAnimationDuration <= 0) {
+      if (
+        this._activeHistoryAnimation ||
+        this._historyAnimationQueue.length > 0
+      ) {
+        this._activeHistoryAnimation = null;
+        this._historyAnimationQueue = [];
+      }
+      return;
+    }
+    if (this._activeHistoryAnimation) {
+      const elapsed = now - this._activeHistoryAnimation.startTime;
+      const progress = Math.min(
+        elapsed / this._activeHistoryAnimation.duration,
+        1,
+      );
+      this._activeHistoryAnimation.progress = progress;
+      if (progress >= 1) {
+        this._activeHistoryAnimation = null;
+      }
+    }
+    if (
+      !this._activeHistoryAnimation &&
+      this._historyAnimationQueue.length > 0
+    ) {
+      const nextAnimation = this._historyAnimationQueue.shift();
+      if (nextAnimation) {
+        this._activeHistoryAnimation = {
+          ...nextAnimation,
+          duration: this._historyAnimationDuration,
+          progress: 0,
+          startTime: now,
+        };
+      }
+    }
+  }
+
+  private _resetHistoryAnimations() {
+    if (
+      this._activeHistoryAnimation ||
+      this._historyAnimationQueue.length > 0
+    ) {
+      this._activeHistoryAnimation = null;
+      this._historyAnimationQueue = [];
+      this._scheduleRedraw();
+    }
+  }
+
+  private _now(): number {
+    return typeof performance !== 'undefined' ? performance.now() : Date.now();
   }
 
   private _loadPieceImage(piece: Piece): HTMLImageElement | null {
