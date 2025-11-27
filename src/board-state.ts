@@ -5,7 +5,18 @@ import { Position } from './position';
 import { HexchessPiece, LegalMoves, Move, Piece } from './types';
 import { Square } from './utils';
 
-export type BoardChange = { state: BoardState; didChange: boolean };
+export type BoardAnimation = {
+  direction: 'forward' | 'backward';
+  from: Square;
+  piece: Piece;
+  to: Square;
+};
+
+export type BoardChange = {
+  animation?: BoardAnimation;
+  didChange: boolean;
+  state: BoardState;
+};
 
 export type WaitingState = {
   game: Game;
@@ -366,6 +377,15 @@ export class BoardStateMachine {
           return { state, didChange: false };
         }
         const move = state.moves[state.currentTurn];
+        const movingPiece = state.game.board.getPiece(move.from);
+        const animation: BoardAnimation | undefined = movingPiece
+          ? {
+              direction: 'forward',
+              from: move.from,
+              piece: movingPiece.toString() as Piece,
+              to: move.to,
+            }
+          : undefined;
         state.game.fastForward(move);
         let newName: BoardState['name'];
         if (state.currentTurn === state.game.turn - 1) {
@@ -383,6 +403,7 @@ export class BoardStateMachine {
             currentTurn: state.currentTurn + 1,
             name: newName,
           },
+          animation,
           didChange: true,
         };
       }
@@ -395,6 +416,15 @@ export class BoardStateMachine {
           this.emitFurthestBack();
         }
         const move = state.moves[state.currentTurn - 1];
+        const movingPiece = state.game.board.getPiece(move.to);
+        const animation: BoardAnimation | undefined = movingPiece
+          ? {
+              direction: 'backward',
+              from: move.to,
+              piece: movingPiece.toString() as Piece,
+              to: move.from,
+            }
+          : undefined;
         state.game.rewind(move);
         return {
           state: {
@@ -402,6 +432,7 @@ export class BoardStateMachine {
             currentTurn: state.currentTurn - 1,
             name: 'REWOUND',
           },
+          animation,
           didChange: true,
         };
       }
@@ -421,6 +452,15 @@ export class BoardStateMachine {
           return { state, didChange: false };
         }
         const move = state.moves[state.game.turn - 1];
+        const movingPiece = state.game.board.getPiece(move.to);
+        const animation: BoardAnimation | undefined = movingPiece
+          ? {
+              direction: 'backward',
+              from: move.to,
+              piece: movingPiece.toString() as Piece,
+              to: move.from,
+            }
+          : undefined;
         state.game.rewind(move);
         if (state.game.turn === 1) {
           this.emitFurthestBack();
@@ -431,6 +471,7 @@ export class BoardStateMachine {
             currentTurn: state.game.turn - 1,
             name: 'REWOUND',
           },
+          animation,
           didChange: true,
         };
       }
