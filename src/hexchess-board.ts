@@ -45,6 +45,8 @@ type ActiveHistoryAnimation = BoardAnimation & {
   startTime: number;
 };
 
+type ColorScheme = 'auto' | 'light' | 'dark';
+
 /**
  * A hexagonal chess board used for playing Glinsky-style hex chess.
  *
@@ -69,6 +71,7 @@ type ActiveHistoryAnimation = BoardAnimation & {
  * @cssprop [--hexchess-possible-move-stroke-grey=#e4c7b7]     - The outline color of a hexagon when the user drags over a grey square, trying to move there.
  * @cssprop [--hexchess-possible-move-stroke-black=#e4c7b7]    - The outline color of a hexagon when the user drags over a black square, trying to move there.
  * @cssprop [--hexchess-possible-move-stroke-opponent=#e3e3e3] - The outline of a square when dragging an opponent piece to a possible move.
+ * @attr color-scheme                                         - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
  *
  * Custom events
  * @fires gameover        - Fired when the game is over.
@@ -387,6 +390,35 @@ export class HexchessBoard extends HTMLElement {
     }
   }
 
+  /**
+   * Color scheme preference.
+   * `auto` follows the user's OS/browser preference, `light` and `dark` force a theme.
+   */
+  private _colorScheme: ColorScheme = 'auto';
+  private _prefersDarkModeMedia: MediaQueryList | null = null;
+  private _boundPrefersColorSchemeChange:
+    | ((event: MediaQueryListEvent) => void)
+    | null = null;
+
+  get colorScheme(): ColorScheme {
+    return this._colorScheme;
+  }
+
+  set colorScheme(value: ColorScheme) {
+    const next: ColorScheme =
+      value === 'dark' || value === 'light' ? value : 'auto';
+    if (next === this._colorScheme) {
+      return;
+    }
+    this._colorScheme = next;
+    if (next === 'auto') {
+      this.removeAttribute('color-scheme');
+    } else {
+      this.setAttribute('color-scheme', next);
+    }
+    this._handleColorSchemeChange();
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -408,6 +440,7 @@ export class HexchessBoard extends HTMLElement {
       'hide-playernames',
       'hide-capturedpieces',
       'history-animation-duration',
+      'color-scheme',
     ];
   }
 
@@ -471,6 +504,15 @@ export class HexchessBoard extends HTMLElement {
       case 'history-animation-duration': {
         this.historyAnimationDuration =
           newValue === null ? 0 : Number(newValue);
+        break;
+      }
+      case 'color-scheme': {
+        const next: ColorScheme =
+          newValue === 'dark' || newValue === 'light' ? newValue : 'auto';
+        if (next !== this._colorScheme) {
+          this._colorScheme = next;
+          this._handleColorSchemeChange();
+        }
         break;
       }
       default:
@@ -587,6 +629,51 @@ export class HexchessBoard extends HTMLElement {
     this._promotionHost.innerHTML = this._renderPromotionOptions();
   }
 
+  private _startColorSchemeObserver() {
+    if (this._prefersDarkModeMedia || typeof window === 'undefined') {
+      return;
+    }
+    if (!window.matchMedia) {
+      return;
+    }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this._prefersDarkModeMedia = mediaQuery;
+    const handler = (_event: MediaQueryListEvent) => {
+      if (this._colorScheme === 'auto') {
+        this._handleColorSchemeChange();
+      }
+    };
+    this._boundPrefersColorSchemeChange = handler;
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handler);
+    } else if (typeof mediaQuery.addListener === 'function') {
+      mediaQuery.addListener(handler);
+    }
+  }
+
+  private _stopColorSchemeObserver() {
+    if (!this._prefersDarkModeMedia || !this._boundPrefersColorSchemeChange) {
+      this._prefersDarkModeMedia = null;
+      this._boundPrefersColorSchemeChange = null;
+      return;
+    }
+    const handler = this._boundPrefersColorSchemeChange;
+    if (typeof this._prefersDarkModeMedia.removeEventListener === 'function') {
+      this._prefersDarkModeMedia.removeEventListener('change', handler);
+    } else if (
+      typeof this._prefersDarkModeMedia.removeListener === 'function'
+    ) {
+      this._prefersDarkModeMedia.removeListener(handler);
+    }
+    this._prefersDarkModeMedia = null;
+    this._boundPrefersColorSchemeChange = null;
+  }
+
+  private _handleColorSchemeChange() {
+    this.requestUpdate('color-scheme');
+    this._scheduleRedraw();
+  }
+
   private _upgradeProperties(properties: string[]) {
     for (const property of properties) {
       if (Object.prototype.hasOwnProperty.call(this, property)) {
@@ -615,15 +702,18 @@ export class HexchessBoard extends HTMLElement {
       'showHints',
       'hidePlayerNames',
       'hideCapturedPieces',
+      'colorScheme',
     ]);
     window.addEventListener('pointerup', this._boundWindowPointerUp);
     window.addEventListener('pointermove', this._boundWindowPointerMove);
+    this._startColorSchemeObserver();
     this.requestUpdate('board');
   }
 
   disconnectedCallback(): void {
     window.removeEventListener('pointerup', this._boundWindowPointerUp);
     window.removeEventListener('pointermove', this._boundWindowPointerMove);
+    this._stopColorSchemeObserver();
   }
 
   private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
@@ -1399,28 +1489,90 @@ export class HexchessBoard extends HTMLElement {
       const value = styles.getPropertyValue(name).trim();
       return value.length > 0 ? value : fallback;
     };
+    const readColor = (
+      property: string,
+      defaultProperty: string,
+      fallback: string,
+    ) => readVar(property, readVar(defaultProperty, fallback));
     return {
-      board: readVar('--hexchess-board-bg', '#ffffff'),
+      board: readColor(
+        '--hexchess-board-bg',
+        '--hexchess-default-board-bg',
+        '#ffffff',
+      ),
       tiles: {
-        white: readVar('--hexchess-white-bg', '#a5c8df'),
-        black: readVar('--hexchess-black-bg', '#4180a9'),
-        grey: readVar('--hexchess-grey-bg', '#80b1d0'),
+        white: readColor(
+          '--hexchess-white-bg',
+          '--hexchess-default-white-bg',
+          '#a5c8df',
+        ),
+        black: readColor(
+          '--hexchess-black-bg',
+          '--hexchess-default-black-bg',
+          '#4180a9',
+        ),
+        grey: readColor(
+          '--hexchess-grey-bg',
+          '--hexchess-default-grey-bg',
+          '#80b1d0',
+        ),
       },
       selectedTiles: {
-        white: readVar('--hexchess-selected-white-bg', '#e4c7b7'),
-        black: readVar('--hexchess-selected-black-bg', '#e4c7b7'),
-        grey: readVar('--hexchess-selected-grey-bg', '#e4c7b7'),
+        white: readColor(
+          '--hexchess-selected-white-bg',
+          '--hexchess-default-selected-white-bg',
+          '#e4c7b7',
+        ),
+        black: readColor(
+          '--hexchess-selected-black-bg',
+          '--hexchess-default-selected-black-bg',
+          '#e4c7b7',
+        ),
+        grey: readColor(
+          '--hexchess-selected-grey-bg',
+          '--hexchess-default-selected-grey-bg',
+          '#e4c7b7',
+        ),
       },
-      label: readVar('--hexchess-label-bg', '#ffffff'),
-      possibleMove: readVar('--hexchess-possible-move-bg', '#a96a41'),
-      opponentMove: readVar('--hexchess-possible-move-opponent-bg', '#e3e3e3'),
-      possibleCapture: readVar('--hexchess-possible-capture-bg', '#a96a41'),
+      label: readColor(
+        '--hexchess-label-bg',
+        '--hexchess-default-label-bg',
+        '#ffffff',
+      ),
+      possibleMove: readColor(
+        '--hexchess-possible-move-bg',
+        '--hexchess-default-possible-move-bg',
+        '#a96a41',
+      ),
+      opponentMove: readColor(
+        '--hexchess-possible-move-opponent-bg',
+        '--hexchess-default-possible-move-opponent-bg',
+        '#e3e3e3',
+      ),
+      possibleCapture: readColor(
+        '--hexchess-possible-capture-bg',
+        '--hexchess-default-possible-capture-bg',
+        '#a96a41',
+      ),
       strokes: {
-        white: readVar('--hexchess-possible-move-stroke-white', '#a96a41'),
-        black: readVar('--hexchess-possible-move-stroke-black', '#a96a41'),
-        grey: readVar('--hexchess-possible-move-stroke-grey', '#a96a41'),
-        opponent: readVar(
+        white: readColor(
+          '--hexchess-possible-move-stroke-white',
+          '--hexchess-default-possible-move-stroke-white',
+          '#a96a41',
+        ),
+        black: readColor(
+          '--hexchess-possible-move-stroke-black',
+          '--hexchess-default-possible-move-stroke-black',
+          '#a96a41',
+        ),
+        grey: readColor(
+          '--hexchess-possible-move-stroke-grey',
+          '--hexchess-default-possible-move-stroke-grey',
+          '#a96a41',
+        ),
+        opponent: readColor(
           '--hexchess-possible-move-stroke-opponent',
+          '--hexchess-default-possible-move-stroke-opponent',
           '#e3e3e3',
         ),
       },

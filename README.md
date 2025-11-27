@@ -20,6 +20,23 @@
 
 Read the full documentation on [the website](https://mganjoo.github.io/gchessboard/).
 
+## Dark mode
+
+`hexchess-board` follows the surrounding page's preferred color scheme automatically (via `prefers-color-scheme`). You can override this behavior at any time with the `color-scheme` attribute or the `colorScheme` property (`'light'`, `'dark'`, or `'auto'`, which is the default).
+
+```html
+<hexchess-board color-scheme="dark"></hexchess-board>
+```
+
+Light mode keeps the existing pastel palette (`#a5c8df`, `#80b1d0`, `#4180a9`, `#e4c7b7`, etc.). Dark mode switches to deeper blues and warm highlights:
+
+- Board background `#050b16`
+- Tiles `#2f6b8f`, `#1f4767`, `#0f2b40`
+- Move highlights / capture rings `#f3c989`
+- Labels/player text `#f6f7fb`
+
+All of these values still come from the same CSS custom properties (`--hexchess-*`), so you can override individual colors per theme if you'd like.
+
 ## Installing
 
 `hexchess-board` is packaged as a [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components) and should be usable directly in most modern browsers. It bundles its own (configurable) styles, inline assets (for chess pieces), and code.
