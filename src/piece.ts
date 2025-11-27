@@ -1,4 +1,3 @@
-import { TemplateResult, html, nothing } from 'lit';
 import { Piece } from './types';
 
 export const PIECE_VALUES: Record<Piece, number> = {
@@ -37,16 +36,18 @@ export const renderPiece = (
   piece: Piece,
   size: number = DEFAULT_PIECE_SIZE,
   translate = true,
-): TemplateResult | typeof nothing => {
-  if (piece === null) return nothing;
+): string => {
+  if (piece === null) {
+    return '';
+  }
   const id = PIECE_ASSET_IDS[piece];
   if (!id) {
-    return nothing;
+    return '';
   }
   const style = translate
     ? `transform: translate(-${size / 2}px, -${size / 2}px)`
     : '';
-  return html`<img
+  return `<img
     src="${pieceUrls[id]}"
     style="${style}"
     class="piece"

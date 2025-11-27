@@ -1,5 +1,3 @@
-import { LitElement, PropertyValues, TemplateResult, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
 import { Board } from './board';
 import {
   BoardChange,
@@ -73,9 +71,21 @@ type CanvasColors = {
  * @fires furthestback    - Fired when the game is rewound to its starting position.
  * @fires furthestforward - Fired when a game is fast forwarded back to its current position.
  */
-@customElement('hexchess-board')
-export class HexchessBoard extends LitElement {
-  static override styles = styles;
+export class HexchessBoard extends HTMLElement {
+  private _rootElement: HTMLDivElement | null = null;
+  private _gameInfoContainer: HTMLDivElement | null = null;
+  private _promotionHost: HTMLDivElement | null = null;
+  private _styleElement: HTMLStyleElement | null = null;
+  private _renderPending = false;
+  private _needsRender = false;
+  private _updateResolver: (() => void) | null = null;
+  private _updateCompletePromise: Promise<void> = Promise.resolve();
+  private _initialResizeDone = false;
+  private readonly _boundCanvasPointerDown = (
+    event: MouseEvent | PointerEvent,
+  ) => this._handleMouseDown(event);
+  private readonly _boundPromotionClick = (event: Event) =>
+    this._handlePromotionClick(event);
 
   private _boardHeight = 250;
   private _boardWidth = 250;
@@ -128,11 +138,6 @@ export class HexchessBoard extends LitElement {
   /**
    * Whose turn it is initially
    */
-  @property({
-    converter: (value: string | null | undefined): 'white' | 'black' =>
-      value === 'black' ? 'black' : 'white',
-    type: String,
-  })
   get turn(): string {
     return this._state.game.turn % 2 === 0 ? 'white' : 'black';
   }
@@ -143,17 +148,14 @@ export class HexchessBoard extends LitElement {
       this._state.game.board,
       turn === 'white' ? 0 : 1,
     );
+    this.requestUpdate('board');
+    this._scheduleRedraw();
   }
 
   /**
    * A hex-FEN notation describing the state of the board.
    * If the string is empty, no pieces will be rendered.
    */
-  @property({
-    converter: (value: string | null | undefined): Board =>
-      fenToBoard(value ?? ''),
-    type: Object,
-  })
   get board(): Board {
     return this._state.game.board;
   }
@@ -182,11 +184,6 @@ export class HexchessBoard extends LitElement {
    * A list of moves made on the board.
    * This is useful for analyzing games already played or certain pre-determined openings.
    */
-  @property({
-    converter: (value: string | null | undefined): Move[] =>
-      stringToMoves(value ?? ''),
-    type: Array,
-  })
   get moves(): Move[] {
     return this._state.moves;
   }
@@ -219,23 +216,50 @@ export class HexchessBoard extends LitElement {
   /**
    * Black's player name
    */
-  @property({ attribute: 'black-player-name', type: String })
-  blackPlayerName = 'Black';
+  private _blackPlayerName = 'Black';
+  get blackPlayerName(): string {
+    return this._blackPlayerName;
+  }
+  set blackPlayerName(value: string) {
+    const next = value ?? 'Black';
+    if (this._blackPlayerName !== next) {
+      this._blackPlayerName = next;
+      this.requestUpdate('board');
+    }
+  }
 
   /**
    * White's player name
    */
-  @property({ attribute: 'white-player-name', type: String })
-  whitePlayerName = 'White';
+  private _whitePlayerName = 'White';
+  get whitePlayerName(): string {
+    return this._whitePlayerName;
+  }
+  set whitePlayerName(value: string) {
+    const next = value ?? 'White';
+    if (this._whitePlayerName !== next) {
+      this._whitePlayerName = next;
+      this.requestUpdate('board');
+    }
+  }
 
   /**
    * The orientation of the board.
    */
-  @property({
-    converter: (value: string | null | undefined): 'black' | 'white' =>
-      value === 'black' ? 'black' : 'white',
-  })
-  orientation: Orientation = 'white';
+  private _orientation: Orientation = 'white';
+  get orientation(): Orientation {
+    return this._orientation;
+  }
+  set orientation(value: Orientation) {
+    const next = value === 'black' ? 'black' : 'white';
+    if (next !== this._orientation) {
+      this._orientation = next;
+      this._recalculateBoardCoordinates();
+      this._configureCanvasSize();
+      this.requestUpdate('board');
+      this._scheduleRedraw();
+    }
+  }
 
   /**
    * The role of the player.
@@ -244,72 +268,325 @@ export class HexchessBoard extends LitElement {
    * If `spectator`, then you cannot make moves at all via the UI.
    * If `analyzer`, then you can make moves for both sides, and it simuluates a local game.
    */
-  @property({
-    attribute: 'player-role',
-    converter: (value: string | null | undefined): Role => {
-      if (value === 'white' || value === 'black' || value === 'spectator') {
-        return value;
-      }
-
-      return 'analyzer';
-    },
-  })
-  playerRole: Role = 'analyzer';
+  private _playerRole: Role = 'analyzer';
+  get playerRole(): Role {
+    return this._playerRole;
+  }
+  set playerRole(value: Role) {
+    const next: Role =
+      value === 'white' || value === 'black' || value === 'spectator'
+        ? value
+        : 'analyzer';
+    if (next !== this._playerRole) {
+      this._playerRole = next;
+      this.requestUpdate('board');
+    }
+  }
 
   /**
    * Show the board coordinates on the bottom and left sides of the board.
    */
-  @property({ attribute: 'hide-coordinates', type: Boolean })
-  hideCoordinates = false;
+  private _hideCoordinates = false;
+  get hideCoordinates(): boolean {
+    return this._hideCoordinates;
+  }
+  set hideCoordinates(value: boolean) {
+    const next = Boolean(value);
+    if (next !== this._hideCoordinates) {
+      this._hideCoordinates = next;
+      this.requestUpdate('board');
+      this._scheduleRedraw();
+    }
+  }
 
   /**
    * Do not allow any other moves beyond the predetermined ones set in the `moves` property.
    */
-  @property({ type: Boolean })
-  frozen = false;
+  private _frozen = false;
+  get frozen(): boolean {
+    return this._frozen;
+  }
+  set frozen(value: boolean) {
+    this._frozen = Boolean(value);
+  }
 
   /**
    * Clicking on an opponent's piece shows all the squares it can move to
    */
-  @property({ attribute: 'show-hints', type: Boolean })
-  showHints = true;
+  private _showHints = true;
+  get showHints(): boolean {
+    return this._showHints;
+  }
+  set showHints(value: boolean) {
+    const next = Boolean(value);
+    if (next !== this._showHints) {
+      this._showHints = next;
+      this.requestUpdate('board');
+      this._scheduleRedraw();
+    }
+  }
 
   /**
    * Hide player names - usually only used for custom websites to render player names separately.
    */
-  @property({ attribute: 'hide-playernames', type: Boolean })
-  hidePlayerNames = false;
+  private _hidePlayerNames = false;
+  get hidePlayerNames(): boolean {
+    return this._hidePlayerNames;
+  }
+  set hidePlayerNames(value: boolean) {
+    const next = Boolean(value);
+    if (next !== this._hidePlayerNames) {
+      this._hidePlayerNames = next;
+      this.requestUpdate('board');
+    }
+  }
 
   /**
    * Hide captured pieces - usually only used for custom websites to render captured pieces separately.
    */
-  @property({ attribute: 'hide-capturedpieces', type: Boolean })
-  hideCapturedPieces = false;
+  private _hideCapturedPieces = false;
+  get hideCapturedPieces(): boolean {
+    return this._hideCapturedPieces;
+  }
+  set hideCapturedPieces(value: boolean) {
+    const next = Boolean(value);
+    if (next !== this._hideCapturedPieces) {
+      this._hideCapturedPieces = next;
+      this.requestUpdate('board');
+    }
+  }
 
   constructor() {
     super();
+    this.attachShadow({ mode: 'open' });
     this._recalculateBoardCoordinates();
+  }
+
+  static get observedAttributes(): string[] {
+    return [
+      'turn',
+      'board',
+      'moves',
+      'black-player-name',
+      'white-player-name',
+      'orientation',
+      'player-role',
+      'hide-coordinates',
+      'frozen',
+      'show-hints',
+      'hide-playernames',
+      'hide-capturedpieces',
+    ];
+  }
+
+  attributeChangedCallback(
+    name: string,
+    _oldValue: string | null,
+    newValue: string | null,
+  ): void {
+    switch (name) {
+      case 'turn': {
+        const next = newValue === 'black' ? 'black' : 'white';
+        this.turn = next;
+        break;
+      }
+      case 'board': {
+        this.board = fenToBoard(newValue ?? '');
+        break;
+      }
+      case 'moves': {
+        this.moves = stringToMoves(newValue ?? '');
+        break;
+      }
+      case 'black-player-name': {
+        this.blackPlayerName = newValue ?? 'Black';
+        break;
+      }
+      case 'white-player-name': {
+        this.whitePlayerName = newValue ?? 'White';
+        break;
+      }
+      case 'orientation': {
+        const next = newValue === 'black' ? 'black' : 'white';
+        this.orientation = next;
+        break;
+      }
+      case 'player-role': {
+        const role = (newValue ?? '') as Role;
+        this.playerRole = role;
+        break;
+      }
+      case 'hide-coordinates': {
+        this.hideCoordinates = newValue !== null;
+        break;
+      }
+      case 'frozen': {
+        this.frozen = newValue !== null;
+        break;
+      }
+      case 'show-hints': {
+        this.showHints = newValue !== null;
+        break;
+      }
+      case 'hide-playernames': {
+        this.hidePlayerNames = newValue !== null;
+        break;
+      }
+      case 'hide-capturedpieces': {
+        this.hideCapturedPieces = newValue !== null;
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  protected requestUpdate(_property?: string): void {
+    this._needsRender = true;
+    if (!this.isConnected || this._renderPending) {
+      return;
+    }
+    this._renderPending = true;
+    this._updateCompletePromise = new Promise((resolve) => {
+      this._updateResolver = resolve;
+    });
+    queueMicrotask(() => {
+      this._renderPending = false;
+      if (this._needsRender) {
+        this._needsRender = false;
+        this._performDomUpdate();
+      }
+      if (this._updateResolver) {
+        this._updateResolver();
+        this._updateResolver = null;
+      }
+    });
+  }
+
+  get updateComplete(): Promise<void> {
+    return this._updateCompletePromise;
+  }
+
+  private _performDomUpdate(): void {
+    this._ensureDom();
+    this._updateCanvasCursor();
+    this._updateGameInfo();
+    this._updatePromotionOverlay();
+  }
+
+  private _ensureDom(): void {
+    const root = this.shadowRoot;
+    if (!root) {
+      return;
+    }
+    if (!this._styleElement) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = styles;
+      root.appendChild(styleElement);
+      this._styleElement = styleElement;
+    }
+    if (!this._rootElement) {
+      const wrapper = document.createElement('div');
+      wrapper.id = 'root';
+      wrapper.style.width = '100%';
+      wrapper.style.height = '100%';
+      wrapper.style.position = 'relative';
+
+      const canvas = document.createElement('canvas');
+      canvas.classList.add('board-canvas', 'cursor-grab');
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.addEventListener('pointerdown', this._boundCanvasPointerDown);
+
+      const gameInfo = document.createElement('div');
+      gameInfo.classList.add('game-info');
+      gameInfo.style.paddingLeft = '17px';
+
+      const overlayHost = document.createElement('div');
+      overlayHost.classList.add('promotion-host');
+      overlayHost.addEventListener('click', this._boundPromotionClick);
+
+      wrapper.append(canvas, gameInfo, overlayHost);
+      root.append(wrapper);
+
+      this._rootElement = wrapper;
+      this._canvas = canvas;
+      this._gameInfoContainer = gameInfo;
+      this._promotionHost = overlayHost;
+
+      this._captureCanvas();
+      if (!this._initialResizeDone) {
+        this._initialResizeDone = true;
+        this.resize();
+      } else {
+        this._configureCanvasSize();
+      }
+    }
+  }
+
+  private _updateCanvasCursor(): void {
+    if (!this._canvas) {
+      return;
+    }
+    const isDragging =
+      this._state.name === 'DRAG_PIECE' ||
+      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
+      this._state.name === 'CANCEL_SELECTION_SOON';
+    this._canvas.classList.toggle('cursor-grabbing', isDragging);
+    this._canvas.classList.toggle('cursor-grab', !isDragging);
+  }
+
+  private _updateGameInfo(): void {
+    if (!this._gameInfoContainer) {
+      return;
+    }
+    this._gameInfoContainer.innerHTML = this._renderGameInfo();
+  }
+
+  private _updatePromotionOverlay(): void {
+    if (!this._promotionHost) {
+      return;
+    }
+    this._promotionHost.innerHTML = this._renderPromotionOptions();
+  }
+
+  private _upgradeProperties(properties: string[]) {
+    for (const property of properties) {
+      if (Object.prototype.hasOwnProperty.call(this, property)) {
+        const value = (this as Record<string, unknown>)[property];
+        delete (this as Record<string, unknown>)[property];
+        (this as Record<string, unknown>)[property] = value;
+      }
+    }
   }
 
   // ---------------
   // Event listeners
   // ---------------
 
-  override connectedCallback(): void {
-    super.connectedCallback();
+  connectedCallback(): void {
+    this._upgradeProperties([
+      'turn',
+      'board',
+      'moves',
+      'blackPlayerName',
+      'whitePlayerName',
+      'orientation',
+      'playerRole',
+      'hideCoordinates',
+      'frozen',
+      'showHints',
+      'hidePlayerNames',
+      'hideCapturedPieces',
+    ]);
     window.addEventListener('pointerup', this._boundWindowPointerUp);
     window.addEventListener('pointermove', this._boundWindowPointerMove);
+    this.requestUpdate('board');
   }
 
-  override disconnectedCallback(): void {
-    super.disconnectedCallback();
+  disconnectedCallback(): void {
     window.removeEventListener('pointerup', this._boundWindowPointerUp);
     window.removeEventListener('pointermove', this._boundWindowPointerMove);
-  }
-
-  protected override firstUpdated(_changedProperties: PropertyValues): void {
-    this._captureCanvas();
-    this.resize();
   }
 
   private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
@@ -318,6 +595,24 @@ export class HexchessBoard extends LitElement {
       piece,
     });
     this._reconcileNewState(newState);
+  }
+
+  private _handlePromotionClick(event: Event) {
+    if (this._state.name !== 'PROMOTING') {
+      return;
+    }
+    const target = (event.target as HTMLElement | null)?.closest(
+      '[data-promotion-piece]',
+    ) as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+    const piece = target.getAttribute('data-promotion-piece');
+    if (piece) {
+      event.preventDefault();
+      event.stopPropagation();
+      this._handlePromotion(piece as Piece);
+    }
   }
 
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
@@ -753,7 +1048,7 @@ export class HexchessBoard extends LitElement {
 
   private _renderPromotionOptions() {
     if (this._state.name !== 'PROMOTING') {
-      return nothing;
+      return '';
     }
 
     const square = this._state.moves[this._state.moves.length - 1].to;
@@ -777,35 +1072,33 @@ export class HexchessBoard extends LitElement {
             ? ['q', 'r', 'b', 'n']
             : ['n', 'b', 'r', 'q'];
 
-    return html`
-      <div class="promotion" style="top: ${y}px; left: ${x}px;">
-        ${options.map((option) => {
-          return html`
-            <div
-              class="hexagon"
-              style="width: ${this._polygonWidth}px; height: ${
-                this._polygonHeight
-              }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
-              @click=${() => this._handlePromotion(option)}
-            >
-              ${renderPiece(option, this._pieceSize, false)}
-            </div>
-          `;
-        })}
-      </div>
-    `;
+    const optionMarkup = options
+      .map((option) => {
+        return `<div
+            class="hexagon"
+            data-promotion-piece="${option}"
+            style="width: ${this._polygonWidth}px; height: ${
+              this._polygonHeight
+            }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
+          >
+            ${renderPiece(option, this._pieceSize, false)}
+          </div>`;
+      })
+      .join('');
+
+    return `<div class="promotion" style="top: ${y}px; left: ${x}px;">${optionMarkup}</div>`;
   }
 
   private _renderScore(score: number | undefined) {
     if (!score) {
-      return nothing;
+      return '';
     }
 
     if (score === 0 || score < 0) {
-      return nothing;
+      return '';
     }
 
-    return html`<p class="score">(+${score})</p>`;
+    return `<p class="score">(+${score})</p>`;
   }
 
   private _renderCapturedPieceGroup(
@@ -813,19 +1106,17 @@ export class HexchessBoard extends LitElement {
     numPieces: number,
     capturedPieceSize: number,
   ) {
-    return html`
-      <div class="captured-piece-group">
-        ${[...Array(numPieces).keys()].map((numPiece) => {
-          const padding =
-            numPiece * capturedPieceSize * this._capturedPiecePadding;
-          return html`
-            <div style="position: relative; left: ${padding}px">
+    const pieces = [...Array(numPieces).keys()]
+      .map((numPiece) => {
+        const padding =
+          numPiece * capturedPieceSize * this._capturedPiecePadding;
+        return `<div style="position: relative; left: ${padding}px">
               ${renderPiece(piece, capturedPieceSize)}
-            </div>
-          `;
-        })}
-      </div>
-    `;
+            </div>`;
+      })
+      .join('');
+
+    return `<div class="captured-piece-group">${pieces}</div>`;
   }
 
   private _renderOneSideCapturedPieces(
@@ -833,7 +1124,7 @@ export class HexchessBoard extends LitElement {
     score: number,
   ) {
     if (this.hideCapturedPieces) {
-      return nothing;
+      return '';
     }
 
     const pawn = 'p' in pieces ? 'p' : 'P' in pieces ? 'P' : undefined;
@@ -848,38 +1139,37 @@ export class HexchessBoard extends LitElement {
           pieces[pawn] as number,
           this._capturedPieceSize,
         )
-      : nothing;
+      : '';
     const capturedBishops = bishop
       ? this._renderCapturedPieceGroup(
           bishop,
           pieces[bishop] as number,
           this._capturedPieceSize,
         )
-      : nothing;
+      : '';
     const capturedKnights = knight
       ? this._renderCapturedPieceGroup(
           knight,
           pieces[knight] as number,
           this._capturedPieceSize,
         )
-      : nothing;
+      : '';
     const capturedRooks = rook
       ? this._renderCapturedPieceGroup(
           rook,
           pieces[rook] as number,
           this._capturedPieceSize,
         )
-      : nothing;
+      : '';
     const capturedQueens = queen
       ? this._renderCapturedPieceGroup(
           queen,
           pieces[queen] as number,
           this._capturedPieceSize,
         )
-      : nothing;
+      : '';
 
-    return html`
-      <div
+    return `<div
         class="captured-pieces"
         style="column-gap: ${
           this._capturedPieceSize * this._capturedPieceGroupPadding
@@ -887,13 +1177,12 @@ export class HexchessBoard extends LitElement {
       >
         ${capturedPawns} ${capturedBishops} ${capturedKnights} ${capturedRooks}
         ${capturedQueens} ${this._renderScore(score)}
-      </div>
-    `;
+      </div>`;
   }
 
   private _renderPlayer(name: string, isWhite: boolean) {
     if (this.hidePlayerNames) {
-      return nothing;
+      return '';
     }
 
     let outcome = '';
@@ -914,7 +1203,18 @@ export class HexchessBoard extends LitElement {
         }
       }
     }
-    return html`<p class="username">${name} ${outcome}</p>`;
+    return `<p class="username">${this._escapeHtml(name)} ${outcome}</p>`;
+  }
+
+  private _escapeHtml(value: string): string {
+    const replacements: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+    return value.replace(/[&<>"']/g, (character) => replacements[character]);
   }
 
   private _renderGameInfo() {
@@ -948,7 +1248,7 @@ export class HexchessBoard extends LitElement {
     const whiteScore = this._state.scoreWhite - this._state.scoreBlack;
     const blackScore = this._state.scoreBlack - this._state.scoreWhite;
 
-    return html`
+    return `
       <div
         class="player-info"
         style="row-gap: ${this._capturedPieceSize / 2}px;"
@@ -978,36 +1278,7 @@ export class HexchessBoard extends LitElement {
     `;
   }
 
-  private _renderBoard() {
-    const cursorClass =
-      this._state.name === 'DRAG_PIECE' ||
-      this._state.name === 'MOUSE_DOWN_PIECE_SELECTED' ||
-      this._state.name === 'CANCEL_SELECTION_SOON'
-        ? 'cursor-grabbing'
-        : 'cursor-grab';
-
-    return html`
-      <div id="root" style="width: 100%; height: 100%; position: relative;">
-        <canvas
-          class="board-canvas ${cursorClass}"
-          width=${this._boardWidth}
-          height=${this._boardHeight}
-          style="width: 100%; height: 100%;"
-          @pointerdown=${(event: MouseEvent | PointerEvent) =>
-            this._handleMouseDown(event)}
-        ></canvas>
-        <div class="game-info" style="padding-left: 17px">
-          ${this._renderGameInfo()}
-        </div>
-        ${this._renderPromotionOptions()}
-      </div>
-    `;
-  }
-
   private _captureCanvas() {
-    this._canvas = this.renderRoot.querySelector(
-      '.board-canvas',
-    ) as HTMLCanvasElement | null;
     this._canvasCtx = this._canvas?.getContext('2d') ?? null;
     this._configureCanvasSize();
   }
@@ -1449,10 +1720,6 @@ export class HexchessBoard extends LitElement {
     }
   }
 
-  override render(): TemplateResult {
-    return html` ${this._renderBoard()} `;
-  }
-
   // --------------
   // Public methods
   // --------------
@@ -1483,10 +1750,6 @@ export class HexchessBoard extends LitElement {
     } else {
       this.orientation = 'white';
     }
-    this._recalculateBoardCoordinates();
-    this._configureCanvasSize();
-    this.requestUpdate('board');
-    this._scheduleRedraw();
   }
 
   /**
@@ -1723,6 +1986,10 @@ export class HexchessBoard extends LitElement {
   restartCustomEvents(): void {
     this._customEventsPaused = false;
   }
+}
+
+if (!customElements.get('hexchess-board')) {
+  customElements.define('hexchess-board', HexchessBoard);
 }
 
 declare global {
