@@ -114,6 +114,8 @@ type ColorScheme = 'auto' | 'light' | 'dark';
  * @cssprop [--hexchess-possible-move-stroke-opponent-dark=#4c627d]  - Dark mode override for opponent drag outlines.
  *
  * @attr color-scheme  - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
+ * @attr muted         - When present, disables all built-in sound effects (same as `audio="off"`).
+ * @attr audio         - Controls audio output. Use `audio="off"` to mute, omit or set to `on` to enable sounds.
  *
  * Custom events
  * @fires gameover        - Fired when the game is over.
