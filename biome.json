@@ -1,8 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2
@@ -17,13 +15,14 @@
     "rules": {
       "recommended": true
     },
-    "ignore": [
-      "node_modules/*",
-      "docs/*",
-      "docs-src/*",
-      "rollup-config.js",
-      "custom-elements.json",
-      "web-dev-server.config.js"
+    "includes": [
+      "**",
+      "!**/node_modules/**/*",
+      "!**/docs/**/*",
+      "!**/docs-src/**/*",
+      "!**/rollup-config.js",
+      "!**/custom-elements.json",
+      "!**/web-dev-server.config.js"
     ]
   }
 }
