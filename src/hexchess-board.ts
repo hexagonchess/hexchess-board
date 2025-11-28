@@ -1,9 +1,11 @@
+import { AudioManager, type SoundPack } from './audio';
 import { Board } from './board';
 import {
   type BoardAnimation,
   type BoardChange,
   type BoardState,
   BoardStateMachine,
+  type GameOverState,
   type RewoundState,
   type WaitingState,
 } from './board-state';
@@ -33,6 +35,9 @@ import {
   boardToFen,
   fenToBoard,
 } from './utils';
+
+export { AudioManager, DEFAULT_SOUND_PACK } from './audio';
+export type { SoundEvent, SoundPack } from './audio';
 
 type CanvasColors = {
   board: string;
@@ -109,6 +114,8 @@ type ColorScheme = 'auto' | 'light' | 'dark';
  * @cssprop [--hexchess-possible-move-stroke-opponent-dark=#4c627d]  - Dark mode override for opponent drag outlines.
  *
  * @attr color-scheme  - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
+ * @attr muted         - When present, disables all built-in sound effects.
+ * @prop audio         - Provide overrides for the built-in sound pack. Pass a partial map or `null` to reset to the defaults.
  *
  * Custom events
  * @fires gameover        - Fired when the game is over.
@@ -176,6 +183,10 @@ export class HexchessBoard extends HTMLElement {
   private _historyAnimationQueue: BoardAnimation[] = [];
   private _historyAnimationDuration = 100;
   private _customEventsPaused = false;
+  private readonly _audioManager = new AudioManager();
+  private _audioOverrides: SoundPack | null = null;
+  private _audioPreloadHandle: number | null = null;
+  private _audioPreloadViaIdle = false;
   private _boundWindowPointerUp = (event: MouseEvent | PointerEvent) =>
     this._handleMouseUp(event);
   private _boundWindowPointerMove = (event: MouseEvent | PointerEvent) =>
@@ -428,6 +439,38 @@ export class HexchessBoard extends HTMLElement {
   }
 
   /**
+   * Mute all built-in sound effects.
+   */
+  private _muted = false;
+  get muted(): boolean {
+    return this._muted;
+  }
+  set muted(value: boolean) {
+    const next = Boolean(value);
+    if (next === this._muted) {
+      return;
+    }
+    this._muted = next;
+    this._audioManager.setMuted(next);
+  }
+
+  /**
+   * Provide overrides for the built-in sound pack.
+   * Pass `null` to revert to the default set of cues.
+   */
+  get audio(): SoundPack | null {
+    return this._audioOverrides;
+  }
+  set audio(value: SoundPack | null) {
+    if (value === this._audioOverrides) {
+      return;
+    }
+    this._audioOverrides = value;
+    this._audioManager.updateSoundPack(value);
+    this._scheduleAudioPreload();
+  }
+
+  /**
    * Color scheme preference.
    * `auto` follows the user's OS/browser preference, `light` and `dark` force a theme.
    */
@@ -478,6 +521,7 @@ export class HexchessBoard extends HTMLElement {
       'hide-capturedpieces',
       'history-animation-duration',
       'color-scheme',
+      'muted',
     ];
   }
 
@@ -550,6 +594,10 @@ export class HexchessBoard extends HTMLElement {
           this._colorScheme = next;
           this._handleColorSchemeChange();
         }
+        break;
+      }
+      case 'muted': {
+        this.muted = newValue !== null;
         break;
       }
       default:
@@ -732,6 +780,44 @@ export class HexchessBoard extends HTMLElement {
     this._scheduleRedraw();
   }
 
+  private _scheduleAudioPreload() {
+    if (!this.isConnected || this._audioPreloadHandle !== null) {
+      return;
+    }
+    const idleWindow = window as typeof window & {
+      requestIdleCallback?: (
+        callback: IdleRequestCallback,
+        options?: IdleRequestOptions,
+      ) => number;
+    };
+    const run = () => {
+      this._audioPreloadHandle = null;
+      void this._audioManager.preloadAll();
+    };
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      this._audioPreloadViaIdle = true;
+      this._audioPreloadHandle = idleWindow.requestIdleCallback(run);
+      return;
+    }
+    this._audioPreloadViaIdle = false;
+    this._audioPreloadHandle = window.setTimeout(run, 0);
+  }
+
+  private _cancelAudioPreload() {
+    if (this._audioPreloadHandle === null) {
+      return;
+    }
+    const idleWindow = window as typeof window & {
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    if (this._audioPreloadViaIdle && idleWindow.cancelIdleCallback) {
+      idleWindow.cancelIdleCallback(this._audioPreloadHandle);
+    } else {
+      window.clearTimeout(this._audioPreloadHandle);
+    }
+    this._audioPreloadHandle = null;
+  }
+
   private _upgradeProperties(properties: string[]) {
     for (const property of properties) {
       if (Object.prototype.hasOwnProperty.call(this, property)) {
@@ -760,11 +846,14 @@ export class HexchessBoard extends HTMLElement {
       'showHints',
       'hidePlayerNames',
       'hideCapturedPieces',
+      'muted',
+      'audio',
       'colorScheme',
     ]);
     window.addEventListener('pointerup', this._boundWindowPointerUp);
     window.addEventListener('pointermove', this._boundWindowPointerMove);
     this._startColorSchemeObserver();
+    this._scheduleAudioPreload();
     this.requestUpdate('board');
   }
 
@@ -772,6 +861,7 @@ export class HexchessBoard extends HTMLElement {
     window.removeEventListener('pointerup', this._boundWindowPointerUp);
     window.removeEventListener('pointermove', this._boundWindowPointerMove);
     this._stopColorSchemeObserver();
+    this._cancelAudioPreload();
   }
 
   private _handlePromotion(piece: Omit<Piece, 'p' | 'P' | 'k' | 'K'>) {
@@ -802,6 +892,7 @@ export class HexchessBoard extends HTMLElement {
 
   private _handleMouseDown(event: MouseEvent | PointerEvent) {
     event.preventDefault();
+    this._audioManager.allowPlayback();
     if (this.frozen || this.playerRole === 'spectator') {
       return;
     }
@@ -919,6 +1010,7 @@ export class HexchessBoard extends HTMLElement {
     if (!newState.didChange) {
       return;
     }
+    const previousState = this._state;
     if (newState.animation) {
       this._queueHistoryAnimation(newState.animation);
     }
@@ -975,10 +1067,53 @@ export class HexchessBoard extends HTMLElement {
         }
       }
     }
+    this._handleSoundEffects(previousState, newState.state);
     this._state = newState.state;
     this._updateDragVisualState();
     this.requestUpdate('board');
     this._scheduleRedraw();
+  }
+
+  private _handleSoundEffects(
+    previousState: BoardState,
+    nextState: BoardState,
+  ) {
+    if (this._customEventsPaused) {
+      return;
+    }
+    if (nextState.name === 'REWOUND') {
+      return;
+    }
+    if (nextState.name === 'GAMEOVER') {
+      if (previousState.name !== 'GAMEOVER') {
+        this._playGameoverSound(nextState);
+      }
+      return;
+    }
+    if (nextState.moves.length <= previousState.moves.length) {
+      return;
+    }
+    const move = nextState.moves[nextState.moves.length - 1];
+    void this._audioManager.play(move.capturedPiece ? 'capture' : 'move');
+    if (nextState.game.isInCheck()) {
+      void this._audioManager.play('check');
+    }
+  }
+
+  private _playGameoverSound(state: GameOverState) {
+    if (state.outcome === 'DRAW') {
+      void this._audioManager.play('draw');
+      return;
+    }
+    const role = this.playerRole;
+    if (role !== 'white' && role !== 'black') {
+      void this._audioManager.play('checkmate');
+      return;
+    }
+    const didWin =
+      (role === 'white' && state.outcome === 'WHITE_WINS') ||
+      (role === 'black' && state.outcome === 'BLACK_WINS');
+    void this._audioManager.play(didWin ? 'victory' : 'defeat');
   }
 
   private _updateDragVisualState() {
@@ -2351,6 +2486,15 @@ export class HexchessBoard extends HTMLElement {
     });
 
     this.frozen = false;
+  }
+
+  /**
+   * Preloads the configured audio files and unlocks playback.
+   * Call this inside a user gesture handler if you need audio before any board interaction occurs.
+   */
+  async prepareAudio(): Promise<void> {
+    this._audioManager.allowPlayback();
+    await this._audioManager.preloadAll();
   }
 
   /**

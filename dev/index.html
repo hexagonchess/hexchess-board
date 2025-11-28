@@ -15,11 +15,19 @@
         .whenDefined('hexchess-board')
         .then(() => document.querySelector('hexchess-board'));
 
+      let audioPrimed = false;
+      const primeAudio = () => {
+        if (audioPrimed) return;
+        audioPrimed = true;
+        boardPromise.then((board) => board?.prepareAudio());
+      };
+
       document.addEventListener('keydown', (event) => {
         event.preventDefault();
       });
       document.addEventListener('keyup', (event) => {
         event.preventDefault();
+        primeAudio();
         if (event.code === 'KeyF') {
           boardPromise.then((board) => board?.flip());
         } else if (event.code === 'ArrowRight') {

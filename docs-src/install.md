@@ -39,3 +39,7 @@ import { HexchessBoard } from 'https://esm.sh/@hexchess/hexchess-board@latest/he
 ```bash
 npm install '@hexchess/hexchess-board'
 ```
+
+## Audio
+
+The component references the [Lichess standard sound pack](https://github.com/lichess-org/lila/tree/master/public/sound/standard) (mirrored under `https://hexagonchess.github.io/hexchess-board/assets/audio/*.mp3`) and preloads it automatically. Use the boolean `muted` attribute/property to silence cues entirely, or override individual sounds via the `audio` property (`{ move: '/sounds/move.mp3', capture: null }`). Mirror the files yourself if you prefer to serve audio locally or offline—just keep the AGPL-3.0 license (see `docs/assets/audio/LICENSE`). Use the `prepareAudio()` method inside a button/click handler if you need to unlock audio playback before a player interacts with the board itself.

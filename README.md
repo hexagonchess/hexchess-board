@@ -39,6 +39,29 @@ All of these values still come from the same CSS custom properties (`--hexchess-
 
 For per-theme customization without duplicating selectors, you can scope variables with `-light` or `-dark` suffixes (`--hexchess-board-bg-dark`, `--hexchess-board-bg-light`, etc.). When a themed value isn't provided, the component falls back to the base `--hexchess-*` value and then to the built-in palette.
 
+## Sound effects
+
+`<hexchess-board>` now mirrors Lichess's [standard sound pack](https://github.com/lichess-org/lila/tree/master/public/sound/standard) (`move`, `capture`, `check`, `checkmate`, `victory`, `defeat`, `draw`) and serves it from this repo's GitHub Pages site, keeping the npm tarball tiny while remaining future-proof. Sounds are preloaded as soon as the element is connected so they fire instantly when moves resolve, check is declared, or the game finishes. Browsers still require a user gesture before audio playback, so either let players click/tap the board once or call `board.prepareAudio()` inside your own button handler.
+
+- Toggle audio entirely via the boolean `muted` attribute/property.
+- Override specific cues by assigning the `audio` property. Each entry accepts a string URL, `null` (disable), or `{src, volume, playbackRate}`.
+- Default cue URLs point at `https://hexagonchess.github.io/hexchess-board/assets/audio/*.mp3`. If you need to run offline or use your own branding, copy those files to your infra/CDN and point `audio` to the new URLs.
+
+```js
+const board = document.querySelector('hexchess-board');
+board.audio = {
+  move: '/my-sounds/move.mp3',
+  capture: { src: '/my-sounds/capture.mp3', volume: 0.75 },
+  victory: null, // turn off the victory cue
+};
+
+startButton.addEventListener('click', () => {
+  board.prepareAudio(); // unlocks + preloads audio inside a user gesture
+});
+```
+
+If you want to reuse the shipped cues from JS you can import `DEFAULT_SOUND_PACK` from the package and merge it with your overrides.
+
 ## Installing
 
 `hexchess-board` is packaged as a [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components) and should be usable directly in most modern browsers. It bundles its own (configurable) styles, inline assets (for chess pieces), and code.
