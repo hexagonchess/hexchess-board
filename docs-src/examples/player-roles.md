@@ -12,15 +12,16 @@ description: Set player roles
 <script>
   document.addEventListener('keydown', (event) => {
     event.preventDefault();
+    if (event.code === 'ArrowRight') {
+      document.querySelector('hexchess-board').fastForward();
+    } else if (event.code === 'ArrowLeft') {
+      document.querySelector('hexchess-board').rewind();
+    }
   });
   document.addEventListener('keyup', (event) => {
     event.preventDefault();
     if (event.code === 'KeyF') {
       document.querySelector('hexchess-board').flip();
-    } else if (event.code === 'ArrowRight') {
-      document.querySelector('hexchess-board').fastForward();
-    } else if (event.code === 'ArrowLeft') {
-      document.querySelector('hexchess-board').rewind();
     } else if (event.code === 'ArrowUp') {
       document.querySelector('hexchess-board').rewindAll();
     } else if (event.code === 'ArrowDown') {

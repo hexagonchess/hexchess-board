@@ -89,15 +89,19 @@ Player variables
        </tr>
      
        <tr>
-         <td>hide-capturedpieces</td><td>Hide captured pieces - usually only used for custom websites to render captured pieces separately.</td><td>boolean</td><td>false</td>
+         <td>hide-capturedpieces</td><td></td><td></td><td></td>
        </tr>
-
+     
        <tr>
          <td>history-animation-duration</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>color-scheme</td><td>Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference. Custom events</td><td></td><td></td>
+         <td>color-scheme</td><td>Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.</td><td></td><td></td>
+       </tr>
+     
+       <tr>
+         <td>muted</td><td>When present, disables all built-in sound effects.</td><td></td><td></td>
        </tr>
      
    </table>
@@ -243,6 +247,11 @@ Usually called when the game is over.</td><td>void</td>
      
        <tr>
          <td>reset</td><td></td><td>Resets and unfreezes the board to the default start state.</td><td>void</td>
+       </tr>
+     
+       <tr>
+         <td>prepareAudio</td><td></td><td>Preloads the configured audio files and unlocks playback.
+Call this inside a user gesture handler if you need audio before any board interaction occurs.</td><td>Promise<void></td>
        </tr>
      
        <tr>

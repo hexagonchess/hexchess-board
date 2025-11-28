@@ -41,6 +41,8 @@
 <pre class="language-html"><code class="language-html">import { HexchessBoard } from 'https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module';</code></pre>
 <h3>NPM</h3>
 <pre class="language-bash"><code class="language-bash"><span class="token function">npm</span> <span class="token function">install</span> <span class="token string">'@hexchess/hexchess-board'</span></code></pre>
+<h2>Audio</h2>
+<p>The component references the <a href="https://github.com/lichess-org/lila/tree/master/public/sound/standard">Lichess standard sound pack</a> (mirrored under <code>https://hexagonchess.github.io/hexchess-board/assets/audio/*.mp3</code>) and preloads it automatically. Use the boolean <code>muted</code> attribute/property to silence cues entirely, or override individual sounds via the <code>audio</code> property (<code>{ move: '/sounds/move.mp3', capture: null }</code>). Mirror the files yourself if you prefer to serve audio locally or offline—just keep the AGPL-3.0 license (see <code>docs/assets/audio/LICENSE</code>). Use the <code>prepareAudio()</code> method inside a button/click handler if you need to unlock audio playback before a player interacts with the board itself.</p>
 
       </main>
     </div>
