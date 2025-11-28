@@ -45,57 +45,59 @@ Player variables
      </tr>
      
        <tr>
-         <td>turn</td><td>Whose turn it is initially</td><td>string</td><td></td>
+         <td>turn</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>board</td><td>A hex-FEN notation describing the state of the board.
-If the string is empty, no pieces will be rendered.</td><td>Board</td><td></td>
+         <td>board</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>moves</td><td>A list of moves made on the board.
-This is useful for analyzing games already played or certain pre-determined openings.</td><td>Move[]</td><td></td>
+         <td>moves</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>black-player-name</td><td>Black's player name</td><td>string</td><td>'Black'</td>
+         <td>black-player-name</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>white-player-name</td><td>White's player name</td><td>string</td><td>'White'</td>
+         <td>white-player-name</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>orientation</td><td>The orientation of the board.</td><td>Orientation</td><td>'white'</td>
+         <td>orientation</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>player-role</td><td>The role of the player.
-If `white`, you can only make moves when it is white's turn.
-If `black`, you can only make moves when it is black's turn.
-If `spectator`, then you cannot make moves at all via the UI.
-If `analyzer`, then you can make moves for both sides, and it simuluates a local game.</td><td>Role</td><td>'analyzer'</td>
+         <td>player-role</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>hide-coordinates</td><td>Show the board coordinates on the bottom and left sides of the board.</td><td>boolean</td><td>false</td>
+         <td>hide-coordinates</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>frozen</td><td>Do not allow any other moves beyond the predetermined ones set in the `moves` property.</td><td>boolean</td><td>false</td>
+         <td>frozen</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>show-hints</td><td>Clicking on an opponent's piece shows all the squares it can move to</td><td>boolean</td><td>true</td>
+         <td>show-hints</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
-         <td>hide-playernames</td><td>Hide player names - usually only used for custom websites to render player names separately.</td><td>boolean</td><td>false</td>
+         <td>hide-playernames</td><td></td><td></td><td></td>
        </tr>
      
        <tr>
          <td>hide-capturedpieces</td><td>Hide captured pieces - usually only used for custom websites to render captured pieces separately.</td><td>boolean</td><td>false</td>
+       </tr>
+
+       <tr>
+         <td>history-animation-duration</td><td></td><td></td><td></td>
+       </tr>
+     
+       <tr>
+         <td>color-scheme</td><td>Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference. Custom events</td><td></td><td></td>
        </tr>
      
    </table>
@@ -106,6 +108,22 @@ If `analyzer`, then you can make moves for both sides, and it simuluates a local
      <tr>
        <th>Name</th><th>Parameters</th><th>Description</th><th>Return</th>
      </tr>
+     
+       <tr>
+         <td>requestUpdate</td><td>
+   
+   <table>
+     <tr>
+       <th>Name</th><th>Description</th><th>Type</th>
+     </tr>
+     
+       <tr>
+         <td>_property</td><td></td><td>string</td>
+       </tr>
+     
+   </table>
+ </td><td></td><td>void</td>
+       </tr>
      
        <tr>
          <td>export</td><td></td><td>Exports the current game to a CSV list of moves that can be fed back into this same component.</td><td>string</td>
@@ -293,7 +311,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-board-bg-light</td><td>Light mode override for the board background color.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-board-bg-dark</td><td>Dark mode override for the board background color.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-white-bg</td><td>The background color of the white tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-white-bg-light</td><td>Light mode override for the white tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-white-bg-dark</td><td>Dark mode override for the white tiles.</td>
        </tr>
      
        <tr>
@@ -301,7 +335,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-selected-white-bg-light</td><td>Light mode override for selected white tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-white-bg-dark</td><td>Dark mode override for selected white tiles.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-black-bg</td><td>The background color of the black tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-black-bg-light</td><td>Light mode override for the black tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-black-bg-dark</td><td>Dark mode override for the black tiles.</td>
        </tr>
      
        <tr>
@@ -309,7 +359,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-selected-black-bg-light</td><td>Light mode override for selected black tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-black-bg-dark</td><td>Dark mode override for selected black tiles.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-grey-bg</td><td>The background color of the grey tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-grey-bg-light</td><td>Light mode override for the grey tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-grey-bg-dark</td><td>Dark mode override for the grey tiles.</td>
        </tr>
      
        <tr>
@@ -317,7 +383,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-selected-grey-bg-light</td><td>Light mode override for selected grey tiles.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-selected-grey-bg-dark</td><td>Dark mode override for selected grey tiles.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-label-bg</td><td>The background color of the column and row labels.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-label-bg-light</td><td>Light mode override for label color.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-label-bg-dark</td><td>Dark mode override for label color.</td>
        </tr>
      
        <tr>
@@ -329,7 +411,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-possible-move-bg-light</td><td>Light mode override for the legal move dot.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-bg-dark</td><td>Dark mode override for the legal move dot.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-possible-move-opponent-bg</td><td>The fill color of the small dot shown on a hexagon indicating this is a move an opponent piece can make.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-opponent-bg-light</td><td>Light mode override for the opponent move dot.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-opponent-bg-dark</td><td>Dark mode override for the opponent move dot.</td>
        </tr>
      
        <tr>
@@ -337,7 +435,23 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-possible-capture-bg-light</td><td>Light mode override for the capture ring color.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-capture-bg-dark</td><td>Dark mode override for the capture ring color.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-possible-move-stroke-white</td><td>The outline color of a hexagon when the user drags over a white square, trying to move there.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-white-light</td><td>Light mode override for white square drag outlines.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-white-dark</td><td>Dark mode override for white square drag outlines.</td>
        </tr>
      
        <tr>
@@ -345,11 +459,35 @@ This is useful when replaying many pre-programmed moves.</td><td>void</td>
        </tr>
      
        <tr>
+         <td>--hexchess-possible-move-stroke-grey-light</td><td>Light mode override for grey square drag outlines.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-grey-dark</td><td>Dark mode override for grey square drag outlines.</td>
+       </tr>
+     
+       <tr>
          <td>--hexchess-possible-move-stroke-black</td><td>The outline color of a hexagon when the user drags over a black square, trying to move there.</td>
        </tr>
      
        <tr>
-         <td>--hexchess-possible-move-stroke-opponent</td><td>The outline of a square when dragging an opponent piece to a possible move. Custom events</td>
+         <td>--hexchess-possible-move-stroke-black-light</td><td>Light mode override for black square drag outlines.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-black-dark</td><td>Dark mode override for black square drag outlines.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-opponent</td><td>The outline of a square when dragging an opponent piece to a possible move.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-opponent-light</td><td>Light mode override for opponent drag outlines.</td>
+       </tr>
+     
+       <tr>
+         <td>--hexchess-possible-move-stroke-opponent-dark</td><td>Dark mode override for opponent drag outlines.</td>
        </tr>
      
    </table>

@@ -14,10 +14,87 @@ export const styles = `
       sans-serif
     );
     font-weight: 600;
+    color-scheme: light;
+    --hexchess-default-board-bg: #ffffff;
+    --hexchess-default-white-bg: #a5c8df;
+    --hexchess-default-black-bg: #4180a9;
+    --hexchess-default-grey-bg: #80b1d0;
+    --hexchess-default-selected-white-bg: #e4c7b7;
+    --hexchess-default-selected-black-bg: #e4c7b7;
+    --hexchess-default-selected-grey-bg: #e4c7b7;
+    --hexchess-default-label-bg: #ffffff;
+    --hexchess-default-possible-move-bg: #a96a41;
+    --hexchess-default-possible-move-opponent-bg: #e3e3e3;
+    --hexchess-default-possible-capture-bg: #a96a41;
+    --hexchess-default-possible-move-stroke-white: #a96a41;
+    --hexchess-default-possible-move-stroke-black: #a96a41;
+    --hexchess-default-possible-move-stroke-grey: #a96a41;
+    --hexchess-default-possible-move-stroke-opponent: #e3e3e3;
+    --hexchess-default-score-color: black;
+    --hexchess-default-playername-color: black;
+    --hexchess-default-piece-bg: #000000;
+  }
+
+  :host([color-scheme='light']) {
+    color-scheme: light;
+  }
+
+  :host([color-scheme='dark']) {
+    color-scheme: dark;
+    --hexchess-default-board-bg: #050b16;
+    --hexchess-default-white-bg: #2f6b8f;
+    --hexchess-default-black-bg: #0f2b40;
+    --hexchess-default-grey-bg: #1f4767;
+    --hexchess-default-selected-white-bg: #d0894c;
+    --hexchess-default-selected-black-bg: #d0894c;
+    --hexchess-default-selected-grey-bg: #d0894c;
+    --hexchess-default-label-bg: #f6f7fb;
+    --hexchess-default-possible-move-bg: #f3c989;
+    --hexchess-default-possible-move-opponent-bg: #4c627d;
+    --hexchess-default-possible-capture-bg: #f3c989;
+    --hexchess-default-possible-move-stroke-white: #f3c989;
+    --hexchess-default-possible-move-stroke-black: #f3c989;
+    --hexchess-default-possible-move-stroke-grey: #f3c989;
+    --hexchess-default-possible-move-stroke-opponent: #4c627d;
+    --hexchess-default-score-color: #f6f7fb;
+    --hexchess-default-playername-color: #f6f7fb;
+    --hexchess-default-piece-bg: #f6f7fb;
+  }
+
+  :host([color-scheme='auto']) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :host(:not([color-scheme])),
+    :host([color-scheme='auto']) {
+      color-scheme: dark;
+      --hexchess-default-board-bg: #050b16;
+      --hexchess-default-white-bg: #2f6b8f;
+      --hexchess-default-black-bg: #0f2b40;
+      --hexchess-default-grey-bg: #1f4767;
+      --hexchess-default-selected-white-bg: #d0894c;
+      --hexchess-default-selected-black-bg: #d0894c;
+      --hexchess-default-selected-grey-bg: #d0894c;
+      --hexchess-default-label-bg: #f6f7fb;
+      --hexchess-default-possible-move-bg: #f3c989;
+      --hexchess-default-possible-move-opponent-bg: #4c627d;
+      --hexchess-default-possible-capture-bg: #f3c989;
+      --hexchess-default-possible-move-stroke-white: #f3c989;
+      --hexchess-default-possible-move-stroke-black: #f3c989;
+      --hexchess-default-possible-move-stroke-grey: #f3c989;
+      --hexchess-default-possible-move-stroke-opponent: #4c627d;
+      --hexchess-default-score-color: #f6f7fb;
+      --hexchess-default-playername-color: #f6f7fb;
+      --hexchess-default-piece-bg: #f6f7fb;
+    }
   }
 
   .board {
-    background-color: var(--hexchess-board-bg, #ffffff);
+    background-color: var(
+      --hexchess-board-bg,
+      var(--hexchess-default-board-bg, #ffffff)
+    );
   }
 
   .board-canvas {
@@ -63,7 +140,10 @@ export const styles = `
   }
 
   .label {
-    fill: var(--hexchess-label-bg, #ffffff);
+    fill: var(
+      --hexchess-label-bg,
+      var(--hexchess-default-label-bg, #ffffff)
+    );
     font-size: var(--hexchess-label-size, 12px);
     /* Disable user selection */
     /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
@@ -77,7 +157,10 @@ export const styles = `
 
   .piece {
     position: absolute;
-    fill: var(--hexchess-piece-bg, #000000);
+    fill: var(
+      --hexchess-piece-bg,
+      var(--hexchess-default-piece-bg, #000000)
+    );
     pointer-events: none;
     z-index: 1;
   }
@@ -89,7 +172,10 @@ export const styles = `
   }
 
   .possible-capture {
-    stroke: var(--hexchess-possible-capture-bg, #a96a41);
+    stroke: var(
+      --hexchess-possible-capture-bg,
+      var(--hexchess-default-possible-capture-bg, #a96a41)
+    );
     stroke-width: 5;
     fill: none;
   }
@@ -104,27 +190,45 @@ export const styles = `
   }
 
   polygon.possible-move-white {
-    stroke: var(--hexchess-possible-move-stroke-white, #a96a41);
+    stroke: var(
+      --hexchess-possible-move-stroke-white,
+      var(--hexchess-default-possible-move-stroke-white, #a96a41)
+    );
   }
   polygon.possible-move-black {
-    stroke: var(--hexchess-possible-move-stroke-black, #a96a41);
+    stroke: var(
+      --hexchess-possible-move-stroke-black,
+      var(--hexchess-default-possible-move-stroke-black, #a96a41)
+    );
   }
   polygon.possible-move-grey {
-    stroke: var(--hexchess-possible-move-stroke-grey, #a96a41);
+    stroke: var(
+      --hexchess-possible-move-stroke-grey,
+      var(--hexchess-default-possible-move-stroke-grey, #a96a41)
+    );
   }
   polygon.possible-move-opponent {
-    stroke: var(--hexchess-possible-move-stroke-opponent, #e3e3e3);
+    stroke: var(
+      --hexchess-possible-move-stroke-opponent,
+      var(--hexchess-default-possible-move-stroke-opponent, #e3e3e3)
+    );
   }
 
   .score {
     margin: 0;
     padding: 0;
-    color: var(--hexchess-score-color, black);
+    color: var(
+      --hexchess-score-color,
+      var(--hexchess-default-score-color, black)
+    );
     font-size: var(--hexchess-score-size, 1.2rem);
   }
 
   .username {
-    color: var(--hexchess-playername-color, black);
+    color: var(
+      --hexchess-playername-color,
+      var(--hexchess-default-playername-color, black)
+    );
     font-size: var(--hexchess-playername-size, 1.4rem);
     margin: 0;
     padding: 0;
@@ -134,42 +238,75 @@ export const styles = `
   }
 
   .selected-opponent .white {
-    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+    fill: var(
+      --hexchess-possible-move-opponent-bg,
+      var(--hexchess-default-possible-move-opponent-bg, #e3e3e3)
+    );
   }
   .selected-opponent .black {
-    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+    fill: var(
+      --hexchess-possible-move-opponent-bg,
+      var(--hexchess-default-possible-move-opponent-bg, #e3e3e3)
+    );
   }
   .selected-opponent .grey {
-    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+    fill: var(
+      --hexchess-possible-move-opponent-bg,
+      var(--hexchess-default-possible-move-opponent-bg, #e3e3e3)
+    );
   }
 
   .white {
-    fill: var(--hexchess-white-bg, #a5c8df);
+    fill: var(
+      --hexchess-white-bg,
+      var(--hexchess-default-white-bg, #a5c8df)
+    );
   }
   .selected .white {
-    fill: var(--hexchess-selected-white-bg, #e4c7b7);
+    fill: var(
+      --hexchess-selected-white-bg,
+      var(--hexchess-default-selected-white-bg, #e4c7b7)
+    );
   }
 
   .black {
-    fill: var(--hexchess-black-bg, #4180a9);
+    fill: var(
+      --hexchess-black-bg,
+      var(--hexchess-default-black-bg, #4180a9)
+    );
   }
   .selected .black {
-    fill: var(--hexchess-selected-black-bg, #e4c7b7);
+    fill: var(
+      --hexchess-selected-black-bg,
+      var(--hexchess-default-selected-black-bg, #e4c7b7)
+    );
   }
 
   .grey {
-    fill: var(--hexchess-grey-bg, #80b1d0);
+    fill: var(
+      --hexchess-grey-bg,
+      var(--hexchess-default-grey-bg, #80b1d0)
+    );
   }
   .selected .grey {
-    fill: var(--hexchess-selected-grey-bg, #e4c7b7);
+    fill: var(
+      --hexchess-selected-grey-bg,
+      var(--hexchess-default-selected-grey-bg, #e4c7b7)
+    );
   }
 
   .possible-move {
-    fill: var(--hexchess-possible-move-bg, #a96a41);
+    fill: var(
+      --hexchess-possible-move-bg,
+      var(--hexchess-default-possible-move-bg, #a96a41)
+    );
   }
 
   .opponent-move {
-    fill: var(--hexchess-possible-move-opponent-bg, #e3e3e3);
+    fill: var(
+      --hexchess-possible-move-opponent-bg,
+      var(--hexchess-default-possible-move-opponent-bg, #e3e3e3)
+    );
   }
 
   .drag-piece {

@@ -43,4 +43,42 @@ suite('hexchess-board', () => {
       'player name should reflect property update',
     );
   });
+
+  test('reflects colorScheme changes through the attribute', async () => {
+    const el = document.createElement('hexchess-board') as HexchessBoard;
+    document.body.appendChild(el);
+    await el.updateComplete;
+    el.colorScheme = 'dark';
+    assert.strictEqual(el.getAttribute('color-scheme'), 'dark');
+    el.colorScheme = 'auto';
+    assert.isNull(el.getAttribute('color-scheme'));
+  });
+
+  test('reacts to color-scheme attribute changes', async () => {
+    const el = document.createElement('hexchess-board') as HexchessBoard;
+    document.body.appendChild(el);
+    await el.updateComplete;
+    el.setAttribute('color-scheme', 'light');
+    assert.strictEqual(el.colorScheme, 'light');
+    el.setAttribute('color-scheme', 'dark');
+    assert.strictEqual(el.colorScheme, 'dark');
+    el.removeAttribute('color-scheme');
+    assert.strictEqual(el.colorScheme, 'auto');
+  });
+
+  test('allows theme specific CSS overrides', async () => {
+    const el = document.createElement('hexchess-board') as HexchessBoard;
+    document.body.appendChild(el);
+    await el.updateComplete;
+
+    el.colorScheme = 'dark';
+    el.style.setProperty('--hexchess-board-bg-dark', '#010203');
+    await el.updateComplete;
+    assert.strictEqual(el.__testingResolvedColors.board, '#010203');
+
+    el.colorScheme = 'light';
+    el.style.setProperty('--hexchess-board-bg-light', '#112233');
+    await el.updateComplete;
+    assert.strictEqual(el.__testingResolvedColors.board, '#112233');
+  });
 });
