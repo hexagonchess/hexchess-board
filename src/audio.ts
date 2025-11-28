@@ -77,7 +77,7 @@ const normalizeSoundPack = (pack?: SoundPack | null): NormalizedSoundPack => {
 };
 
 const CDN_AUDIO_BASE_URL =
-  'https://github.com/hexagonchess/hexchess-board/docs/assets/audio';
+  'https://hexagonchess.github.io/hexchess-board/assets/audio';
 
 const resolveAssetUrl = (event: SoundEvent): string => {
   if (
