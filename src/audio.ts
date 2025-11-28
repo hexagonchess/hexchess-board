@@ -77,7 +77,7 @@ const normalizeSoundPack = (pack?: SoundPack | null): NormalizedSoundPack => {
 };
 
 const DEFAULT_AUDIO_BASE_URL =
-  'https://raw.githubusercontent.com/lichess-org/lila/master/public/sound/standard';
+  'https://hexagonchess.github.io/hexchess-board/assets/audio';
 
 const defaultAssetUrl = (event: SoundEvent): string =>
   `${DEFAULT_AUDIO_BASE_URL}/${SOUND_FILE_NAMES[event]}`;
