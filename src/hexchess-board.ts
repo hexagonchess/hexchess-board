@@ -55,23 +55,54 @@ type ColorScheme = 'auto' | 'light' | 'dark';
  * @cssprop [--hexchess-playername-color=black]                - The color of the player names.
  *
  * Board variables
- * @cssprop [--hexchess-board-bg=#ffffff]                      - The background color of the whitespace of the board (not tiles).
- * @cssprop [--hexchess-white-bg=#a5c8df]                      - The background color of the white tiles.
- * @cssprop [--hexchess-selected-white-bg=#a96a41]             - The background color of a white tile that's selected to be moved.
- * @cssprop [--hexchess-black-bg=#4180a9]                      - The background color of the black tiles.
- * @cssprop [--hexchess-selected-black-bg=#a96a41]             - The background color of a black tile that's selected to be moved.
- * @cssprop [--hexchess-grey-bg=#80b1d0]                       - The background color of the grey tiles.
- * @cssprop [--hexchess-selected-grey-bg=#a96a41]              - The background color of a grey tile that's selected to be moved.
- * @cssprop [--hexchess-label-bg=#ffffff]                      - The background color of the column and row labels.
- * @cssprop [--hexchess-label-size=12px]                       - The font size of the column and row labels.
- * @cssprop [--hexchess-possible-move-bg=#e4c7b7]              - The fill color of the small dot shown on a hexagon indicating this is a legal move.
- * @cssprop [--hexchess-possible-move-opponent-bg=#e3e3e3]     - The fill color of the small dot shown on a hexagon indicating this is a move an opponent piece can make.
- * @cssprop [--hexchess-possible-capture-bg=#e4c7b7]           - The stroke color of the large circle outlining a piece that can be captured.
- * @cssprop [--hexchess-possible-move-stroke-white=#e4c7b7]    - The outline color of a hexagon when the user drags over a white square, trying to move there.
- * @cssprop [--hexchess-possible-move-stroke-grey=#e4c7b7]     - The outline color of a hexagon when the user drags over a grey square, trying to move there.
- * @cssprop [--hexchess-possible-move-stroke-black=#e4c7b7]    - The outline color of a hexagon when the user drags over a black square, trying to move there.
- * @cssprop [--hexchess-possible-move-stroke-opponent=#e3e3e3] - The outline of a square when dragging an opponent piece to a possible move.
- * @attr color-scheme                                         - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
+ * @cssprop [--hexchess-board-bg=#ffffff]                        - The background color of the whitespace of the board (not tiles).
+ * @cssprop [--hexchess-board-bg-light=#ffffff]                  - Light mode override for the board background color.
+ * @cssprop [--hexchess-board-bg-dark=#050b16]                   - Dark mode override for the board background color.
+ * @cssprop [--hexchess-white-bg=#a5c8df]                        - The background color of the white tiles.
+ * @cssprop [--hexchess-white-bg-light=#a5c8df]                  - Light mode override for the white tiles.
+ * @cssprop [--hexchess-white-bg-dark=#2f6b8f]                   - Dark mode override for the white tiles.
+ * @cssprop [--hexchess-selected-white-bg=#a96a41]               - The background color of a white tile that's selected to be moved.
+ * @cssprop [--hexchess-selected-white-bg-light=#a96a41]         - Light mode override for selected white tiles.
+ * @cssprop [--hexchess-selected-white-bg-dark=#d0894c]          - Dark mode override for selected white tiles.
+ * @cssprop [--hexchess-black-bg=#4180a9]                        - The background color of the black tiles.
+ * @cssprop [--hexchess-black-bg-light=#4180a9]                  - Light mode override for the black tiles.
+ * @cssprop [--hexchess-black-bg-dark=#0f2b40]                   - Dark mode override for the black tiles.
+ * @cssprop [--hexchess-selected-black-bg=#a96a41]               - The background color of a black tile that's selected to be moved.
+ * @cssprop [--hexchess-selected-black-bg-light=#a96a41]         - Light mode override for selected black tiles.
+ * @cssprop [--hexchess-selected-black-bg-dark=#d0894c]          - Dark mode override for selected black tiles.
+ * @cssprop [--hexchess-grey-bg=#80b1d0]                         - The background color of the grey tiles.
+ * @cssprop [--hexchess-grey-bg-light=#80b1d0]                   - Light mode override for the grey tiles.
+ * @cssprop [--hexchess-grey-bg-dark=#1f4767]                    - Dark mode override for the grey tiles.
+ * @cssprop [--hexchess-selected-grey-bg=#a96a41]                - The background color of a grey tile that's selected to be moved.
+ * @cssprop [--hexchess-selected-grey-bg-light=#a96a41]          - Light mode override for selected grey tiles.
+ * @cssprop [--hexchess-selected-grey-bg-dark=#d0894c]           - Dark mode override for selected grey tiles.
+ * @cssprop [--hexchess-label-bg=#ffffff]                        - The background color of the column and row labels.
+ * @cssprop [--hexchess-label-bg-light=#ffffff]                  - Light mode override for label color.
+ * @cssprop [--hexchess-label-bg-dark=#f6f7fb]                   - Dark mode override for label color.
+ * @cssprop [--hexchess-label-size=12px]                         - The font size of the column and row labels.
+ * @cssprop [--hexchess-possible-move-bg=#e4c7b7]                - The fill color of the small dot shown on a hexagon indicating this is a legal move.
+ * @cssprop [--hexchess-possible-move-bg-light=#a96a41]          - Light mode override for the legal move dot.
+ * @cssprop [--hexchess-possible-move-bg-dark=#f3c989]           - Dark mode override for the legal move dot.
+ * @cssprop [--hexchess-possible-move-opponent-bg=#e3e3e3]       - The fill color of the small dot shown on a hexagon indicating this is a move an opponent piece can make.
+ * @cssprop [--hexchess-possible-move-opponent-bg-light=#e3e3e3] - Light mode override for the opponent move dot.
+ * @cssprop [--hexchess-possible-move-opponent-bg-dark=#4c627d]  - Dark mode override for the opponent move dot.
+ * @cssprop [--hexchess-possible-capture-bg=#e4c7b7]             - The stroke color of the large circle outlining a piece that can be captured.
+ * @cssprop [--hexchess-possible-capture-bg-light=#a96a41]       - Light mode override for the capture ring color.
+ * @cssprop [--hexchess-possible-capture-bg-dark=#f3c989]        - Dark mode override for the capture ring color.
+ * @cssprop [--hexchess-possible-move-stroke-white=#e4c7b7]      - The outline color of a hexagon when the user drags over a white square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-white-light=#a96a41] - Light mode override for white square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-white-dark=#f3c989]  - Dark mode override for white square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-grey=#e4c7b7]        - The outline color of a hexagon when the user drags over a grey square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-grey-light=#a96a41]  - Light mode override for grey square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-grey-dark=#f3c989]   - Dark mode override for grey square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-black=#e4c7b7]       - The outline color of a hexagon when the user drags over a black square, trying to move there.
+ * @cssprop [--hexchess-possible-move-stroke-black-light=#a96a41] - Light mode override for black square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-black-dark=#f3c989]  - Dark mode override for black square drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-opponent=#e3e3e3]    - The outline of a square when dragging an opponent piece to a possible move.
+ * @cssprop [--hexchess-possible-move-stroke-opponent-light=#e3e3e3] - Light mode override for opponent drag outlines.
+ * @cssprop [--hexchess-possible-move-stroke-opponent-dark=#4c627d]  - Dark mode override for opponent drag outlines.
+ *
+ * @attr color-scheme  - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
  *
  * Custom events
  * @fires gameover        - Fired when the game is over.
@@ -629,15 +660,37 @@ export class HexchessBoard extends HTMLElement {
     this._promotionHost.innerHTML = this._renderPromotionOptions();
   }
 
+  private _getResolvedColorScheme(): 'light' | 'dark' {
+    if (this._colorScheme === 'dark') {
+      return 'dark';
+    }
+    if (this._colorScheme === 'light') {
+      return 'light';
+    }
+    const mediaQuery = this._getPrefersDarkModeMedia();
+    if (mediaQuery) {
+      return mediaQuery.matches ? 'dark' : 'light';
+    }
+    return 'light';
+  }
+
+  private _getPrefersDarkModeMedia(): MediaQueryList | null {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return null;
+    }
+    if (!this._prefersDarkModeMedia) {
+      this._prefersDarkModeMedia = window.matchMedia(
+        '(prefers-color-scheme: dark)',
+      );
+    }
+    return this._prefersDarkModeMedia;
+  }
+
   private _startColorSchemeObserver() {
-    if (this._prefersDarkModeMedia || typeof window === 'undefined') {
+    const mediaQuery = this._getPrefersDarkModeMedia();
+    if (!mediaQuery || this._boundPrefersColorSchemeChange) {
       return;
     }
-    if (!window.matchMedia) {
-      return;
-    }
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    this._prefersDarkModeMedia = mediaQuery;
     const handler = (_event: MediaQueryListEvent) => {
       if (this._colorScheme === 'auto') {
         this._handleColorSchemeChange();
@@ -652,18 +705,17 @@ export class HexchessBoard extends HTMLElement {
   }
 
   private _stopColorSchemeObserver() {
-    if (!this._prefersDarkModeMedia || !this._boundPrefersColorSchemeChange) {
-      this._prefersDarkModeMedia = null;
-      this._boundPrefersColorSchemeChange = null;
-      return;
-    }
-    const handler = this._boundPrefersColorSchemeChange;
-    if (typeof this._prefersDarkModeMedia.removeEventListener === 'function') {
-      this._prefersDarkModeMedia.removeEventListener('change', handler);
-    } else if (
-      typeof this._prefersDarkModeMedia.removeListener === 'function'
-    ) {
-      this._prefersDarkModeMedia.removeListener(handler);
+    if (this._prefersDarkModeMedia && this._boundPrefersColorSchemeChange) {
+      const handler = this._boundPrefersColorSchemeChange;
+      if (
+        typeof this._prefersDarkModeMedia.removeEventListener === 'function'
+      ) {
+        this._prefersDarkModeMedia.removeEventListener('change', handler);
+      } else if (
+        typeof this._prefersDarkModeMedia.removeListener === 'function'
+      ) {
+        this._prefersDarkModeMedia.removeListener(handler);
+      }
     }
     this._prefersDarkModeMedia = null;
     this._boundPrefersColorSchemeChange = null;
@@ -1485,15 +1537,25 @@ export class HexchessBoard extends HTMLElement {
   }
 
   private _getCssColors(styles: CSSStyleDeclaration): CanvasColors {
-    const readVar = (name: string, fallback: string) => {
-      const value = styles.getPropertyValue(name).trim();
-      return value.length > 0 ? value : fallback;
-    };
+    const resolvedScheme = this._getResolvedColorScheme();
+    const readRaw = (name: string) => styles.getPropertyValue(name).trim();
     const readColor = (
       property: string,
       defaultProperty: string,
       fallback: string,
-    ) => readVar(property, readVar(defaultProperty, fallback));
+    ) => {
+      const themedProperty = `${property}-${resolvedScheme}`;
+      const themedValue = readRaw(themedProperty);
+      if (themedValue) {
+        return themedValue;
+      }
+      const value = readRaw(property);
+      if (value) {
+        return value;
+      }
+      const defaultValue = readRaw(defaultProperty);
+      return defaultValue || fallback;
+    };
     return {
       board: readColor(
         '--hexchess-board-bg',
@@ -1577,6 +1639,13 @@ export class HexchessBoard extends HTMLElement {
         ),
       },
     };
+  }
+
+  /**
+   * @internal Exposed only for internal tests that need to inspect resolved colors.
+   */
+  get __testingResolvedColors(): CanvasColors {
+    return this._getCssColors(getComputedStyle(this));
   }
 
   private _drawSquares(

@@ -37,6 +37,8 @@ Light mode keeps the existing pastel palette (`#a5c8df`, `#80b1d0`, `#4180a9`, `
 
 All of these values still come from the same CSS custom properties (`--hexchess-*`), so you can override individual colors per theme if you'd like.
 
+For per-theme customization without duplicating selectors, you can scope variables with `-light` or `-dark` suffixes (`--hexchess-board-bg-dark`, `--hexchess-board-bg-light`, etc.). When a themed value isn't provided, the component falls back to the base `--hexchess-*` value and then to the built-in palette.
+
 ## Installing
 
 `hexchess-board` is packaged as a [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components) and should be usable directly in most modern browsers. It bundles its own (configurable) styles, inline assets (for chess pieces), and code.
