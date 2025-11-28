@@ -39,3 +39,7 @@ import { HexchessBoard } from 'https://esm.sh/@hexchess/hexchess-board@latest/he
 ```bash
 npm install '@hexchess/hexchess-board'
 ```
+
+## Audio
+
+The component references a lightweight sound pack and preloads it automatically. A boolean `muted` attribute/property or the `audio="off"` attribute turns the cues off entirely, or you can override individual sounds via the `soundPack` property (`{ move: '/sounds/move.mp3', capture: null }`). By default, cue URLs point at `https://hexagonchess.github.io/hexchess-board/assets/audio/*.wav` (served from the docs site, not bundled with npm); host them yourself if you prefer to serve audio locally or offline. Use the `prepareAudio()` method inside a button/click handler if you need to unlock audio playback before a player interacts with the board itself.

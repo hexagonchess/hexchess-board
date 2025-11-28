@@ -61,3 +61,24 @@ render(
 
   </div>
 </section>
+
+## Sound effects
+
+Built-in cues (move, capture, check, checkmate, victory, defeat, and draw) are preloaded as soon as the element is connected. Toggle them with the boolean `muted` attribute or the declarative `audio="off"` attribute, or swap individual files by setting the `soundPack` property from JavaScript. The defaults reference `https://hexagonchess.github.io/hexchess-board/assets/audio/*.wav` (hosted by the docs site rather than bundled with npm), so host your own files if you need different URLs or offline access.
+
+```html
+<hexchess-board id="audio-board" board="start"></hexchess-board>
+<button id="prime-audio">Enable audio</button>
+<script type="module">
+  const board = document.querySelector('#audio-board');
+  primeAudio.addEventListener('click', async () => {
+    await board.prepareAudio();
+    board.soundPack = {
+      move: '/assets/sounds/move.mp3',
+      capture: null, // disable capture cue
+    };
+  });
+</script>
+```
+
+The `prepareAudio()` helper lets you unlock and preload sounds during your own UI gesture (to satisfy autoplay restrictions) if your players won't click on the board directly.
