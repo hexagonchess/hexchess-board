@@ -24,16 +24,19 @@
 
       document.addEventListener('keydown', (event) => {
         event.preventDefault();
+        if (event.code === 'ArrowRight') {
+          primeAudio();
+          boardPromise.then((board) => board?.fastForward());
+        } else if (event.code === 'ArrowLeft') {
+          primeAudio();
+          boardPromise.then((board) => board?.rewind());
+        }
       });
       document.addEventListener('keyup', (event) => {
         event.preventDefault();
         primeAudio();
         if (event.code === 'KeyF') {
           boardPromise.then((board) => board?.flip());
-        } else if (event.code === 'ArrowRight') {
-          boardPromise.then((board) => board?.fastForward());
-        } else if (event.code === 'ArrowLeft') {
-          boardPromise.then((board) => board?.rewind());
         } else if (event.code === 'ArrowDown') {
           boardPromise.then((board) => board?.rewindAll());
         } else if (event.code === 'ArrowUp') {
