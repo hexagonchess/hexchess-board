@@ -1,6 +1,6 @@
-import { Board } from './board';
-import { Position } from './position';
-import { Square } from './utils';
+import type { Board } from './board';
+import type { Position } from './position';
+import type { Square } from './utils';
 
 export type Color = 'white' | 'black' | 'grey';
 export type LegalMoves = Partial<Record<Square, Set<Square>>>;

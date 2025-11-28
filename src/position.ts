@@ -1,6 +1,6 @@
-import { Board } from './board';
-import { Color } from './types';
-import { COLUMN_ARRAY, Column, Square } from './utils';
+import type { Board } from './board';
+import type { Color } from './types';
+import { COLUMN_ARRAY, type Column, type Square } from './utils';
 
 export class Position {
   readonly col: Column;
@@ -111,7 +111,7 @@ export class Position {
 
   static fromString(pos: string): Position {
     const column = pos[0];
-    const row = parseInt(pos.slice(1));
+    const row = parseInt(pos.slice(1), 10);
     if (!Position.validatePosition(column, row)) {
       throw new Error(`Invalid position: ${pos}`);
     }

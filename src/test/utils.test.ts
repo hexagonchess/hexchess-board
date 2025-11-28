@@ -2,7 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import { Board } from '../board';
 import { King } from '../king';
 import { Position } from '../position';
-import { Move } from '../types';
+import type { Move } from '../types';
 import {
   boardToFen,
   fenToBoard,

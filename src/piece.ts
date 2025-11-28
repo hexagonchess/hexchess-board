@@ -1,4 +1,4 @@
-import { Piece } from './types';
+import type { Piece } from './types';
 
 export const PIECE_VALUES: Record<Piece, number> = {
   k: 1_000,

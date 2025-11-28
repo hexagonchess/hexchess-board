@@ -1,5 +1,5 @@
 import { Board } from './board';
-import { Color, Move, Piece } from './types';
+import type { Color, Move, Piece } from './types';
 
 export const COLUMN_ARRAY = [
   'A',
