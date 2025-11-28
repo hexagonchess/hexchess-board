@@ -114,8 +114,8 @@ type ColorScheme = 'auto' | 'light' | 'dark';
  * @cssprop [--hexchess-possible-move-stroke-opponent-dark=#4c627d]  - Dark mode override for opponent drag outlines.
  *
  * @attr color-scheme  - Force `light`, `dark`, or `auto` (default) theming. When unset, the component follows the page/system preference.
- * @attr muted         - When present, disables all built-in sound effects (same as `audio="off"`).
- * @attr audio         - Controls audio output. Use `audio="off"` to mute, omit or set to `on` to enable sounds.
+ * @attr muted         - When present, disables all built-in sound effects.
+ * @prop audio         - Provide overrides for the built-in sound pack. Pass a partial map or `null` to reset to the defaults.
  *
  * Custom events
  * @fires gameover        - Fired when the game is over.
@@ -184,7 +184,7 @@ export class HexchessBoard extends HTMLElement {
   private _historyAnimationDuration = 100;
   private _customEventsPaused = false;
   private readonly _audioManager = new AudioManager();
-  private _soundPackOverrides: SoundPack | null = null;
+  private _audioOverrides: SoundPack | null = null;
   private _audioPreloadHandle: number | null = null;
   private _audioPreloadViaIdle = false;
   private _boundWindowPointerUp = (event: MouseEvent | PointerEvent) =>
@@ -442,7 +442,6 @@ export class HexchessBoard extends HTMLElement {
    * Mute all built-in sound effects.
    */
   private _muted = false;
-  private _audioSetting: 'on' | 'off' = 'on';
   get muted(): boolean {
     return this._muted;
   }
@@ -453,51 +452,20 @@ export class HexchessBoard extends HTMLElement {
     }
     this._muted = next;
     this._audioManager.setMuted(next);
-    const audioSetting = next ? 'off' : 'on';
-    if (this._audioSetting !== audioSetting) {
-      this._audioSetting = audioSetting;
-      if (audioSetting === 'off') {
-        this.setAttribute('audio', 'off');
-      } else {
-        this.removeAttribute('audio');
-      }
-    }
-  }
-
-  /**
-   * Controls whether audio is enabled.
-   * Use `'off'` to mute via the `audio="off"` attribute.
-   */
-  get audio(): 'on' | 'off' {
-    return this._audioSetting;
-  }
-  set audio(value: 'on' | 'off') {
-    const next = value === 'off' ? 'off' : 'on';
-    if (next === this._audioSetting) {
-      return;
-    }
-    this._audioSetting = next;
-    if (next === 'off') {
-      this.setAttribute('audio', 'off');
-      this.muted = true;
-    } else {
-      this.removeAttribute('audio');
-      this.muted = false;
-    }
   }
 
   /**
    * Provide overrides for the built-in sound pack.
    * Pass `null` to revert to the default set of cues.
    */
-  get soundPack(): SoundPack | null {
-    return this._soundPackOverrides;
+  get audio(): SoundPack | null {
+    return this._audioOverrides;
   }
-  set soundPack(value: SoundPack | null) {
-    if (value === this._soundPackOverrides) {
+  set audio(value: SoundPack | null) {
+    if (value === this._audioOverrides) {
       return;
     }
-    this._soundPackOverrides = value;
+    this._audioOverrides = value;
     this._audioManager.updateSoundPack(value);
     this._scheduleAudioPreload();
   }
@@ -553,7 +521,6 @@ export class HexchessBoard extends HTMLElement {
       'hide-capturedpieces',
       'history-animation-duration',
       'color-scheme',
-      'audio',
       'muted',
     ];
   }
@@ -626,14 +593,6 @@ export class HexchessBoard extends HTMLElement {
         if (next !== this._colorScheme) {
           this._colorScheme = next;
           this._handleColorSchemeChange();
-        }
-        break;
-      }
-      case 'audio': {
-        const next = newValue === 'off' ? 'off' : 'on';
-        if (next !== this._audioSetting) {
-          this._audioSetting = next;
-          this.muted = next === 'off';
         }
         break;
       }
@@ -887,7 +846,6 @@ export class HexchessBoard extends HTMLElement {
       'showHints',
       'hidePlayerNames',
       'hideCapturedPieces',
-      'soundPack',
       'muted',
       'audio',
       'colorScheme',

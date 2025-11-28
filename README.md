@@ -43,13 +43,13 @@ For per-theme customization without duplicating selectors, you can scope variabl
 
 `<hexchess-board>` now mirrors Lichess's [standard sound pack](https://github.com/lichess-org/lila/tree/master/public/sound/standard) (`move`, `capture`, `check`, `checkmate`, `victory`, `defeat`, `draw`) and serves it from this repo's GitHub Pages site, keeping the npm tarball tiny while remaining future-proof. Sounds are preloaded as soon as the element is connected so they fire instantly when moves resolve, check is declared, or the game finishes. Browsers still require a user gesture before audio playback, so either let players click/tap the board once or call `board.prepareAudio()` inside your own button handler.
 
-- Toggle audio entirely via the boolean `muted` attribute/property or the declarative `audio="off"` attribute (`audio="on"` or the absence of the attribute re-enables sounds).
-- Override specific cues by assigning a `soundPack` object. Each entry accepts a string URL, `null` (disable), or `{src, volume, playbackRate}`.
-- Default cue URLs point at `https://hexagonchess.github.io/hexchess-board/assets/audio/*.mp3` (mirrored copies of the Lichess sounds; see `docs/assets/audio/LICENSE` for the AGPL-3.0 license). If you need to run offline or use your own branding, copy those files to your infra/CDN and point `soundPack` to the new URLs.
+- Toggle audio entirely via the boolean `muted` attribute/property.
+- Override specific cues by assigning the `audio` property. Each entry accepts a string URL, `null` (disable), or `{src, volume, playbackRate}`.
+- Default cue URLs point at `https://hexagonchess.github.io/hexchess-board/assets/audio/*.mp3`. If you need to run offline or use your own branding, copy those files to your infra/CDN and point `audio` to the new URLs.
 
 ```js
 const board = document.querySelector('hexchess-board');
-board.soundPack = {
+board.audio = {
   move: '/my-sounds/move.mp3',
   capture: { src: '/my-sounds/capture.mp3', volume: 0.75 },
   victory: null, // turn off the victory cue
