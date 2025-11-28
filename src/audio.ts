@@ -1,14 +1,14 @@
-const SOUND_FILES = {
-  move: 'move',
-  capture: 'capture',
-  check: 'check',
-  checkmate: 'checkmate',
-  victory: 'victory',
-  defeat: 'defeat',
-  draw: 'draw',
+const SOUND_FILE_NAMES = {
+  move: 'Move.mp3',
+  capture: 'Capture.mp3',
+  check: 'Check.mp3',
+  checkmate: 'Checkmate.mp3',
+  victory: 'Victory.mp3',
+  defeat: 'Defeat.mp3',
+  draw: 'Draw.mp3',
 } as const;
 
-export type SoundEvent = keyof typeof SOUND_FILES;
+export type SoundEvent = keyof typeof SOUND_FILE_NAMES;
 
 export type SoundDetail = {
   src: string;
@@ -53,7 +53,7 @@ const normalizePlaybackRate = (value: number | undefined): number => {
 
 const normalizeSoundPack = (pack?: SoundPack | null): NormalizedSoundPack => {
   const normalized = {} as NormalizedSoundPack;
-  for (const event of Object.keys(SOUND_FILES) as SoundEvent[]) {
+  for (const event of SOUND_EVENTS) {
     const override = pack?.[event];
     if (override === null) {
       normalized[event] = null;
@@ -77,25 +77,25 @@ const normalizeSoundPack = (pack?: SoundPack | null): NormalizedSoundPack => {
 };
 
 const DEFAULT_AUDIO_BASE_URL =
-  'https://hexagonchess.github.io/hexchess-board/assets/audio';
+  'https://raw.githubusercontent.com/lichess-org/lila/master/public/sound/standard';
 
-const defaultAssetUrl = (name: string): string =>
-  `${DEFAULT_AUDIO_BASE_URL}/${name}.wav`;
+const defaultAssetUrl = (event: SoundEvent): string =>
+  `${DEFAULT_AUDIO_BASE_URL}/${SOUND_FILE_NAMES[event]}`;
 
 export const DEFAULT_SOUND_PACK: Record<SoundEvent, SoundDetail> = {
-  move: { src: defaultAssetUrl(SOUND_FILES.move), volume: 0.6 },
-  capture: { src: defaultAssetUrl(SOUND_FILES.capture), volume: 0.75 },
-  check: { src: defaultAssetUrl(SOUND_FILES.check), volume: 0.7 },
-  checkmate: { src: defaultAssetUrl(SOUND_FILES.checkmate), volume: 0.8 },
-  victory: { src: defaultAssetUrl(SOUND_FILES.victory), volume: 0.85 },
-  defeat: { src: defaultAssetUrl(SOUND_FILES.defeat), volume: 0.65 },
-  draw: { src: defaultAssetUrl(SOUND_FILES.draw), volume: 0.65 },
+  move: { src: defaultAssetUrl('move'), volume: 0.6 },
+  capture: { src: defaultAssetUrl('capture'), volume: 0.75 },
+  check: { src: defaultAssetUrl('check'), volume: 0.7 },
+  checkmate: { src: defaultAssetUrl('checkmate'), volume: 0.8 },
+  victory: { src: defaultAssetUrl('victory'), volume: 0.85 },
+  defeat: { src: defaultAssetUrl('defeat'), volume: 0.65 },
+  draw: { src: defaultAssetUrl('draw'), volume: 0.65 },
 };
 
 const hasAudioSupport =
   typeof window !== 'undefined' && typeof window.Audio === 'function';
 
-const SOUND_EVENTS = Object.keys(SOUND_FILES) as SoundEvent[];
+const SOUND_EVENTS = Object.keys(SOUND_FILE_NAMES) as SoundEvent[];
 
 export class AudioManager {
   private _muted = false;

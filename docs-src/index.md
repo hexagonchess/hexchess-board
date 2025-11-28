@@ -64,7 +64,7 @@ render(
 
 ## Sound effects
 
-Built-in cues (move, capture, check, checkmate, victory, defeat, and draw) are preloaded as soon as the element is connected. Toggle them with the boolean `muted` attribute or the declarative `audio="off"` attribute, or swap individual files by setting the `soundPack` property from JavaScript. The defaults reference `https://hexagonchess.github.io/hexchess-board/assets/audio/*.wav` (hosted by the docs site rather than bundled with npm), so host your own files if you need different URLs or offline access.
+Built-in cues (move, capture, check, checkmate, victory, defeat, and draw) reuse [Lichess's standard sound pack](https://github.com/lichess-org/lila/tree/master/public/sound/standard) and are preloaded as soon as the element is connected. Toggle them with the boolean `muted` attribute or the declarative `audio="off"` attribute, or swap individual files by setting the `soundPack` property from JavaScript. Defaults stream from `https://raw.githubusercontent.com/lichess-org/lila/master/public/sound/standard/*.mp3`, so host your own files (respecting the AGPL license) if you need different URLs or offline access.
 
 ```html
 <hexchess-board id="audio-board" board="start"></hexchess-board>

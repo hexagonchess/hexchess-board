@@ -4,6 +4,7 @@ coverage/
 /test/
 custom-elements.json
 # top level source
+audio.js
 bishop.js
 board.js
 board-state.js
