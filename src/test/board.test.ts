@@ -7,8 +7,8 @@ import { Pawn } from '../pawn';
 import { Position } from '../position';
 import { Queen } from '../queen';
 import { Rook } from '../rook';
-import { HexchessPiece } from '../types';
-import { Square } from '../utils';
+import type { HexchessPiece } from '../types';
+import type { Square } from '../utils';
 
 describe('Board', () => {
   test('Properly initialize the game state', () => {

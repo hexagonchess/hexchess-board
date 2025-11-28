@@ -8,7 +8,7 @@ import { Pawn } from '../pawn';
 import { Position } from '../position';
 import { Queen } from '../queen';
 import { Rook } from '../rook';
-import { HexchessPiece, Move, Piece } from '../types';
+import type { HexchessPiece, Move, Piece } from '../types';
 import * as BoardUtils from './board-utils';
 
 const createMinimalBoard = (): Board => {

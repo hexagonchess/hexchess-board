@@ -1,9 +1,9 @@
-import { Game, GameState } from './game';
+import { type Game, GameState } from './game';
 import { Pawn } from './pawn';
 import { PIECE_VALUES } from './piece';
 import { Position } from './position';
-import { HexchessPiece, LegalMoves, Move, Piece } from './types';
-import { Square } from './utils';
+import type { HexchessPiece, LegalMoves, Move, Piece } from './types';
+import type { Square } from './utils';
 
 export type BoardAnimation = {
   direction: 'forward' | 'backward';
@@ -198,7 +198,7 @@ export class BoardStateMachine {
     let enPassant = false;
     if (fromPiece instanceof Pawn && from[0] !== to[0] && !toPiece) {
       enPassant = true;
-      const row = Number.parseInt(to.slice(1));
+      const row = Number.parseInt(to.slice(1), 10);
       const capturedLocation =
         fromPiece.color === 'white'
           ? `${to[0]}${row - 1}`

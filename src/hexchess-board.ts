@@ -1,11 +1,11 @@
 import { Board } from './board';
 import {
-  BoardAnimation,
-  BoardChange,
-  BoardState,
+  type BoardAnimation,
+  type BoardChange,
+  type BoardState,
   BoardStateMachine,
-  RewoundState,
-  WaitingState,
+  type RewoundState,
+  type WaitingState,
 } from './board-state';
 import { Game } from './game';
 import { styles } from './hexchess-styles';
@@ -15,7 +15,7 @@ import {
   PIECE_ASSET_URLS,
   renderPiece,
 } from './piece';
-import { Color, Move, Orientation, Piece, Role, TileColor } from './types';
+import type { Color, Move, Orientation, Piece, Role, TileColor } from './types';
 import {
   ALL_SQUARES,
   ANNOTATED_BLACK_SQUARES,
@@ -26,7 +26,13 @@ import {
   movesToString,
   stringToMoves,
 } from './utils';
-import { Column, ColumnConfig, Square, boardToFen, fenToBoard } from './utils';
+import {
+  type Column,
+  type ColumnConfig,
+  type Square,
+  boardToFen,
+  fenToBoard,
+} from './utils';
 
 type CanvasColors = {
   board: string;
@@ -1155,7 +1161,7 @@ export class HexchessBoard extends HTMLElement {
 
   private _getOffsets(square: Square, config: ColumnConfig): [number, number] {
     const column = square[0] as Column;
-    const row = parseInt(square.slice(1));
+    const row = parseInt(square.slice(1), 10);
 
     const xOffset = config[column].x;
     const baseOffset = config[column].y;
@@ -1216,7 +1222,7 @@ export class HexchessBoard extends HTMLElement {
 
   private _getColorForSquare(square: Square): TileColor {
     const colors = this._columnConfig[square[0] as Column].colors;
-    const number = parseInt(square.slice(1));
+    const number = parseInt(square.slice(1), 10);
     return number % 3 === 0
       ? colors[0]
       : number % 3 === 1
@@ -2235,7 +2241,7 @@ export class HexchessBoard extends HTMLElement {
         });
         this._reconcileNewState(newState);
         return newState.didChange;
-      } catch (error) {
+      } catch (_error) {
         console.error('Invalid FEN format move.');
         return false;
       }

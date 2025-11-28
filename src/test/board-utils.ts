@@ -6,7 +6,7 @@ import { Pawn } from '../pawn';
 import { Queen } from '../queen';
 import { Rook } from '../rook';
 import { Position } from './../position';
-import { HexchessPiece } from './../types';
+import type { HexchessPiece } from './../types';
 
 export function insufficientMaterialStalemate(): Board {
   const board = Board.empty();

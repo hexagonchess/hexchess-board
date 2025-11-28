@@ -5,8 +5,8 @@ import { Pawn } from './pawn';
 import { Position } from './position';
 import { Queen } from './queen';
 import { Rook } from './rook';
-import { Color, HexchessPiece, Piece } from './types';
-import { Square } from './utils';
+import type { Color, HexchessPiece, Piece } from './types';
+import type { Square } from './utils';
 
 export class Board {
   readonly pieces: Record<Square, HexchessPiece | null>;

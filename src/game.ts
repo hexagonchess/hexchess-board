@@ -6,8 +6,8 @@ import { Pawn } from './pawn';
 import { Position } from './position';
 import { Queen } from './queen';
 import { Rook } from './rook';
-import { Color, HexchessPiece, LegalMoves, Move, Piece } from './types';
-import { Square } from './utils';
+import type { Color, HexchessPiece, LegalMoves, Move, Piece } from './types';
+import type { Square } from './utils';
 
 export enum GameState {
   CHECKMATE = 0,
@@ -61,7 +61,7 @@ export class Game {
 
       // Get position information
       const square = piece.position.toSquare();
-      const row = parseInt(square.slice(1));
+      const row = parseInt(square.slice(1), 10);
       const column = square[0];
 
       // Check if pawn is at the end row for its color
@@ -126,7 +126,7 @@ export class Game {
       if (newGame.isInCheck()) {
         return false;
       }
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
 

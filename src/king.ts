@@ -1,6 +1,6 @@
-import { Board } from './board';
-import { Position } from './position';
-import { Color, HexchessPiece, Piece } from './types';
+import type { Board } from './board';
+import type { Position } from './position';
+import type { Color, HexchessPiece, Piece } from './types';
 
 export class King implements HexchessPiece {
   readonly color: Color;
