@@ -76,20 +76,30 @@ const normalizeSoundPack = (pack?: SoundPack | null): NormalizedSoundPack => {
   return normalized;
 };
 
-const DEFAULT_AUDIO_BASE_URL =
-  'https://hexagonchess.github.io/hexchess-board/assets/audio';
+const CDN_AUDIO_BASE_URL =
+  'https://github.com/hexagonchess/hexchess-board/docs/assets/audio';
 
-const defaultAssetUrl = (event: SoundEvent): string =>
-  `${DEFAULT_AUDIO_BASE_URL}/${SOUND_FILE_NAMES[event]}`;
+const resolveAssetUrl = (event: SoundEvent): string => {
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname === 'localhost'
+  ) {
+    return new URL(
+      `../docs/assets/audio/${SOUND_FILE_NAMES[event]}`,
+      window.location.href,
+    ).href;
+  }
+  return `${CDN_AUDIO_BASE_URL}/${SOUND_FILE_NAMES[event]}`;
+};
 
 export const DEFAULT_SOUND_PACK: Record<SoundEvent, SoundDetail> = {
-  move: { src: defaultAssetUrl('move'), volume: 0.6 },
-  capture: { src: defaultAssetUrl('capture'), volume: 0.75 },
-  check: { src: defaultAssetUrl('check'), volume: 0.7 },
-  checkmate: { src: defaultAssetUrl('checkmate'), volume: 0.8 },
-  victory: { src: defaultAssetUrl('victory'), volume: 0.85 },
-  defeat: { src: defaultAssetUrl('defeat'), volume: 0.65 },
-  draw: { src: defaultAssetUrl('draw'), volume: 0.65 },
+  move: { src: resolveAssetUrl('move'), volume: 0.6 },
+  capture: { src: resolveAssetUrl('capture'), volume: 0.75 },
+  check: { src: resolveAssetUrl('check'), volume: 0.7 },
+  checkmate: { src: resolveAssetUrl('checkmate'), volume: 0.8 },
+  victory: { src: resolveAssetUrl('victory'), volume: 0.85 },
+  defeat: { src: resolveAssetUrl('defeat'), volume: 0.65 },
+  draw: { src: resolveAssetUrl('draw'), volume: 0.65 },
 };
 
 const hasAudioSupport =
