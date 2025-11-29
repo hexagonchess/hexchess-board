@@ -82,3 +82,26 @@ Built-in cues (move, capture, check, checkmate, victory, defeat, and draw) reuse
 ```
 
 The `prepareAudio()` helper lets you unlock and preload sounds during your own UI gesture (to satisfy autoplay restrictions) if your players won't click on the board directly.
+
+## Custom pieces
+
+Bring your own artwork by filling the hidden slots for each piece. Add `<img>` elements with slot names like `piece-white-queen` inside the component and every rendering surface (board, captured pieces, promotions) swaps to your graphics. Leave any slot empty to keep the default set.
+
+```html
+<hexchess-board board="start">
+  <img slot="piece-white-queen" src="/pieces/white-queen.svg" />
+  <img slot="piece-black-queen" src="/pieces/black-queen.svg" />
+  <img slot="piece-black-pawn" src="/pieces/black-pawn.svg" />
+</hexchess-board>
+```
+
+Available slots:
+
+- `piece-white-king` / `piece-black-king`
+- `piece-white-queen` / `piece-black-queen`
+- `piece-white-bishop` / `piece-black-bishop`
+- `piece-white-knight` / `piece-black-knight`
+- `piece-white-rook` / `piece-black-rook`
+- `piece-white-pawn` / `piece-black-pawn`
+
+Any image format the browser supports works (PNG, SVG, AVIF, etc.). The board scales assets to match the current hex size, so ship large, crisp art for the sharpest results.

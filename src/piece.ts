@@ -36,6 +36,7 @@ export const renderPiece = (
   piece: Piece,
   size: number = DEFAULT_PIECE_SIZE,
   translate = true,
+  srcOverride?: string,
 ): string => {
   if (piece === null) {
     return '';
@@ -44,11 +45,15 @@ export const renderPiece = (
   if (!id) {
     return '';
   }
+  const src = srcOverride ?? pieceUrls[id];
+  if (!src) {
+    return '';
+  }
   const style = translate
     ? `transform: translate(-${size / 2}px, -${size / 2}px)`
     : '';
   return `<img
-    src="${pieceUrls[id]}"
+    src="${src}"
     style="${style}"
     class="piece"
     height="${size}"

@@ -129,6 +129,8 @@ export class HexchessBoard extends HTMLElement {
   private _rootElement: HTMLDivElement | null = null;
   private _gameInfoContainer: HTMLDivElement | null = null;
   private _promotionHost: HTMLDivElement | null = null;
+  private _pieceSlots: Partial<Record<Piece, HTMLSlotElement>> = {};
+  private _customPieceAssets: Partial<Record<Piece, string>> = {};
   private _styleElement: HTMLStyleElement | null = null;
   private _renderPending = false;
   private _needsRender = false;
@@ -670,7 +672,13 @@ export class HexchessBoard extends HTMLElement {
       overlayHost.classList.add('promotion-host');
       overlayHost.addEventListener('click', this._boundPromotionClick);
 
-      wrapper.append(canvas, gameInfo, overlayHost);
+      const slotHost = document.createElement('div');
+      slotHost.classList.add('piece-slot-host');
+      slotHost.style.display = 'none';
+      slotHost.setAttribute('aria-hidden', 'true');
+      this._initializePieceSlots(slotHost);
+
+      wrapper.append(canvas, gameInfo, overlayHost, slotHost);
       root.append(wrapper);
 
       this._rootElement = wrapper;
@@ -686,6 +694,64 @@ export class HexchessBoard extends HTMLElement {
         this._configureCanvasSize();
       }
     }
+  }
+
+  private _initializePieceSlots(container: HTMLDivElement): void {
+    const pieces = Object.keys(PIECE_ASSET_IDS) as Piece[];
+    for (const entry of pieces) {
+      if (this._pieceSlots[entry]) {
+        continue;
+      }
+      const slot = document.createElement('slot');
+      slot.name = this._getPieceSlotName(entry);
+      const pieceType = entry;
+      slot.addEventListener('slotchange', () =>
+        this._handlePieceSlotChange(pieceType),
+      );
+      container.appendChild(slot);
+      this._pieceSlots[pieceType] = slot;
+    }
+    queueMicrotask(() => {
+      for (const piece of pieces) {
+        this._handlePieceSlotChange(piece);
+      }
+    });
+  }
+
+  private _getPieceSlotName(piece: Piece): string {
+    const assetId = PIECE_ASSET_IDS[piece];
+    return assetId ? `piece-${assetId}` : '';
+  }
+
+  private _handlePieceSlotChange(piece: Piece) {
+    const slot = this._pieceSlots[piece];
+    if (!slot) {
+      return;
+    }
+    const assigned = slot.assignedElements({ flatten: true });
+    const image = assigned.find(
+      (node): node is HTMLImageElement => node instanceof HTMLImageElement,
+    );
+    if (image && image.src) {
+      const nextSrc = image.currentSrc || image.src;
+      if (nextSrc) {
+        if (!image.complete) {
+          image.addEventListener('load', () => this._scheduleRedraw(), {
+            once: true,
+          });
+        }
+        if (this._customPieceAssets[piece] !== nextSrc) {
+          this._customPieceAssets[piece] = nextSrc;
+          delete this._pieceImages[piece];
+        }
+      }
+    } else if (this._customPieceAssets[piece]) {
+      delete this._customPieceAssets[piece];
+      delete this._pieceImages[piece];
+    }
+    this._updateGameInfo();
+    this._updatePromotionOverlay();
+    this._scheduleRedraw();
   }
 
   private _updateCanvasCursor(): void {
@@ -1404,7 +1470,12 @@ export class HexchessBoard extends HTMLElement {
               this._polygonHeight
             }px; background-color: var(--hexchess-board-bg, #fcfaf2);"
           >
-            ${renderPiece(option, this._pieceSize, false)}
+            ${renderPiece(
+              option,
+              this._pieceSize,
+              false,
+              this._getPieceAssetUrl(option) ?? undefined,
+            )}
           </div>`;
       })
       .join('');
@@ -1434,7 +1505,12 @@ export class HexchessBoard extends HTMLElement {
         const padding =
           numPiece * capturedPieceSize * this._capturedPiecePadding;
         return `<div style="position: relative; left: ${padding}px">
-              ${renderPiece(piece, capturedPieceSize)}
+              ${renderPiece(
+                piece,
+                capturedPieceSize,
+                true,
+                this._getPieceAssetUrl(piece) ?? undefined,
+              )}
             </div>`;
       })
       .join('');
@@ -2182,18 +2258,33 @@ export class HexchessBoard extends HTMLElement {
     return typeof performance !== 'undefined' ? performance.now() : Date.now();
   }
 
-  private _loadPieceImage(piece: Piece): HTMLImageElement | null {
+  private _getPieceAssetUrl(piece: Piece): string | null {
+    const custom = this._customPieceAssets[piece];
+    if (custom) {
+      return custom;
+    }
     const assetId = PIECE_ASSET_IDS[piece];
     if (!assetId) {
       return null;
     }
+    return PIECE_ASSET_URLS[assetId];
+  }
+
+  private _loadPieceImage(piece: Piece): HTMLImageElement | null {
+    const src = this._getPieceAssetUrl(piece);
+    if (!src) {
+      return null;
+    }
     const cached = this._pieceImages[piece];
-    if (cached) {
+    if (cached && cached.src === src) {
       return cached.complete ? cached : null;
+    }
+    if (cached && cached.src !== src) {
+      delete this._pieceImages[piece];
     }
     const image = new Image();
     image.crossOrigin = 'anonymous';
-    image.src = PIECE_ASSET_URLS[assetId];
+    image.src = src;
     image.onload = () => this._scheduleRedraw();
     this._pieceImages[piece] = image;
     return image.complete ? image : null;
