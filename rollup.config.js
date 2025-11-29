@@ -26,10 +26,7 @@ if (!Number.isNaN(workerOverride) && workerOverride > 0) {
   terserOptions.numWorkers = workerOverride;
 }
 
-const plugins = [
-  replace({ 'Reflect.decorate': 'undefined' }),
-  resolve(),
-];
+const plugins = [replace({ 'Reflect.decorate': 'undefined' }), resolve()];
 
 if (!disableTerser) {
   /**

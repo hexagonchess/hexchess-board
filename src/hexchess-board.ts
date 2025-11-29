@@ -732,7 +732,7 @@ export class HexchessBoard extends HTMLElement {
     const image = assigned.find(
       (node): node is HTMLImageElement => node instanceof HTMLImageElement,
     );
-    if (image && image.src) {
+    if (image?.src) {
       const nextSrc = image.currentSrc || image.src;
       if (nextSrc) {
         if (!image.complete) {
