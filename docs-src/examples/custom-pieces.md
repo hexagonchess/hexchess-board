@@ -16,11 +16,6 @@ description: Override the built-in set with slots
       src="https://raw.githubusercontent.com/clarkerubber/Staunton-Pieces/master/Trophies/Big-Gold-Cup.png"
       alt="White king trophy"
     />
-    <img
-      slot="piece-black-king"
-      src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Set_chess_rdt45.svg"
-      alt="Black glass king"
-    />
   </hexchess-board>
 </div>
 
@@ -32,11 +27,6 @@ description: Override the built-in set with slots
     slot="piece-white-king"
     src="https://raw.githubusercontent.com/clarkerubber/Staunton-Pieces/master/Trophies/Big-Gold-Cup.png"
     alt="White king trophy"
-  />
-  <img
-    slot="piece-black-king"
-    src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Set_chess_rdt45.svg"
-    alt="Black glass king"
   />
 </hexchess-board>
 ```
