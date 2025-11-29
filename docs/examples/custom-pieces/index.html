@@ -1,0 +1,96 @@
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><hexchess-board> ⌲ Examples ⌲ Custom pieces</title>
+    <link rel="stylesheet" href="../../docs.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Roboto+Mono">
+    <link href="../../prism-okaidia.css" rel="stylesheet" />
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="/node_modules/lit/polyfill-support.js"></script>
+    <script type="module" src="../../hexchess-board.bundled.js"></script>
+  </head>
+  <body>
+    
+<header>
+  <h1>&lt;hexchess-board></h1>
+  <h2>Chess is better with hexagons</h2>
+</header>
+    
+<nav>
+  <a href="../../">Home</a>
+  <a href="../">Examples</a>
+  <a href="../../api/">API</a>
+  <a href="../../install/">Install</a>
+</nav>
+    <div id="main-wrapper">
+      <main>
+        
+    <h1>Example: Custom pieces</h1>
+    <section class="examples">
+      <nav class="collection">
+        <ul>
+          
+                  <li class=>
+                    <a href="../change-look/">Changing the look and feel of the board</a>
+                  </li>
+                
+                  <li class=selected>
+                    <a href="">Override the built-in set with slots</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../darkmode/">Dark and light modes are both supported.</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../hexfen/">Customizing the board layout with Hex-FEN</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../">Common keyboard operations</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../player-roles/">Set player roles</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../preset-moves/">Analyzing a game that has a specific set of moves played.</a>
+                  </li>
+                
+        </ul>
+      </nav>
+      <div>
+        <script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<script type="module" src="https://esm.sh/@hexchess/hexchess-board@latest/hexchess-board.js?module"></script>
+<div style="width: 575px; height: 500px">
+  <hexchess-board board="start">
+    <img
+      slot="piece-white-king"
+      src="https://raw.githubusercontent.com/clarkerubber/Staunton-Pieces/master/Trophies/Big-Gold-Cup.png"
+      alt="White king trophy"
+    />
+  </hexchess-board>
+</div>
+<h3>HTML</h3>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span> <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>img</span><br>    <span class="token attr-name">slot</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>piece-white-king<span class="token punctuation">"</span></span><br>    <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://raw.githubusercontent.com/clarkerubber/Staunton-Pieces/master/Trophies/Big-Gold-Cup.png<span class="token punctuation">"</span></span><br>    <span class="token attr-name">alt</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>White king trophy<span class="token punctuation">"</span></span><br>  <span class="token punctuation">/></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>hexchess-board</span><span class="token punctuation">></span></span></code></pre>
+<p>Add <code>&lt;img&gt;</code> tags for any other slot (<code>piece-white-queen</code>, <code>piece-black-pawn</code>, etc.) to override more pieces. Every surface of the component (canvas, captured pieces, promotions) swaps to the provided art automatically.</p>
+
+      </div>
+    </section>
+  
+      </main>
+    </div>
+    
+<footer>
+  <p>
+    Made with
+    <a href="https://github.com/lit/lit-element-starter-ts">lit-starter-ts</a>
+  </p>
+</footer>
+  </body>
+</html>

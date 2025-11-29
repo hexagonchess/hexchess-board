@@ -12,7 +12,7 @@
 |:--------:|:----:|
 |![](./gifs/hexchess-perf.gif)|![](./gifs/hexchess-resize-perf.gif)|
 
-2. Completely customizable - every single color you see can be changed to whatever fits your style and liking! Soon, we will support [slots](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot), which will also allow you to customize the pieces on the board.
+2. Completely customizable - every single color you see can be changed to whatever fits your style and liking! Provide your own artwork via [slots](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) (for example, `piece-white-queen`) to override the built-in piece set.
 
 3. Can be standalone without a server! `hexchess-board` ships with a complete game engine that can detect illegal moves, checkmate, stalemate, and more! You can play with two players on the same laptop without any other dependencies, should you choose.
 
@@ -61,6 +61,29 @@ startButton.addEventListener('click', () => {
 ```
 
 If you want to reuse the shipped cues from JS you can import `DEFAULT_SOUND_PACK` from the package and merge it with your overrides.
+
+## Custom pieces
+
+Slots expose each piece so you can bring your own set without forking the component. Drop `<img>` tags inside the element with the matching slot name and the board, captured piece tray, and promotion dialog will automatically switch to your artwork.
+
+```html
+<hexchess-board board="start">
+  <img slot="piece-white-queen" src="/pieces/white-queen.svg" />
+  <img slot="piece-black-queen" src="/pieces/black-queen.svg" />
+  <img slot="piece-black-pawn" src="/pieces/black-pawn.svg" />
+</hexchess-board>
+```
+
+| Slot name | Piece |
+| --------- | ----- |
+| `piece-white-king` / `piece-black-king` | King (`K`/`k`) |
+| `piece-white-queen` / `piece-black-queen` | Queen (`Q`/`q`) |
+| `piece-white-bishop` / `piece-black-bishop` | Bishop (`B`/`b`) |
+| `piece-white-knight` / `piece-black-knight` | Knight (`N`/`n`) |
+| `piece-white-rook` / `piece-black-rook` | Rook (`R`/`r`) |
+| `piece-white-pawn` / `piece-black-pawn` | Pawn (`P`/`p`) |
+
+Only the slots you fill are overridden—the rest fall back to the bundled Wikimedia set—so you can replace one piece or the entire collection. Since the board draws onto a canvas, use `<img>` elements (any format the browser can load works, including SVG and PNG). The component scales everything to the current board size, so ship high-resolution art for the cleanest result.
 
 ## Installing
 
