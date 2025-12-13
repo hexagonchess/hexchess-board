@@ -223,7 +223,7 @@ export const stringToMoves = (movesStr: string): Move[] => {
     const move = moves[i];
     if (move === RESIGNATION_MARKER) {
       if (i !== moves.length - 1) {
-        throw new Error(`Invalid move: ${move}`);
+        throw new Error('Cannot process resignation when subsequent moves still exist.');
       }
       break;
     }

@@ -125,7 +125,7 @@ describe('Utils', () => {
 
     expect(stringToMoves(`${base},R`)).toEqual(expected);
     expect(stringToMoves('R')).toEqual([]);
-    expect(() => stringToMoves('R,B1-B3')).toThrow('Invalid move: R');
+    expect(() => stringToMoves('R,B1-B3')).toThrow('Cannot process resignation when subsequent moves still exist.');
   });
 
   test('fenToBoard falls back to an empty board for invalid input', () => {
