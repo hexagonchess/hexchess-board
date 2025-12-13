@@ -45,6 +45,8 @@ Since hexagonal chess has no castling, we do not need to deal with that notation
 
 Lastly, promotion is handled with the `=` sign. So a white pawn that moved from `A5` to `A6` and became a Rook would be written as `A5-A6=R`.
 
+If a player resigns instead of being checkmated, append `,R` to the end of the moves list. The alternating turn order already encodes which player resigned, so the marker only needs to appear once at the end.
+
 ```html
 <div style="width: 575px; height: 500px">
   <hexchess-board

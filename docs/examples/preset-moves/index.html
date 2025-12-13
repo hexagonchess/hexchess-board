@@ -39,15 +39,7 @@
                   </li>
                 
                   <li class=>
-                    <a href="../custom-pieces/">Override the built-in set with slots</a>
-                  </li>
-                
-                  <li class=>
                     <a href="../darkmode/">Dark and light modes are both supported.</a>
-                  </li>
-                
-                  <li class=>
-                    <a href="../hexfen/">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
                   <li class=>
@@ -60,6 +52,14 @@
                 
                   <li class=selected>
                     <a href="">Analyzing a game that has a specific set of moves played.</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../custom-pieces/">Override the built-in set with slots</a>
+                  </li>
+                
+                  <li class=>
+                    <a href="../hexfen/">Customizing the board layout with Hex-FEN</a>
                   </li>
                 
         </ul>
@@ -96,6 +96,7 @@
 <p>En passant captures are notated with an <code>$</code> at the end. This is done to simplify the format of notations into a standard of a square, followed by <code>x</code> or <code>-</code>, followed by a square, and then either <code>$</code> or <code>=</code>.</p>
 <p>Since hexagonal chess has no castling, we do not need to deal with that notation.</p>
 <p>Lastly, promotion is handled with the <code>=</code> sign. So a white pawn that moved from <code>A5</code> to <code>A6</code> and became a Rook would be written as <code>A5-A6=R</code>.</p>
+<p>If a player resigns instead of being checkmated, append <code>,R</code> to the end of the moves list. The alternating turn order already encodes which player resigned, so the marker only needs to appear once at the end.</p>
 <pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">width</span><span class="token punctuation">:</span> 575px<span class="token punctuation">;</span> <span class="token property">height</span><span class="token punctuation">:</span> 500px</span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span><br>  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hexchess-board</span><br>    <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>hexchess-board<span class="token punctuation">"</span></span><br>    <span class="token attr-name">board</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>start<span class="token punctuation">"</span></span><br>    <span class="token attr-name">orientation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>white<span class="token punctuation">"</span></span><br>    <span class="token attr-name">moves</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>B1-B3,B7-B5,C2-C4,D7-D5,C4xD5p,F11xB3P,C1xC7p<span class="token punctuation">"</span></span><br>  <span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>hexchess-board</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span></code></pre>
 <div style="width: 575px; height: 500px">
   <hexchess-board

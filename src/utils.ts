@@ -1,6 +1,8 @@
 import { Board } from './board';
 import type { Color, Move, Piece } from './types';
 
+export const RESIGNATION_MARKER = 'R';
+
 export const COLUMN_ARRAY = [
   'A',
   'B',
@@ -188,7 +190,7 @@ export const fenToBoard = (position: string | null): Board => {
   return converted;
 };
 
-export const movesToString = (moves: Move[]): string => {
+export const movesToString = (moves: Move[], resigned = false): string => {
   const result: string[] = [];
   for (const move of moves) {
     let newString = move.capturedPiece
@@ -202,6 +204,9 @@ export const movesToString = (moves: Move[]): string => {
     }
     result.push(newString);
   }
+  if (resigned) {
+    result.push(RESIGNATION_MARKER);
+  }
   return result.join(',');
 };
 
@@ -214,7 +219,16 @@ export const stringToMoves = (movesStr: string): Move[] => {
 
   const moves = movesStr.split(',');
   const result: Move[] = [];
-  for (const move of moves) {
+  for (let i = 0; i < moves.length; i++) {
+    const move = moves[i];
+    if (move === RESIGNATION_MARKER) {
+      if (i !== moves.length - 1) {
+        throw new Error(
+          'Cannot process resignation when subsequent moves still exist.',
+        );
+      }
+      break;
+    }
     if (!moveRegex.test(move)) {
       throw new Error(`Invalid move: ${move}`);
     }
