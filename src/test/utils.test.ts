@@ -37,6 +37,67 @@ describe('Utils', () => {
     expect(movesToString(moves, true)).toBe(`${encoded},R`);
   });
 
+  test('Move strings round-trip without losing information', () => {
+    const moves: Move[] = [
+      { from: 'B1', to: 'B3', enPassant: false, promotion: null },
+      { from: 'C7', to: 'C5', enPassant: false, promotion: null },
+      { from: 'B3', to: 'B4', enPassant: false, promotion: null },
+      {
+        from: 'C5',
+        to: 'B4',
+        capturedPiece: 'P',
+        enPassant: false,
+        promotion: null,
+      },
+      { from: 'D3', to: 'D5', enPassant: false, promotion: null },
+      { from: 'E7', to: 'E5', enPassant: false, promotion: null },
+      {
+        from: 'D5',
+        to: 'E6',
+        capturedPiece: 'p',
+        enPassant: true,
+        promotion: null,
+      },
+      { from: 'B4', to: 'B3', enPassant: false, promotion: null },
+      {
+        from: 'E6',
+        to: 'F7',
+        capturedPiece: 'p',
+        enPassant: false,
+        promotion: null,
+      },
+      { from: 'B3', to: 'B2', enPassant: false, promotion: null },
+      {
+        from: 'F7',
+        to: 'G7',
+        capturedPiece: 'p',
+        enPassant: false,
+        promotion: null,
+      },
+      { from: 'B2', to: 'B1', enPassant: false, promotion: 'q' },
+    ];
+
+    const encoded = movesToString(moves);
+    expect(stringToMoves(encoded)).toEqual(moves);
+  });
+
+  test('Move strings round-trip when resignation is included', () => {
+    const moves: Move[] = [
+      { from: 'A1', to: 'A2', enPassant: false, promotion: null },
+      {
+        from: 'B2',
+        to: 'A3',
+        capturedPiece: 'n',
+        enPassant: false,
+        promotion: null,
+      },
+    ];
+
+    const encoded = movesToString(moves, true);
+    expect(encoded.endsWith(',R')).toBe(true);
+    expect(stringToMoves(encoded)).toEqual(moves);
+  });
+
   test('Converts a CSV string to moves properly', () => {
     const moveStr =
       'B1-B3,C7-C5,B3-B4,C5xB4P,D3-D5,E7-E5,D5xE6p$,B4-B3,E6xF7p,B3-B2,F7xG7p,B2-B1=q';
