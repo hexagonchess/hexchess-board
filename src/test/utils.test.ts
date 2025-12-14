@@ -37,6 +37,17 @@ describe('Utils', () => {
     expect(movesToString(moves, true)).toBe(`${encoded},R`);
   });
 
+  test('Move strings support all termination markers', () => {
+    const moves: Move[] = [
+      { from: 'A1', to: 'A2', enPassant: false, promotion: null },
+    ];
+    const base = movesToString(moves);
+    expect(movesToString(moves, 'resignation')).toBe(`${base},R`);
+    expect(movesToString(moves, 'checkmate')).toBe(`${base},#`);
+    expect(movesToString(moves, 'draw')).toBe(`${base},D`);
+    expect(movesToString(moves, 'timeout')).toBe(`${base},T`);
+  });
+
   test('Move strings round-trip without losing information', () => {
     const moves: Move[] = [
       { from: 'B1', to: 'B3', enPassant: false, promotion: null },
@@ -187,7 +198,32 @@ describe('Utils', () => {
     expect(stringToMoves(`${base},R`)).toEqual(expected);
     expect(stringToMoves('R')).toEqual([]);
     expect(() => stringToMoves('R,B1-B3')).toThrow(
-      'Cannot process resignation when subsequent moves still exist.',
+      'Cannot process resignation marker when subsequent moves still exist.',
+    );
+  });
+
+  test('stringToMoves handles additional game termination markers', () => {
+    const moves: Move[] = [
+      { from: 'A1', to: 'A2', enPassant: false, promotion: null },
+      { from: 'B2', to: 'B3', enPassant: false, promotion: null },
+    ];
+    const base = movesToString(moves);
+    expect(stringToMoves(`${base},#`)).toEqual(moves);
+    expect(stringToMoves(`${base},D`)).toEqual(moves);
+    expect(stringToMoves(`${base},T`)).toEqual(moves);
+
+    expect(stringToMoves('#')).toEqual([]);
+    expect(stringToMoves('D')).toEqual([]);
+    expect(stringToMoves('T')).toEqual([]);
+
+    expect(() => stringToMoves('#,A1-A2')).toThrow(
+      'Cannot process checkmate marker when subsequent moves still exist.',
+    );
+    expect(() => stringToMoves('D,A1-A2')).toThrow(
+      'Cannot process draw marker when subsequent moves still exist.',
+    );
+    expect(() => stringToMoves('T,A1-A2')).toThrow(
+      'Cannot process timeout marker when subsequent moves still exist.',
     );
   });
 

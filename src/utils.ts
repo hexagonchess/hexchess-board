@@ -2,6 +2,33 @@ import { Board } from './board';
 import type { Color, Move, Piece } from './types';
 
 export const RESIGNATION_MARKER = 'R';
+export const CHECKMATE_MARKER = '#';
+export const DRAW_MARKER = 'D';
+export const TIMEOUT_MARKER = 'T';
+
+export type GameTermination = 'resignation' | 'checkmate' | 'draw' | 'timeout';
+
+type GameTerminationMarker =
+  | typeof RESIGNATION_MARKER
+  | typeof CHECKMATE_MARKER
+  | typeof DRAW_MARKER
+  | typeof TIMEOUT_MARKER;
+
+const TERMINATION_MARKERS: Record<GameTermination, GameTerminationMarker> = {
+  resignation: RESIGNATION_MARKER,
+  checkmate: CHECKMATE_MARKER,
+  draw: DRAW_MARKER,
+  timeout: TIMEOUT_MARKER,
+};
+
+const TERMINATION_LABELS: Record<GameTerminationMarker, string> = {
+  [RESIGNATION_MARKER]: 'resignation',
+  [CHECKMATE_MARKER]: 'checkmate',
+  [DRAW_MARKER]: 'draw',
+  [TIMEOUT_MARKER]: 'timeout',
+};
+
+type MovesToStringTerminator = GameTermination | boolean | undefined;
 
 export const COLUMN_ARRAY = [
   'A',
@@ -190,7 +217,10 @@ export const fenToBoard = (position: string | null): Board => {
   return converted;
 };
 
-export const movesToString = (moves: Move[], resigned = false): string => {
+export const movesToString = (
+  moves: Move[],
+  terminator?: MovesToStringTerminator,
+): string => {
   const result: string[] = [];
   for (const move of moves) {
     let newString = move.capturedPiece
@@ -204,8 +234,14 @@ export const movesToString = (moves: Move[], resigned = false): string => {
     }
     result.push(newString);
   }
-  if (resigned) {
-    result.push(RESIGNATION_MARKER);
+  const normalizedTerminator =
+    typeof terminator === 'boolean'
+      ? terminator
+        ? 'resignation'
+        : undefined
+      : terminator;
+  if (normalizedTerminator) {
+    result.push(TERMINATION_MARKERS[normalizedTerminator]);
   }
   return result.join(',');
 };
@@ -221,10 +257,10 @@ export const stringToMoves = (movesStr: string): Move[] => {
   const result: Move[] = [];
   for (let i = 0; i < moves.length; i++) {
     const move = moves[i];
-    if (move === RESIGNATION_MARKER) {
+    if (move in TERMINATION_LABELS) {
       if (i !== moves.length - 1) {
         throw new Error(
-          'Cannot process resignation when subsequent moves still exist.',
+          `Cannot process ${TERMINATION_LABELS[move as GameTerminationMarker]} marker when subsequent moves still exist.`,
         );
       }
       break;
